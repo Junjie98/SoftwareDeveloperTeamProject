@@ -3,6 +3,8 @@ package events;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import akka.actor.ActorRef;
+import commandbuilders.TileDrawCommandBuilder;
+import commandbuilders.TileModes;
 import commands.BasicCommands;
 import demo.CommandDemo;
 import structures.GameState;
@@ -29,8 +31,14 @@ public class Initalize implements EventProcessor{
 		// Setup the board
 		for (int idx = 0; idx < 9; idx++) {
 			for (int jdx = 0; jdx < 5; jdx++) {
-				Tile tile = BasicObjectBuilders.loadTile(idx, jdx);
-				BasicCommands.drawTile(out, tile, 0);
+				// 1 - This uses the builder created by the professor
+				// Tile tile = BasicObjectBuilders.loadTile(idx, jdx);
+				// BasicCommands.drawTile(out, tile, 0);
+
+				// 2 - This is the same thing using the command builder in the commandbuilders package.
+				new TileDrawCommandBuilder(out)
+						.setX(idx).setY(jdx).setMode(TileModes.NORMAL)
+						.issueCommand();
 			}
 		}
 	}

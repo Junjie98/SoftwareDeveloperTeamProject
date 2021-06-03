@@ -4,12 +4,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 import akka.actor.ActorRef;
 import commandbuilders.TileDrawCommandBuilder;
-import commandbuilders.TileModes;
-import commands.BasicCommands;
-import demo.CommandDemo;
+import commandbuilders.States;
 import structures.GameState;
-import structures.basic.Tile;
-import utils.BasicObjectBuilders;
 
 /**
  * Indicates that both the core game loop in the browser is starting, meaning
@@ -37,10 +33,14 @@ public class Initalize implements EventProcessor{
 
 				// 2 - This is the same thing using the command builder in the commandbuilders package.
 				new TileDrawCommandBuilder(out)
-						.setX(idx).setY(jdx).setMode(TileModes.NORMAL)
+						.setX(idx).setY(jdx).setMode(States.NORMAL)
 						.issueCommand();
 			}
 		}
+
+		// Draw Card
+		// Player (turn)
+		gameState.drawCard(out);
 	}
 
 }

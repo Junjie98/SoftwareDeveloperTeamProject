@@ -1,5 +1,10 @@
 package structures;
 
+import akka.actor.ActorRef;
+import commandbuilders.DrawCardCommandBuilder;
+import commandbuilders.States;
+import decks.*;
+
 /**
  * This class can be used to hold information about the on-going game.
  * Its created with the GameActor.
@@ -9,6 +14,12 @@ package structures;
  */
 public class GameState {
     private Players turn = Players.PLAYER1;
+    private int player1CardsInHand = 0;
+    private int player2CardsInHand = 0;  // Not used yet.
+    private final int MAX_NUM_OF_CARD_IN_HAND = 5;
+
+    private DeckOne deck1 = new DeckOne();
+    private DeckTwo deck2 = new DeckTwo();
 
     public void nextTurn() {
         if (turn == Players.PLAYER1) {
@@ -24,5 +35,20 @@ public class GameState {
 
     public void setTurn(Players player) {
         turn = player;
+    }
+
+    public void drawCard(ActorRef out) {
+        if (turn == Players.PLAYER1) {
+            if (player1CardsInHand < MAX_NUM_OF_CARD_IN_HAND) {
+                new DrawCardCommandBuilder(out)
+                        .setCard(deck1.nextCard())
+                        .setPosition(player1CardsInHand)
+                        .setMode(States.NORMAL)
+                        .issueCommand();
+                player1CardsInHand++;
+            }
+        } else if (turn == Players.PLAYER2) {
+            player2CardsInHand++;
+        }
     }
 }

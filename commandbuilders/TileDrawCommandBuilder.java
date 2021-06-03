@@ -8,7 +8,7 @@ import utils.BasicObjectBuilders;
 public class TileDrawCommandBuilder extends CommandBuilder {
     private int x = 0;
     private int y = 0;
-    private TileModes mode = TileModes.NORMAL;
+    private States mode = States.NORMAL;
     ActorRef reference;
 
     public TileDrawCommandBuilder(ActorRef out) {
@@ -24,7 +24,7 @@ public class TileDrawCommandBuilder extends CommandBuilder {
         return this;
     }
 
-    public TileDrawCommandBuilder setMode(TileModes selected) {
+    public TileDrawCommandBuilder setMode(States selected) {
         mode = selected;
         return this;
     }
@@ -32,7 +32,7 @@ public class TileDrawCommandBuilder extends CommandBuilder {
     @Override
     public void issueCommand() {
         Tile tile = BasicObjectBuilders.loadTile(x, y);
-        int drawMode = (mode == TileModes.HIGHLIGHTED) ? 1 : 0;
+        int drawMode = (mode == States.HIGHLIGHTED) ? 1 : 0;
         BasicCommands.drawTile(reference, tile, drawMode);
     }
 }

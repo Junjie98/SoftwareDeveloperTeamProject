@@ -8,9 +8,7 @@ package structures;
  *
  */
 public class GameState {
-    Players turn = Players.PLAYER1;     // TODO: This should not be initialised this way.
-                                            // This is done this way for testing.
-    boolean turnChanged = true;
+    private Players turn = Players.PLAYER1;
 
     public void nextTurn() {
         if (turn == Players.PLAYER1) {
@@ -18,16 +16,13 @@ public class GameState {
         } else {
             turn = Players.PLAYER1;
         }
-        turnChanged = true;
     }
 
     public Players getTurn() {
         return turn;
     }
 
-    public boolean isTurnChanged() {
-        boolean temp = turnChanged;
-        turnChanged = false;
-        return temp;
+    public void setTurn(Players player) {
+        turn = player;
     }
 }

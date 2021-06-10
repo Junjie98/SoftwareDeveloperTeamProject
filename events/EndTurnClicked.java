@@ -3,7 +3,7 @@ package events;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import akka.actor.ActorRef;
-import commands.BasicCommands;
+import commandbuilders.PlayerNotificationCommandBuilder;
 import structures.GameState;
 import structures.Players;
 
@@ -28,11 +28,23 @@ public class EndTurnClicked implements EventProcessor{
 
 	private void processChangedTurns(ActorRef out, GameState gameState) {
 		if (gameState.getTurn() == Players.PLAYER1) {
-			BasicCommands.addPlayer1Notification(out, "Player 1's turn", 2);
+			new PlayerNotificationCommandBuilder(out)
+					.setMessage("Player 1's turn")
+					.setDisplaySeconds(2)
+					.setPlayer(Players.PLAYER1)
+					.issueCommand();
+
 			// TODO: Perform things that should be done on Player 1's turn.
 			gameState.drawCard(out, Players.PLAYER1);
 		} else {
-			BasicCommands.addPlayer1Notification(out, "Player 2's turn", 2);
+			// Setting Player to PLAYER2 should in theory work.
+			// However, it is not properly supported by the front-end so it is strongly discouraged.
+			new PlayerNotificationCommandBuilder(out)
+					.setMessage("Player 2's turn")
+					.setDisplaySeconds(2)
+					.setPlayer(Players.PLAYER1)
+					.issueCommand();
+
 			// TODO: Perform things that should be done on Player 2's turn.
 			gameState.drawCard(out, Players.PLAYER2);
 		}

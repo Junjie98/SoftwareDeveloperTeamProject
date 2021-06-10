@@ -2,10 +2,14 @@ package structures;
 
 import akka.actor.ActorRef;
 import commandbuilders.CardInHandCommandBuilder;
+import commandbuilders.PlayerSetCommandsBuilder;
 import commandbuilders.enums.CardInHandCommandMode;
+import commandbuilders.enums.PlayerStats;
+import commandbuilders.enums.Players;
 import commandbuilders.enums.States;
 import decks.*;
 import structures.basic.Card;
+import structures.basic.Player;
 
 /**
  * This class can be used to hold information about the on-going game.
@@ -20,6 +24,8 @@ public class GameState {
 
     private Players turn = Players.PLAYER1;
     // TODO: This should be randomised according to game loop.
+
+    private Player player1, player2;
 
     private Card[] player1CardsInHand = new Card[MAX_CARD_COUNT_IN_HAND];
     private int player1CardsInHandCount = 0;
@@ -43,6 +49,22 @@ public class GameState {
 
     public void setTurn(Players player) {
         turn = player;
+    }
+
+    public void generateTwoUsers(ActorRef out) {
+        player1 = new Player();
+        player2 = new Player();
+
+        new PlayerSetCommandsBuilder(out)
+                .setPlayer(Players.PLAYER1)
+                .setStats(PlayerStats.ALL)
+                .setInstance(player1)
+                .issueCommand();
+        new PlayerSetCommandsBuilder(out)
+                .setPlayer(Players.PLAYER2)
+                .setStats(PlayerStats.ALL)
+                .setInstance(player2)
+                .issueCommand();
     }
 
     // This method add 3 cards to both Players as part of initialisation.

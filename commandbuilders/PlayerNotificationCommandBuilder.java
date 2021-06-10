@@ -4,7 +4,7 @@ import akka.actor.ActorRef;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import commands.BasicCommands;
 import play.libs.Json;
-import structures.Players;
+import commandbuilders.enums.Players;
 
 public class PlayerNotificationCommandBuilder extends CommandBuilder {
     private final ActorRef reference;

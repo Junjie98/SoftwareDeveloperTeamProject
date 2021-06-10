@@ -33,6 +33,10 @@ public class Initalize implements EventProcessor{
 			}
 		}
 
+		// Create the two users
+		gameState.generateTwoUsers(out);
+
+		// Deal initial cards
 		gameState.drawInitialCards(out);
 	}
 }

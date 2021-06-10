@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import akka.actor.ActorRef;
 import commandbuilders.PlayerNotificationCommandBuilder;
 import structures.GameState;
-import structures.Players;
+import commandbuilders.enums.Players;
 
 /**
  * Indicates that the user has clicked an object on the game canvas, in this case

@@ -24,9 +24,12 @@ public class Initalize implements EventProcessor{
 	public void processEvent(ActorRef out, GameState gameState, JsonNode message) {
 		// CommandDemo.executeDemo(out); // this executes the command demo, comment out this when implementing your solution
 
+		final int INITIAL_CARD_COUNT = 3;
+
 		// Setup the board
 		for (int idx = 0; idx < 9; idx++) {
 			for (int jdx = 0; jdx < 5; jdx++) {
+				// TODO: Decide whether we want CommandBuilders
 				// 1 - This uses the builder created by the professor
 				// Tile tile = BasicObjectBuilders.loadTile(idx, jdx);
 				// BasicCommands.drawTile(out, tile, 0);
@@ -40,7 +43,9 @@ public class Initalize implements EventProcessor{
 
 		// Draw Card
 		// Player (turn)
-		gameState.drawCard(out);
+		for (int idx = 0; idx < INITIAL_CARD_COUNT; idx++) {
+			gameState.drawCard(out);
+		}
 	}
 
 }

@@ -15,8 +15,8 @@ import decks.*;
 public class GameState {
     private Players turn = Players.PLAYER1;
     private int player1CardsInHand = 0;
-    private int player2CardsInHand = 0;  // Not used yet.
-    private final int MAX_NUM_OF_CARD_IN_HAND = 5;
+    private int player2CardsInHand = 0;  // TODO: Player2 card drawing not yet implemented
+    private final int MAX_CARD_COUNT_IN_HAND = 6;
 
     private DeckOne deck1 = new DeckOne();
     private DeckTwo deck2 = new DeckTwo();
@@ -39,7 +39,7 @@ public class GameState {
 
     public void drawCard(ActorRef out) {
         if (turn == Players.PLAYER1) {
-            if (player1CardsInHand < MAX_NUM_OF_CARD_IN_HAND) {
+            if (player1CardsInHand < MAX_CARD_COUNT_IN_HAND) {
                 new DrawCardCommandBuilder(out)
                         .setCard(deck1.nextCard())
                         .setPosition(player1CardsInHand)
@@ -48,6 +48,7 @@ public class GameState {
                 player1CardsInHand++;
             }
         } else if (turn == Players.PLAYER2) {
+            // TODO: Player2 card drawing not yet implemented
             player2CardsInHand++;
         }
     }

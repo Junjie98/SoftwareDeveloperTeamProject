@@ -7,10 +7,10 @@ import play.libs.Json;
 import structures.Players;
 
 public class PlayerNotificationCommandBuilder extends CommandBuilder {
-    ActorRef reference;
-    String message = "";
-    int seconds = 2;
-    Players player = Players.PLAYER1;
+    private final ActorRef reference;
+    private String message = "";
+    private int seconds = 2;
+    private Players player = Players.PLAYER1;
 
     public PlayerNotificationCommandBuilder(ActorRef out) {
         reference = out;
@@ -31,6 +31,7 @@ public class PlayerNotificationCommandBuilder extends CommandBuilder {
         return this;
     }
 
+    @Override
     public void issueCommand() {
         if (player == Players.PLAYER1) {
             BasicCommands.addPlayer1Notification(reference, message, seconds);

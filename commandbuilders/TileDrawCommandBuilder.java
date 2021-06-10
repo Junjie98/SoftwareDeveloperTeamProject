@@ -1,15 +1,16 @@
 package commandbuilders;
 
 import akka.actor.ActorRef;
+import commandbuilders.enums.States;
 import commands.BasicCommands;
 import structures.basic.Tile;
 import utils.BasicObjectBuilders;
 
 public class TileDrawCommandBuilder extends CommandBuilder {
+    private final ActorRef reference;
+    private States mode = States.NORMAL;
     private int x = 0;
     private int y = 0;
-    private States mode = States.NORMAL;
-    ActorRef reference;
 
     public TileDrawCommandBuilder(ActorRef out) {
         reference = out;

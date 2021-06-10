@@ -1,3 +1,3 @@
-package commandbuilders;
+package commandbuilders.enums;
 
 public enum States { HIGHLIGHTED, NORMAL }

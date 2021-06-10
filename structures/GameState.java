@@ -2,8 +2,8 @@ package structures;
 
 import akka.actor.ActorRef;
 import commandbuilders.CardInHandCommandBuilder;
-import commandbuilders.CardInHandCommandMode;
-import commandbuilders.States;
+import commandbuilders.enums.CardInHandCommandMode;
+import commandbuilders.enums.States;
 import decks.*;
 import structures.basic.Card;
 
@@ -83,7 +83,7 @@ public class GameState {
                         .setCommandMode(CardInHandCommandMode.DRAW)
                         .setCard(currentCardInHand[idx])
                         .setPosition(idx)
-                        .setMode(States.NORMAL)
+                        .setState(States.NORMAL)
                         .issueCommand();
             } else {
                 new CardInHandCommandBuilder(out)

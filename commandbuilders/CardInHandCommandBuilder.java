@@ -1,15 +1,17 @@
 package commandbuilders;
 
 import akka.actor.ActorRef;
+import commandbuilders.enums.CardInHandCommandMode;
+import commandbuilders.enums.States;
 import commands.BasicCommands;
 import structures.basic.Card;
 
 public class CardInHandCommandBuilder extends CommandBuilder {
-    Card card = null;
-    CardInHandCommandMode command = CardInHandCommandMode.DRAW;
+    private final ActorRef reference;
+    private Card card = null;
+    private CardInHandCommandMode command = CardInHandCommandMode.DRAW;
+    private States state = States.NORMAL;
     int position = 0;
-    States mode = States.NORMAL;
-    ActorRef reference;
 
     public CardInHandCommandBuilder(ActorRef out) {
         reference = out;
@@ -30,15 +32,15 @@ public class CardInHandCommandBuilder extends CommandBuilder {
         return this;
     }
 
-    public CardInHandCommandBuilder setMode(States mode) {
-        this.mode = mode;
+    public CardInHandCommandBuilder setState(States state) {
+        this.state = state;
         return this;
     }
 
     @Override
     public void issueCommand() {
         if (command == CardInHandCommandMode.DRAW) {
-            int mode = (this.mode == States.NORMAL) ? 0 : 1;
+            int mode = (this.state == States.NORMAL) ? 0 : 1;
             BasicCommands.drawCard(reference, card, position, mode);
         } else if (command == CardInHandCommandMode.DELETE) {
             BasicCommands.deleteCard(reference, position);

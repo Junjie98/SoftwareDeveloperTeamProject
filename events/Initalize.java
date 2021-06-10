@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 import akka.actor.ActorRef;
 import commandbuilders.TileDrawCommandBuilder;
-import commandbuilders.States;
+import commandbuilders.enums.States;
 import structures.GameState;
 
 /**

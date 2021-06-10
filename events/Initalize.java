@@ -3,7 +3,7 @@ package events;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import akka.actor.ActorRef;
-import commandbuilders.TileDrawCommandBuilder;
+import commandbuilders.TileCommandBuilder;
 import commandbuilders.enums.States;
 import structures.GameState;
 
@@ -27,8 +27,8 @@ public class Initalize implements EventProcessor{
 		// Setup the board
 		for (int idx = 0; idx < 9; idx++) {
 			for (int jdx = 0; jdx < 5; jdx++) {
-				new TileDrawCommandBuilder(out)
-						.setX(idx).setY(jdx).setMode(States.NORMAL)
+				new TileCommandBuilder(out)
+						.setX(idx).setY(jdx).setState(States.NORMAL)
 						.issueCommand();
 			}
 		}

@@ -11,7 +11,7 @@ public class CardInHandCommandBuilder extends CommandBuilder {
     private Card card = null;
     private CardInHandCommandMode command = CardInHandCommandMode.DRAW;
     private States state = States.NORMAL;
-    int position = 0;
+    private int position = 0;
 
     public CardInHandCommandBuilder(ActorRef out) {
         reference = out;

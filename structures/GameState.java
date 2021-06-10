@@ -1,9 +1,11 @@
 package structures;
 
 import akka.actor.ActorRef;
-import commandbuilders.DrawCardCommandBuilder;
+import commandbuilders.CardInHandCommandBuilder;
+import commandbuilders.CardInHandCommandMode;
 import commandbuilders.States;
 import decks.*;
+import structures.basic.Card;
 
 /**
  * This class can be used to hold information about the on-going game.
@@ -13,10 +15,16 @@ import decks.*;
  *
  */
 public class GameState {
-    private Players turn = Players.PLAYER1;
-    private int player1CardsInHand = 0;
-    private int player2CardsInHand = 0;  // TODO: Player2 card drawing not yet implemented
     private final int MAX_CARD_COUNT_IN_HAND = 6;
+    private final int INITIAL_CARD_COUNT = 3;
+
+    private Players turn = Players.PLAYER1;
+    // TODO: This should be randomised according to game loop.
+
+    private Card[] player1CardsInHand = new Card[MAX_CARD_COUNT_IN_HAND];
+    private int player1CardsInHandCount = 0;
+    private Card[] player2CardsInHand = new Card[MAX_CARD_COUNT_IN_HAND];
+    private int player2CardsInHandCount = 0;
 
     private DeckOne deck1 = new DeckOne();
     private DeckTwo deck2 = new DeckTwo();
@@ -37,19 +45,52 @@ public class GameState {
         turn = player;
     }
 
-    public void drawCard(ActorRef out) {
-        if (turn == Players.PLAYER1) {
-            if (player1CardsInHand < MAX_CARD_COUNT_IN_HAND) {
-                new DrawCardCommandBuilder(out)
-                        .setCard(deck1.nextCard())
-                        .setPosition(player1CardsInHand)
+    // This method add 3 cards to both Players as part of initialisation.
+    public void drawInitialCards(ActorRef out) {
+        for (int idx = 0; idx < INITIAL_CARD_COUNT; idx++) {
+            drawNewCardFor(Players.PLAYER1);
+            drawNewCardFor(Players.PLAYER2);
+        }
+        displayCardsOnScreenFor(out, turn);
+    }
+
+    public void drawCard(ActorRef out, Players player) {
+        drawNewCardFor(player);
+        displayCardsOnScreenFor(out, player);
+    }
+
+    private void drawNewCardFor(Players player) {
+        // TODO: This does not protect anything regarding end game logic.
+        if (player == Players.PLAYER1) {
+            if (player1CardsInHandCount < MAX_CARD_COUNT_IN_HAND) {
+                Card temp = deck1.nextCard();
+                player1CardsInHand[player1CardsInHandCount++] = temp;
+            }
+        } else {
+            if (player2CardsInHandCount < MAX_CARD_COUNT_IN_HAND) {
+                Card temp = deck2.nextCard();
+                player2CardsInHand[player2CardsInHandCount++] = temp;
+            }
+        }
+    }
+
+    private void displayCardsOnScreenFor(ActorRef out, Players player) {
+        Card[] currentCardInHand = (player == Players.PLAYER1) ? player1CardsInHand : player2CardsInHand;
+        int currentCardInHandCount = (player == Players.PLAYER2) ? player1CardsInHandCount : player2CardsInHandCount;
+        for (int idx = 0; idx < currentCardInHand.length; idx++) {
+            if (idx < currentCardInHandCount) {
+                new CardInHandCommandBuilder(out)
+                        .setCommandMode(CardInHandCommandMode.DRAW)
+                        .setCard(currentCardInHand[idx])
+                        .setPosition(idx)
                         .setMode(States.NORMAL)
                         .issueCommand();
-                player1CardsInHand++;
+            } else {
+                new CardInHandCommandBuilder(out)
+                        .setCommandMode(CardInHandCommandMode.DELETE)
+                        .setPosition(idx)
+                        .issueCommand();
             }
-        } else if (turn == Players.PLAYER2) {
-            // TODO: Player2 card drawing not yet implemented
-            player2CardsInHand++;
         }
     }
 }

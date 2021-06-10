@@ -24,8 +24,6 @@ public class Initalize implements EventProcessor{
 	public void processEvent(ActorRef out, GameState gameState, JsonNode message) {
 		// CommandDemo.executeDemo(out); // this executes the command demo, comment out this when implementing your solution
 
-		final int INITIAL_CARD_COUNT = 3;
-
 		// Setup the board
 		for (int idx = 0; idx < 9; idx++) {
 			for (int jdx = 0; jdx < 5; jdx++) {
@@ -35,13 +33,8 @@ public class Initalize implements EventProcessor{
 			}
 		}
 
-		// Draw Card
-		// Player (turn)
-		for (int idx = 0; idx < INITIAL_CARD_COUNT; idx++) {
-			gameState.drawCard(out);
-		}
+		gameState.drawInitialCards(out);
 	}
-
 }
 
 

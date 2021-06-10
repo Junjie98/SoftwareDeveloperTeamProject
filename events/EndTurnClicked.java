@@ -30,10 +30,11 @@ public class EndTurnClicked implements EventProcessor{
 		if (gameState.getTurn() == Players.PLAYER1) {
 			BasicCommands.addPlayer1Notification(out, "Player 1's turn", 2);
 			// TODO: Perform things that should be done on Player 1's turn.
-			gameState.drawCard(out);
+			gameState.drawCard(out, Players.PLAYER1);
 		} else {
 			BasicCommands.addPlayer1Notification(out, "Player 2's turn", 2);
 			// TODO: Perform things that should be done on Player 2's turn.
+			gameState.drawCard(out, Players.PLAYER2);
 		}
 	}
 

@@ -9,6 +9,18 @@ import structures.basic.UnitAnimationType;
 import utils.BasicObjectBuilders;
 import utils.StaticConfFiles;
 
+/**
+ * This builder is to display a ProjectTile animation.
+ *
+ * The initialisation step takes the ActorRef that is used to send/receive commands in the front-end side.
+ *
+ * You will need to call .setUnit1(Unit, Tile) and .setUnit2(Unit, Tile) before you issue the command.
+ *
+ * Notice the issueCommand code is now a generalised version of the Demo code. Further testing may reveal some refinements needed.
+ */
+
+// TODO: This may need to be tested and refined.
+
 public class ProjectTileAnimationCommandBuilder extends CommandBuilder {
     private final ActorRef reference;
     private Unit unit1, unit2;

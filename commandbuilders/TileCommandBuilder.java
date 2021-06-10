@@ -3,7 +3,6 @@ package commandbuilders;
 import akka.actor.ActorRef;
 import akka.japi.Effect;
 import commandbuilders.enums.States;
-import commandbuilders.enums.TileAnimationEffect;
 import commandbuilders.enums.TileCommandBuilderMode;
 import commandbuilders.enums.TileEffectAnimation;
 import commands.BasicCommands;
@@ -11,6 +10,21 @@ import structures.basic.EffectAnimation;
 import structures.basic.Tile;
 import utils.BasicObjectBuilders;
 import utils.StaticConfFiles;
+
+/**
+ * This class can be used to send out DRAW or ANIMATION commands for Tiles.
+ *
+ * The initialisation step takes the ActorRef that is used to send/receive commands in the front-end side.
+ *
+ * You will need to specified the mode with .setMode(TileCommandBuilderMode), with the following descriptions:
+ *
+ * You will need to call .setX(int) and .setY(int) to specify the position of the tile.
+ *
+ * - mode DRAW: Use .setState(States) to decide NORMAL or HIGHLIGHTED state of the command.
+ *
+ * - mode ANIMATION: You will need to call .setEffectAnimation(TileEffectAnimation) to set animation.
+ *      It is defined with an enum containing INMOLATION, BUFF, MARTYRDOM, SUMMON options.
+ */
 
 public class TileCommandBuilder extends CommandBuilder {
     private final ActorRef reference;

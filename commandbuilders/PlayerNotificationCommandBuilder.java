@@ -6,6 +6,18 @@ import commands.BasicCommands;
 import play.libs.Json;
 import commandbuilders.enums.Players;
 
+/**
+ * This builder sends out notification in the specified seconds.
+ *
+ * The initialisation step takes the ActorRef that is used to send/receive commands in the front-end side.
+ *
+ * You will need to call .setMessage(String) to set the message, .setDisplaySeconds(int) to set the time to be displayed,
+ *      and .setPlayer(Players) before calling .issueCommand().
+ *
+ * Although the user is defined as enum of PLAYER1 and PLAYER2,
+ *      the PLAYER2 is not properly supported by the front end so it is strongly discouraged to use it.
+ */
+
 public class PlayerNotificationCommandBuilder extends CommandBuilder {
     private final ActorRef reference;
     private String message = "";

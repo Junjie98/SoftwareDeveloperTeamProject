@@ -6,6 +6,21 @@ import commandbuilders.enums.States;
 import commands.BasicCommands;
 import structures.basic.Card;
 
+/**
+ * This builder sends out specified DRAW or DELETE command.
+ *
+ * The initialisation step takes the ActorRef that is used to send/receive commands in the front-end side.
+ *
+ * You will first need to use .setMode(CardInHandCommandMode) to decide the mode to be used. The description is as following:
+ *
+ * - mode DRAW - You will need to call .setCard(Card), .setPosition(int), .setState(States) to set the card to be added,
+ *      the position of the card in the hand, and the NORMAL or HIGHLIGHTED state of the card before called .issueCommand().
+ *      Card state is defined by States, including HIGHLIGHTED, NORMAL.
+ *
+ * - mode DELETE - When set to delete, you will need to call .setPosition(int) to indicate the position of card to be removed.
+ *      Notice any other fields set will be ignored by the .issueCommand() function.
+ */
+
 public class CardInHandCommandBuilder extends CommandBuilder {
     private final ActorRef reference;
     private Card card = null;

@@ -8,6 +8,24 @@ import structures.basic.Tile;
 import structures.basic.Unit;
 import structures.basic.UnitAnimationType;
 
+/**
+ * This command builder is the most flexible command builder, with modes: DRAW, MOVE, SET, DELETE, ANIMATION.
+ *
+ * The initialisation step takes the ActorRef that is used to send/receive commands in the front-end side.
+ *
+ * You will first need to specify the mode by calling .setMode(UnitCommandBuilderMode).
+ * You will need to specify a unit by calling .setUnit(Unit)
+ *
+ * For MOVE and DRAW commands, just specify .setTile(Tile) to specify the target position.
+ *
+ * For setting stats of a unit, use .setStats(UnitStats, int), to set the ATTACK or HEALTH to the following value.
+ *
+ * For ANIMATION, specify one of the UnitAnimationType by calling .setAnimationType(UnitAnimationType), to specify one of
+ *      idle, death, attack, move, channel, hit.
+ *
+ * Each command issuing will only take effect once. Setting the non-required fields will be ignored.
+ */
+
 public class UnitCommandBuilder extends CommandBuilder{
     private final ActorRef reference;
 

@@ -6,6 +6,16 @@ import commandbuilders.enums.Players;
 import commands.BasicCommands;
 import structures.basic.Player;
 
+/**
+ * This builder sends out commands to set stats of the Player.
+ *
+ * The initialisation step takes the ActorRef that is used to send/receive commands in the front-end side.
+ *
+ * You will need to call .setPlayer(Players) to decide the player to set is PLAYER1 or PLAYER2,
+ *      .setStats(PlayerStats) to decide to set MANA, HEALTH, or ALL, and
+ *      .setInstance(Player) to provide an instance whose specified Stats will be set to the UI.
+ */
+
 public class PlayerSetCommandsBuilder extends CommandBuilder {
     private final ActorRef reference;
     private Players player;

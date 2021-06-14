@@ -147,7 +147,7 @@ For `ANIMATION`, specify one of the `UnitAnimationType` by calling `.setAnimatio
 
 Each command issuing will only take effect once. Setting the non-required fields will be ignored.
 
-Sedning a draw command will be *expected* to be like this:
+Sending a draw command will be *expected* to be like this:
 
 ```java
 new UnitCommandBuilder(out)

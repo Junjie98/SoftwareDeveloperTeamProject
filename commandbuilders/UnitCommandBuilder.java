@@ -76,6 +76,7 @@ public class UnitCommandBuilder extends CommandBuilder{
     @Override
     public void issueCommand() {
         if (mode == UnitCommandBuilderMode.DRAW) {
+            unit.setPositionByTile(tile);
             BasicCommands.drawUnit(reference, unit, tile);
         } else if (mode == UnitCommandBuilderMode.MOVE) {
             BasicCommands.moveUnitToTile(reference, unit, tile);

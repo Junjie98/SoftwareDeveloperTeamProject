@@ -6,6 +6,8 @@ import akka.actor.ActorRef;
 import commandbuilders.TileCommandBuilder;
 import commandbuilders.enums.States;
 import structures.GameState;
+import structures.basic.Tile;
+import utils.BasicObjectBuilders;
 
 /**
  * Indicates that both the core game loop in the browser is starting, meaning
@@ -38,6 +40,10 @@ public class Initalize implements EventProcessor{
 
 		// Deal initial cards
 		gameState.drawInitialCards(out);
+
+		//Spawn avatars
+
+		gameState.spawnAvatars(out);
 	}
 }
 

@@ -3,14 +3,20 @@ package structures;
 import akka.actor.ActorRef;
 import commandbuilders.CardInHandCommandBuilder;
 import commandbuilders.PlayerSetCommandsBuilder;
+import commandbuilders.UnitCommandBuilder;
 import commandbuilders.enums.CardInHandCommandMode;
 import commandbuilders.enums.PlayerStats;
 import commandbuilders.enums.Players;
 import commandbuilders.enums.States;
+import commandbuilders.enums.UnitCommandBuilderMode;
 import commands.BasicCommands;
 import decks.*;
 import structures.basic.Card;
 import structures.basic.Player;
+import structures.basic.Tile;
+import structures.basic.Unit;
+import utils.BasicObjectBuilders;
+import utils.StaticConfFiles;
 
 /**
  * This class can be used to hold information about the on-going game.
@@ -117,4 +123,28 @@ public class GameState {
             }
         }
     }
+
+
+    public void spawnAvatars(ActorRef out)
+    {
+        Unit unit = BasicObjectBuilders.loadUnit(StaticConfFiles.humanAvatar, 0, Unit.class);
+        Unit unit2 = BasicObjectBuilders.loadUnit(StaticConfFiles.aiAvatar, 0, Unit.class);
+
+		Tile tile = BasicObjectBuilders.loadTile(1, 2);
+		Tile tile2 = BasicObjectBuilders.loadTile(7, 2);
+
+        new UnitCommandBuilder(out)
+                    .setMode(UnitCommandBuilderMode.DRAW)
+                    .setTile(tile)
+                    .setUnit(unit)
+                    .issueCommand();
+
+        new UnitCommandBuilder(out)
+                    .setMode(UnitCommandBuilderMode.DRAW)
+                    .setTile(tile2)
+                    .setUnit(unit2)
+                    .issueCommand();
+                    
+    }
+
 }

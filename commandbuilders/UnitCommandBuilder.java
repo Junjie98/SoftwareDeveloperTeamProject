@@ -1,9 +1,11 @@
 package commandbuilders;
 
 import akka.actor.ActorRef;
+import commandbuilders.enums.Players;
 import commandbuilders.enums.UnitCommandBuilderMode;
 import commandbuilders.enums.UnitStats;
 import commands.BasicCommands;
+import structures.basic.Player;
 import structures.basic.Tile;
 import structures.basic.Unit;
 import structures.basic.UnitAnimationType;
@@ -35,6 +37,7 @@ public class UnitCommandBuilder extends CommandBuilder{
 
     // For Move and Draw
     private Tile tile;
+    private Players player;////////
 
     // For Stats
     private UnitStats stats = UnitStats.ATTACK;
@@ -68,6 +71,12 @@ public class UnitCommandBuilder extends CommandBuilder{
         return this;
     }
 
+    public UnitCommandBuilder setPlayerID(Players Player) //dunno where you want to put this but i kinda need it aha 
+    {
+        this.player = Player;
+        return this;
+    }
+
     public UnitCommandBuilder setAnimationType(UnitAnimationType animationType) {
         this.animationType = animationType;
         return this;
@@ -77,6 +86,7 @@ public class UnitCommandBuilder extends CommandBuilder{
     public void issueCommand() {
         if (mode == UnitCommandBuilderMode.DRAW) {
             unit.setPositionByTile(tile);
+            unit.setPlayerID(this.player);
             BasicCommands.drawUnit(reference, unit, tile);
         } else if (mode == UnitCommandBuilderMode.MOVE) {
             BasicCommands.moveUnitToTile(reference, unit, tile);

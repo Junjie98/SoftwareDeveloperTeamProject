@@ -1,5 +1,7 @@
 package structures;
 
+import java.lang.reflect.Array;
+
 import akka.actor.ActorRef;
 import commandbuilders.CardInHandCommandBuilder;
 import commandbuilders.PlayerSetCommandsBuilder;
@@ -142,21 +144,21 @@ public class GameState {
         Unit unit = BasicObjectBuilders.loadUnit(StaticConfFiles.humanAvatar, 0, Unit.class);
         Unit unit2 = BasicObjectBuilders.loadUnit(StaticConfFiles.aiAvatar, 0, Unit.class);
 
-		//Tile tile = BasicObjectBuilders.loadTile(1, 2);
-		//Tile tile2 = BasicObjectBuilders.loadTile(7, 2);
-        board[1][2].setUnit(unit);
-        board[7][2].setUnit(unit2);
+		Tile tile = board[1][2];        //you can enum this if you want but honestly is it worth it?
+		Tile tile2 = board[7][2];
+        tile.setUnit(unit);
+        tile2.setUnit(unit2);
 
         new UnitCommandBuilder(out)
                     .setMode(UnitCommandBuilderMode.DRAW)
-                    .setTile(board[1][2])
+                    .setTile(tile)
                     .setPlayerID(Players.PLAYER1)
                     .setUnit(unit)
                     .issueCommand();
 
         new UnitCommandBuilder(out)
                     .setMode(UnitCommandBuilderMode.DRAW)
-                    .setTile(board[7][2])
+                    .setTile(tile2)
                     .setPlayerID(Players.PLAYER2)
                     .setUnit(unit2)
                     .issueCommand();
@@ -170,7 +172,7 @@ public class GameState {
         { 
             System.out.println("move logic");
                                                                   //what were the prev valid move squares?
-            int[][] activeTiles = getMoveTiles(4, previousUnitLocation.getTilex(), previousUnitLocation.getTiley());
+            int[][] activeTiles = getAllMoveTiles(previousUnitLocation.getTilex(), previousUnitLocation.getTiley());
             int[] test = {x,y};                                 //what we testing?
             for (int[] ip : activeTiles) 
             {
@@ -212,7 +214,7 @@ public class GameState {
             if(preMove == true)
             {
                 System.out.println("working");
-                int[][] activeTiles = getMoveTiles(4, x, y);
+                int[][] activeTiles = getAllMoveTiles(x, y);
                 TileUnhighlight(out, activeTiles);
                 preMove = false;
                 return;
@@ -225,12 +227,12 @@ public class GameState {
 
     public void basicMoveHighlight(ActorRef out,int x, int y)
     {
-            int[][] initDir = getMoveTiles(1, x, y);
+            int[][] initDir = getInitMoveTiles(x, y);
             
             boolean[] initDirB = {true,true,true,true};
 
-            int[][] secondDir = getMoveTiles(2, x, y);
-            int[][] interDir = getMoveTiles(3, x, y);
+            int[][] secondDir = getSecondayMoveTiles(x, y);
+            int[][] interDir = getInterMoveTiles(x, y);
 
             int count = 0;
             for (int[] is : initDir)                                    //for the inital directions you can move
@@ -289,63 +291,60 @@ public class GameState {
                 .issueCommand();
         }
     }
-    ///opt decides what depth of move, eg 1 is 1st 4 ortho, 2 is 2nd degree ortho, 3 is the inter diags, 4 is get all
-    private int[][] getMoveTiles(int opt, int x, int y)
+
+    private int[][] getInitMoveTiles(int x, int y)
     {
-        switch (opt)
-        {
+        int[] up = {x, y-1};
+        int[] left = {x-1, y};
+        int[] right = {x+1, y};
+        int[] down = {x, y+1};
+        int[][] initDir = {up, left, right, down};
+        return initDir;
+    }
 
-            case 1: 
-                int[] up = {x, y-1};
-                int[] left = {x-1, y};
-                int[] right = {x+1, y};
-                int[] down = {x, y+1};
-                int[][] initDir = {up, left, right, down};
-                return initDir;
-                
-            case 2: 
-                int[] up2 = {x, y-2};
-                int[] left2 = {x-2, y};
-                int[] right2 = {x+2, y};
-                int[] down2 = {x, y+2};
-                int[][] secondDir = {up2, left2, right2, down2};
-                return secondDir;
-                
-            case 3: 
-                int[] upL = {x-1, y-1};
-                int[] leftD = {x-1, y+1};
-                int[] rightU = {x+1, y-1};
-                int[] downR = {x+1, y+1};
-                int[][] interDir = {upL, leftD, rightU, downR};
-                return interDir;     
+    private int[][] getSecondayMoveTiles(int x, int y)
+    {
+        int[] up2 = {x, y-2};
+        int[] left2 = {x-2, y};
+        int[] right2 = {x+2, y};
+        int[] down2 = {x, y+2};
+        int[][] secondDir = {up2, left2, right2, down2};
+        return secondDir;
+    }
 
-            case 4: 
-                int[] p1 = {x, y-1};
-                int[] p2 = {x-1, y};
-                int[] p3 = {x+1, y};
-                int[] p4 = {x, y+1};
+    private int[][] getInterMoveTiles(int x, int y)
+    {
+        int[] upL = {x-1, y-1};
+        int[] leftD = {x-1, y+1};
+        int[] rightU = {x+1, y-1};
+        int[] downR = {x+1, y+1};
+        int[][] interDir = {upL, leftD, rightU, downR};
+        return interDir;  
+    }
 
-                int[] p5 = {x, y-2};
-                int[] p6 = {x-2, y};
-                int[] p7 = {x+2, y};
-                int[] p8 = {x, y+2};
-                
-                int[] p9 = {x-1, y-1};
-                int[] p10 = {x-1, y+1};
-                int[] p11 = {x+1, y-1};
-                int[] p12 = {x+1, y+1};
-
-                int[][] out = {p1, p2, p3, p4, p5, p6, p6, p7, p8, p9, p10, p11, p12};
-
-                return out;
-            
-            default:
-                int[][]o={};
-                return o;
-                
-        }
+    private int[][] getAllMoveTiles(int x, int y)
+    {
+        int[][]a = getInitMoveTiles(x, y);
+        int[][]b = getSecondayMoveTiles(x, y);
+        int[][]c = getInterMoveTiles(x, y);
+        a=concatenate(a, b);
+        a=concatenate(a, c);
+        return a;
         
     }
+
+    public <T> T[] concatenate(T[] a, T[] b) {
+        int aLen = a.length;
+        int bLen = b.length;
+    
+        @SuppressWarnings("unchecked")
+        T[] c = (T[]) Array.newInstance(a.getClass().getComponentType(), aLen + bLen);
+        System.arraycopy(a, 0, c, 0, aLen);
+        System.arraycopy(b, 0, c, aLen, bLen);
+    
+        return c;
+    }
+
 
     public boolean checkTileHighlight(ActorRef out, int[] pos, Players playerID)
     {
@@ -370,7 +369,7 @@ public class GameState {
             if(board[pos[0]][pos[1]].getUnit().getPlayerID() != turn) //enemy
             {
                 new TileCommandBuilder(out)
-                .setX(pos[0]).setY(pos[1]).setState(States.NORMAL)
+                .setX(pos[0]).setY(pos[1]).setState(States.NORMAL)    //RED give red, make red. @YU
                 .issueCommand();
             }
             return false;

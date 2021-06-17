@@ -1,4 +1,5 @@
 package structures.basic;
+import commandbuilders.enums.Players;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -25,6 +26,7 @@ public class Unit {
 	Position position;
 	UnitAnimationSet animations;
 	ImageCorrection correction;
+	Players owningPlayer;
 	
 	public Unit() {}
 	
@@ -97,6 +99,14 @@ public class Unit {
 		this.animations = animations;
 	}
 	
+	public void setPlayerID(Players Player) 
+	{
+		this.owningPlayer = Player;
+	}
+	public Players getPlayerID()
+	{
+		return this.owningPlayer;
+	}
 	/**
 	 * This command sets the position of the Unit to a specified
 	 * tile.

@@ -5,10 +5,13 @@ import commandbuilders.enums.Players;
 import commandbuilders.enums.UnitCommandBuilderMode;
 import commandbuilders.enums.UnitStats;
 import commands.BasicCommands;
+import structures.Board;
 import structures.basic.Player;
 import structures.basic.Tile;
 import structures.basic.Unit;
 import structures.basic.UnitAnimationType;
+import utils.BasicObjectBuilders;
+import utils.StaticConfFiles;
 
 /**
  * This command builder is the most flexible command builder, with modes: DRAW, MOVE, SET, DELETE, ANIMATION.
@@ -18,7 +21,7 @@ import structures.basic.UnitAnimationType;
  * You will first need to specify the mode by calling .setMode(UnitCommandBuilderMode).
  * You will need to specify a unit by calling .setUnit(Unit)
  *
- * For MOVE and DRAW commands, just specify .setTile(Tile) to specify the target position.
+ * For MOVE and DRAW commands, just specify .setTilePosition(x, y) to specify the target position.
  *
  * For setting stats of a unit, use .setStats(UnitStats, int), to set the ATTACK or HEALTH to the following value.
  *
@@ -36,8 +39,9 @@ public class UnitCommandBuilder extends CommandBuilder{
     private UnitCommandBuilderMode mode;
 
     // For Move and Draw
-    private Tile tile;
-    private Players player;////////
+    int tileX = -1;
+    int tileY = -1;
+    private Players player;
 
     // For Stats
     private UnitStats stats = UnitStats.ATTACK;
@@ -55,8 +59,9 @@ public class UnitCommandBuilder extends CommandBuilder{
         return this;
     }
 
-    public UnitCommandBuilder setTile(Tile tile) {
-        this.tile = tile;
+    public UnitCommandBuilder setTilePosition(int x, int y) {
+        tileX = x;
+        tileY = y;
         return this;
     }
 
@@ -71,7 +76,7 @@ public class UnitCommandBuilder extends CommandBuilder{
         return this;
     }
 
-    public UnitCommandBuilder setPlayerID(Players Player) //dunno where you want to put this but i kinda need it aha 
+    public UnitCommandBuilder setPlayerID(Players Player)
     {
         this.player = Player;
         return this;
@@ -85,10 +90,15 @@ public class UnitCommandBuilder extends CommandBuilder{
     @Override
     public void issueCommand() {
         if (mode == UnitCommandBuilderMode.DRAW) {
+            Tile tile = Board.getInstance().getTile(tileX, tileY);
+            tile.setUnit(unit);
             unit.setPositionByTile(tile);
             unit.setPlayerID(this.player);
             BasicCommands.drawUnit(reference, unit, tile);
         } else if (mode == UnitCommandBuilderMode.MOVE) {
+            Tile tile = Board.getInstance().getTile(tileX, tileY);
+            tile.setUnit(unit);
+            unit.setPositionByTile(tile);
             BasicCommands.moveUnitToTile(reference, unit, tile);
         } else if (mode == UnitCommandBuilderMode.SET) {
             if (stats == UnitStats.ATTACK) {

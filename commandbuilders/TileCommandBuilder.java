@@ -18,9 +18,9 @@ import utils.StaticConfFiles;
  *
  * You will need to specified the mode with .setMode(TileCommandBuilderMode), with the following descriptions:
  *
- * You will need to call .setX(int) and .setY(int) to specify the position of the tile.
+ * You will need to call .setTilePosition(x, y) to specify the position of the tile.
  *
- * - mode DRAW: Use .setState(States) to decide NORMAL or HIGHLIGHTED state of the command.
+ * - mode DRAW: Use .setState(States) to decide NORMAL, HIGHLIGHTED, or RED state of the command.
  *
  * - mode ANIMATION: You will need to call .setEffectAnimation(TileEffectAnimation) to set animation.
  *      It is defined with an enum containing INMOLATION, BUFF, MARTYRDOM, SUMMON options.
@@ -43,12 +43,9 @@ public class TileCommandBuilder extends CommandBuilder {
         return this;
     }
 
-    public TileCommandBuilder setX(int value) {
-        x = value;
-        return this;
-    }
-    public TileCommandBuilder setY(int value) {
-        y = value;
+    public TileCommandBuilder setTilePosition(int x, int y) {
+        this.x = x;
+        this.y = y;
         return this;
     }
 
@@ -66,7 +63,17 @@ public class TileCommandBuilder extends CommandBuilder {
     public void issueCommand() {
         if (mode == TileCommandBuilderMode.DRAW) {
             Tile tile = BasicObjectBuilders.loadTile(x, y);
-            int drawMode = (state == States.HIGHLIGHTED) ? 1 : 0;
+            int drawMode = 0;
+
+            switch (state) {
+                case HIGHLIGHTED:
+                    drawMode = 1;
+                    break;
+                case RED:
+                    drawMode = 2;
+                    break;
+            }
+
             BasicCommands.drawTile(reference, tile, drawMode);
         } else if (mode == TileCommandBuilderMode.ANIMATION) {
             Tile tile = BasicObjectBuilders.loadTile(x, y);

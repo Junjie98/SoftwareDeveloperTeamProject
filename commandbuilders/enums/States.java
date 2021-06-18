@@ -1,3 +1,3 @@
 package commandbuilders.enums;
 
-public enum States { HIGHLIGHTED, NORMAL }
+public enum States { HIGHLIGHTED, NORMAL, RED }

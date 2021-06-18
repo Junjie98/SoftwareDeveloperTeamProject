@@ -6,6 +6,7 @@ import akka.actor.ActorRef;
 import commandbuilders.PlayerNotificationCommandBuilder;
 import structures.GameState;
 import commandbuilders.enums.Players;
+import structures.basic.Tile;
 
 /**
  * Indicates that the user has clicked an object on the game canvas, in this case
@@ -22,6 +23,12 @@ public class EndTurnClicked implements EventProcessor{
 
 	@Override
 	public void processEvent(ActorRef out, GameState gameState, JsonNode message) {
+		if (gameState.getPreMove() == true) {
+			Tile prev = gameState.getPreviousUnitLocation();
+			int[][] active = gameState.getAllMoveTiles(prev.getTilex(), prev.getTiley());
+			gameState.TileUnhighlight(out, active);
+		}
+
 		gameState.nextTurn();
 		processChangedTurns(out, gameState);
 	}

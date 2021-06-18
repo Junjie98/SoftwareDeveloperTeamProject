@@ -3,15 +3,8 @@ package structures;
 import java.lang.reflect.Array;
 
 import akka.actor.ActorRef;
-import commandbuilders.CardInHandCommandBuilder;
-import commandbuilders.PlayerSetCommandsBuilder;
-import commandbuilders.UnitCommandBuilder;
-import commandbuilders.TileCommandBuilder;
-import commandbuilders.enums.CardInHandCommandMode;
-import commandbuilders.enums.PlayerStats;
-import commandbuilders.enums.Players;
-import commandbuilders.enums.States;
-import commandbuilders.enums.UnitCommandBuilderMode;
+import commandbuilders.*;
+import commandbuilders.enums.*;
 import commands.BasicCommands;
 import decks.*;
 import structures.basic.Card;
@@ -50,12 +43,7 @@ public class GameState {
 
     private boolean preMove = false;
     private Tile previousUnitLocation = null;
-    private Tile[][] board = new Tile[9][5];
 
-    public void loadBoardFromTile(int x, int y)
-    {
-        board[x][y] = BasicObjectBuilders.loadTile(x, y);
-    }
     //////////////////////////////////////////////////////////////////////////////
     public void nextTurn() {
         if (turn == Players.PLAYER1) {
@@ -138,35 +126,37 @@ public class GameState {
         }
     }
 
-
     public void spawnAvatars(ActorRef out)
     {
-        Unit unit = BasicObjectBuilders.loadUnit(StaticConfFiles.humanAvatar, 0, Unit.class);
-        Unit unit2 = BasicObjectBuilders.loadUnit(StaticConfFiles.aiAvatar, 0, Unit.class);
-
-		Tile tile = board[1][2];        //you can enum this if you want but honestly is it worth it?
-		Tile tile2 = board[7][2];
-        tile.setUnit(unit);
-        tile2.setUnit(unit2);
+        Unit human = new UnitFactory().generateUnit(UnitType.HUMAN);
+        Unit ai = new UnitFactory().generateUnit(UnitType.AI);
 
         new UnitCommandBuilder(out)
                     .setMode(UnitCommandBuilderMode.DRAW)
-                    .setTile(tile)
+                    .setTilePosition(1, 2)
                     .setPlayerID(Players.PLAYER1)
-                    .setUnit(unit)
+                    .setUnit(human)
                     .issueCommand();
 
         new UnitCommandBuilder(out)
                     .setMode(UnitCommandBuilderMode.DRAW)
-                    .setTile(tile2)
+                    .setTilePosition(7, 2)
                     .setPlayerID(Players.PLAYER2)
-                    .setUnit(unit2)
+                    .setUnit(ai)
                     .issueCommand();
                     
     }
 
-    
-    public void highlightedMoveTileClicked(ActorRef out,int x, int y)       //test for selectex
+
+    public Tile getPreviousUnitLocation() {
+        return previousUnitLocation;
+    }
+
+    public boolean getPreMove() {
+        return preMove;
+    }
+
+    public void highlightedMoveTileClicked(ActorRef out, int x, int y)       //test for selectex
     {
         if(preMove==true)                                       //if about to move
         { 
@@ -178,7 +168,7 @@ public class GameState {
             {
                 if(ip[0] == test[0] && ip[1] == test[1])        //valid move 
                 {
-                    if(board[x][y].getUnit()!=null)             //this space is occupied
+                    if(Board.getInstance().getTile(x, y).getUnit()!=null)             //this space is occupied
                     {
                         return;
                     }
@@ -186,11 +176,10 @@ public class GameState {
 
                     new UnitCommandBuilder(out)
                             .setMode(UnitCommandBuilderMode.MOVE)
-                            .setTile(board[x][y])
+                            .setTilePosition(x, y)
                             .setUnit(previousUnitLocation.getUnit())
                             .issueCommand();
 
-                    board[x][y].setUnit(previousUnitLocation.getUnit());
                     previousUnitLocation.setUnit(null);
 
                     TileUnhighlight(out, activeTiles);
@@ -203,13 +192,15 @@ public class GameState {
 
     public void unitClicked(ActorRef out,int x, int y)
     {
-        if(board[x][y].getUnit() != null)
+        System.out.println(x +"," + y + " Clicked");
+        System.out.println(Board.getInstance().getTile(x, y).getUnit());
+        if(Board.getInstance().getTile(x, y).getUnit() != null)
         { 
-            if(board[x][y].getUnit().getPlayerID() != turn) //you dont own this unit!
+            if(Board.getInstance().getTile(x, y).getUnit().getPlayerID() != turn) //you dont own this unit!
             {
                 return;
             }
-            previousUnitLocation = board[x][y];
+            previousUnitLocation = Board.getInstance().getTile(x, y);
             System.out.println("activates");
             if(preMove == true)
             {
@@ -227,12 +218,12 @@ public class GameState {
 
     public void basicMoveHighlight(ActorRef out,int x, int y)
     {
-            int[][] initDir = getInitMoveTiles(x, y);
+            int[][] initDir = getMoveTiles(x, y, 1, 0);
             
             boolean[] initDirB = {true,true,true,true};
 
-            int[][] secondDir = getSecondayMoveTiles(x, y);
-            int[][] interDir = getInterMoveTiles(x, y);
+            int[][] secondDir = getMoveTiles(x, y,2, 0);
+            int[][] interDir = getMoveTiles(x, y, 1, 1);
 
             int count = 0;
             for (int[] is : initDir)                                    //for the inital directions you can move
@@ -285,48 +276,27 @@ public class GameState {
             }
 
             new TileCommandBuilder(out)
-                .setX(at[0])
-                .setY(at[1])
+                .setTilePosition(at[0], at[1])
                 .setState(States.NORMAL)
                 .issueCommand();
         }
     }
 
-    private int[][] getInitMoveTiles(int x, int y)
+    private int[][] getMoveTiles(int x, int y, int depth, int inter)
     {
-        int[] up = {x, y-1};
-        int[] left = {x-1, y};
-        int[] right = {x+1, y};
-        int[] down = {x, y+1};
-        int[][] initDir = {up, left, right, down};
-        return initDir;
+        int[] up = {x-inter, y-depth};
+        int[] left = {x-depth, y+inter};
+        int[] right = {x+depth, y-inter};
+        int[] down = {x+inter, y+depth};
+        int[][] dir = {up, left, right, down};
+        return dir;
     }
 
-    private int[][] getSecondayMoveTiles(int x, int y)
+    public int[][] getAllMoveTiles(int x, int y)
     {
-        int[] up2 = {x, y-2};
-        int[] left2 = {x-2, y};
-        int[] right2 = {x+2, y};
-        int[] down2 = {x, y+2};
-        int[][] secondDir = {up2, left2, right2, down2};
-        return secondDir;
-    }
-
-    private int[][] getInterMoveTiles(int x, int y)
-    {
-        int[] upL = {x-1, y-1};
-        int[] leftD = {x-1, y+1};
-        int[] rightU = {x+1, y-1};
-        int[] downR = {x+1, y+1};
-        int[][] interDir = {upL, leftD, rightU, downR};
-        return interDir;  
-    }
-
-    private int[][] getAllMoveTiles(int x, int y)
-    {
-        int[][]a = getInitMoveTiles(x, y);
-        int[][]b = getSecondayMoveTiles(x, y);
-        int[][]c = getInterMoveTiles(x, y);
+        int[][]a = getMoveTiles(x, y, 1, 0);
+        int[][]b = getMoveTiles(x, y, 2, 0);
+        int[][]c = getMoveTiles(x, y, 1, 1);
         a=concatenate(a, b);
         a=concatenate(a, c);
         return a;
@@ -357,20 +327,22 @@ public class GameState {
             return false;
         }
 
-        if(!board[pos[0]][pos[1]].hasUnit())    //empty so highlight
+        if(!Board.getInstance().getTile(pos[0], pos[1]).hasUnit())    //empty so highlight
         {
             new TileCommandBuilder(out)
-		 				.setX(pos[0]).setY(pos[1]).setState(States.HIGHLIGHTED)
-		 				.issueCommand();
-                         return true;
+                    .setTilePosition(pos[0], pos[1])
+                    .setState(States.HIGHLIGHTED)
+                    .issueCommand();
+            return true;
         }
         else
         {
-            if(board[pos[0]][pos[1]].getUnit().getPlayerID() != turn) //enemy
+            if(Board.getInstance().getTile(pos[0], pos[1]).getUnit().getPlayerID() != turn) //enemy
             {
                 new TileCommandBuilder(out)
-                .setX(pos[0]).setY(pos[1]).setState(States.NORMAL)    //RED give red, make red. @YU
-                .issueCommand();
+                        .setTilePosition(pos[0], pos[1])
+                        .setState(States.RED)
+                        .issueCommand();
             }
             return false;
 

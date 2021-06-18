@@ -15,7 +15,7 @@ import structures.basic.Card;
  *
  * - mode DRAW - You will need to call .setCard(Card), .setPosition(int), .setState(States) to set the card to be added,
  *      the position of the card in the hand, and the NORMAL or HIGHLIGHTED state of the card before called .issueCommand().
- *      Card state is defined by States, including HIGHLIGHTED, NORMAL.
+ *      Card state is defined by States, including HIGHLIGHTED (RED will be interpreted as HIGHLIGHTED too), NORMAL.
  *
  * - mode DELETE - When set to delete, you will need to call .setPosition(int) to indicate the position of card to be removed.
  *      Notice any other fields set will be ignored by the .issueCommand() function.

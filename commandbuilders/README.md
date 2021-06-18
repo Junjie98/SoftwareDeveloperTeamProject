@@ -14,7 +14,7 @@ The initialisation step takes the `ActorRef` that is used to send/receive comman
 
 You will first need to use `.setMode(CardInHandCommandMode)` to decide the mode to be used. The description is as following:
 
-* mode `DRAW` - You will need to call `.setCard(Card)`, `.setPosition(int)`, `.setState(States)` to set the card to be added, the position of the card in the hand, and the `NORMAL` or `HIGHLIGHTED` state of the card before called `.issueCommand()`. Card state is defined by `States`, including `HIGHLIGHTED`, `NORMAL`.
+* mode `DRAW` - You will need to call `.setCard(Card)`, `.setPosition(int)`, `.setState(States)` to set the card to be added, the position of the card in the hand, and the `NORMAL` or `HIGHLIGHTED` state of the card before called `.issueCommand()`. Card state is defined by `States`, including `HIGHLIGHTED`, `NORMAL`. (`RED` is tile only. It will be interpreted as `HIGHLIGHTED` here.)
 * mode `DELETE` - When set to delete, you will need to call .setPosition(int) to indicate the position of card to be removed. Notice any other fields set will be ignored by the `.issueCommand()` function.
 
 The following code draws card at `currentCardInHand` array's `idx` at position `idx`.
@@ -108,7 +108,7 @@ You will need to specified the mode with `.setMode(TileCommandBuilderMode)`, wit
 
 You will need to call `.setTilePosition(x, y)` to specify the position of the tile.
 
-* mode `DRAW`: Use `.setState(States)` to decide `NORMAL` or `HIGHLIGHTED` state of the command.
+* mode `DRAW`: Use `.setState(States)` to decide `NORMAL`, `HIGHLIGHTED`, or `RED` state of the tile.
 
 * mode `ANIMATION`: You will need to call `.setEffectAnimation(TileEffectAnimation)` to set animation. It is defined with an enum containing `INMOLATION`, `BUFF`, `MARTYRDOM`, `SUMMON` options.
 

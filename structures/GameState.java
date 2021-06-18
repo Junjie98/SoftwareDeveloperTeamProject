@@ -362,7 +362,7 @@ public class GameState {
             {
                 new TileCommandBuilder(out)
                         .setTilePosition(pos[0], pos[1])
-                        .setState(States.NORMAL)    //TODO: RED give red, make red. @YU
+                        .setState(States.RED)
                         .issueCommand();
             }
             return false;

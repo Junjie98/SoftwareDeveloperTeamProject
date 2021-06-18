@@ -26,13 +26,21 @@ public class Player {
 		return health;
 	}
 	public void setHealth(int health) {
+		if(health > 20) { //sets the health cap.
+			this.health = 20;
+		}
 		this.health = health;
 	}
 	public int getMana() {
 		return mana;
 	}
 	public void setMana(int mana) {
-		this.mana = mana;
+		if(mana > 9) { //sets the mana cap.
+			this.mana = 9;
+		}else {
+			this.mana = mana;
+		}
+		
 	}
 	
 	

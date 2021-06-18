@@ -41,6 +41,8 @@ public class EndTurnClicked implements EventProcessor{
 					.setPlayer(Players.PLAYER1)
 					.issueCommand();
 
+			//mana increment after endturn
+			gameState.ManaIncrementPerRound(out);
 			// TODO: Perform things that should be done on Player 1's turn.
 			gameState.drawCard(out, Players.PLAYER1);
 		} else {
@@ -51,6 +53,11 @@ public class EndTurnClicked implements EventProcessor{
 					.setDisplaySeconds(2)
 					.setPlayer(Players.PLAYER1)
 					.issueCommand();
+			
+			//mana increment after endturn
+			if(gameState.getRound() > 0) { //Checks if it is round 0. If it is, dont increment the mana of Player2
+				gameState.ManaIncrementPerRound(out);
+			}
 
 			// TODO: Perform things that should be done on Player 2's turn.
 			gameState.drawCard(out, Players.PLAYER2);

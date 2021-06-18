@@ -25,7 +25,8 @@ import utils.StaticConfFiles;
 public class GameState {
     private final int MAX_CARD_COUNT_IN_HAND = 6;
     private final int INITIAL_CARD_COUNT = 3;
-
+    private int roundNumber = 0;
+    
     private Players turn = Players.PLAYER1;
     // TODO: This should be randomised according to game loop.
 
@@ -48,8 +49,11 @@ public class GameState {
     public void nextTurn() {
         if (turn == Players.PLAYER1) {
             turn = Players.PLAYER2;
+            
         } else {
             turn = Players.PLAYER1;
+
+            ++roundNumber;//new round when player2 has finished their turn
         }
     }
 
@@ -62,8 +66,8 @@ public class GameState {
     }
 
     public void generateTwoUsers(ActorRef out) {
-        player1 = new Player();
-        player2 = new Player();
+    	player1 = new Player(20,0); //set players health and mana to 20,0
+        player2 = new Player(20,0); 
 
         new PlayerSetCommandsBuilder(out)
                 .setPlayer(Players.PLAYER1)
@@ -348,4 +352,32 @@ public class GameState {
 
         }
     }
+    
+    public void ManaIncrementPerRound(ActorRef out) {
+    	if(this.turn==Players.PLAYER1) {
+    		int player1Mana = player1.getMana();
+    		player1.setMana(player1Mana + roundNumber + 1);
+    		new PlayerSetCommandsBuilder(out)
+        		.setPlayer(Players.PLAYER1)
+        		.setStats(PlayerStats.MANA)
+        		.setInstance(player1)
+        		.issueCommand();
+    	}else {
+        	int player2Mana = player2.getMana();
+        	player2.setMana(player2Mana + roundNumber + 1);
+        	new PlayerSetCommandsBuilder(out)
+            	.setPlayer(Players.PLAYER2)
+            	.setStats(PlayerStats.MANA)
+            	.setInstance(player2)
+            	.issueCommand();
+    	}
+    }
+    
+
+    public int getRound() { //uses for validation. So round 0 will not increment the mana for player 2 after
+    						//player1 ends his turn.
+    	return this.roundNumber;
+    	
+    }
+
 }

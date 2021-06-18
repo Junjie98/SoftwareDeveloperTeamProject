@@ -1,6 +1,7 @@
 package commandbuilders;
 
 import commandbuilders.enums.UnitType;
+import scala.runtime.Static;
 import structures.basic.Unit;
 import utils.BasicObjectBuilders;
 import utils.StaticConfFiles;
@@ -15,6 +16,54 @@ public class UnitFactory {
                 break;
             case AI:
                 conf = StaticConfFiles.aiAvatar;
+                break;
+            case SERPENTI:
+                conf = StaticConfFiles.u_serpenti;
+                break;
+            case PYROMANCER:
+                conf = StaticConfFiles.u_pyromancer;
+                break;
+            case WINDSHRIKE:
+                conf = StaticConfFiles.u_windshrike;
+                break;
+            case BLAZE_HOUND:
+                conf = StaticConfFiles.u_blaze_hound;
+                break;
+            case AZURE_HERALD:
+                conf = StaticConfFiles.u_azure_herald;
+                break;
+            case AZURITE_LION:
+                conf = StaticConfFiles.u_azurite_lion;
+                break;
+            case FIRE_SPITTER:
+                conf = StaticConfFiles.u_fire_spitter;
+                break;
+            case PLANAR_SCOUT:
+                conf = StaticConfFiles.u_planar_scout;
+                break;
+            case COMODO_CHARGER:
+                conf = StaticConfFiles.u_comodo_charger;
+                break;
+            case HAILSTONE_GOLEM:
+                conf = StaticConfFiles.u_hailstone_golem;
+                break;
+            case ROCK_PULVERISER:
+                conf = StaticConfFiles.u_rock_pulveriser;
+                break;
+            case BLOODSHARD_GOLEM:
+                conf = StaticConfFiles.u_bloodshard_golem;
+                break;
+            case HAILSTONE_GOLEM_R:
+                conf = StaticConfFiles.u_hailstone_golemR;
+                break;
+            case IRONCLIFF_GUARDIAN:
+                conf = StaticConfFiles.u_ironcliff_guardian;
+                break;
+            case PUREBLADE_ENFORCER:
+                conf = StaticConfFiles.u_pureblade_enforcer;
+                break;
+            case SILVERGUARD_KNIGHT:
+                conf = StaticConfFiles.u_silverguard_knight;
                 break;
         }
         return BasicObjectBuilders.loadUnit(conf, counter++, Unit.class);

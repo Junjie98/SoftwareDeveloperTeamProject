@@ -89,7 +89,6 @@ public class UnitCommandBuilder extends CommandBuilder{
 
     @Override
     public void issueCommand() {
-        System.out.println("Issuing Command to move");
         if (mode == UnitCommandBuilderMode.DRAW) {
             Tile tile = Board.getInstance().getTile(tileX, tileY);
             tile.setUnit(unit);
@@ -97,7 +96,6 @@ public class UnitCommandBuilder extends CommandBuilder{
             unit.setPlayerID(this.player);
             BasicCommands.drawUnit(reference, unit, tile);
         } else if (mode == UnitCommandBuilderMode.MOVE) {
-            System.out.println("About to move");
             Tile tile = Board.getInstance().getTile(tileX, tileY);
             tile.setUnit(unit);
             unit.setPositionByTile(tile);

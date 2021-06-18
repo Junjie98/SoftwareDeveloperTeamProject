@@ -147,8 +147,16 @@ public class GameState {
                     
     }
 
-    
-    public void highlightedMoveTileClicked(ActorRef out,int x, int y)       //test for selectex
+
+    public Tile getPreviousUnitLocation() {
+        return previousUnitLocation;
+    }
+
+    public boolean getPreMove() {
+        return preMove;
+    }
+
+    public void highlightedMoveTileClicked(ActorRef out, int x, int y)       //test for selectex
     {
         if(preMove==true)                                       //if about to move
         { 
@@ -284,7 +292,7 @@ public class GameState {
         return dir;
     }
 
-    private int[][] getAllMoveTiles(int x, int y)
+    public int[][] getAllMoveTiles(int x, int y)
     {
         int[][]a = getMoveTiles(x, y, 1, 0);
         int[][]b = getMoveTiles(x, y, 2, 0);

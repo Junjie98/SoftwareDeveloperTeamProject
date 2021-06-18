@@ -46,31 +46,6 @@ public class GameState {
 
     //////////////////////////////////////////////////////////////////////////////
 
-    public int[][] scanBoardForFriendlyUnits()
-    {
-        int[][] friendlyUnitLocations = new int[45][2];
-        int count = 0;
-
-        for(int x = 0; x < 9; x++ )
-        {
-            for(int y = 0; y < 5; y ++)
-            {
-                if(Board.getInstance().getTile(x,y).hasFriendlyUnit(turn))
-                {
-                    //save ints into array x y
-                    friendlyUnitLocations[count][0] = x;
-                    friendlyUnitLocations[count][1] = y;
-                    count++;
-                }
-            }
-        }
-        //Print comments in temirnal
-        for (int i=0; i<count;i++) {System.out.println("Unit " + count + ", x: " + friendlyUnitLocations[i][0] + " y: " + friendlyUnitLocations[i][1]); }
-        System.out.println(turn + " has " + count + " of friendly units");
-
-        return friendlyUnitLocations;
-    }
-
     public void nextTurn() {
         if (turn == Players.PLAYER1) {
             turn = Players.PLAYER2;
@@ -173,7 +148,6 @@ public class GameState {
                     
     }
 
-
     public Tile getPreviousUnitLocation() {
         return previousUnitLocation;
     }
@@ -267,8 +241,8 @@ public class GameState {
                 }
                 count++;
             }
-
-            
+//
+//
             if(initDirB[0] == true || initDirB[1] == true)              //for the inter tiles do some logic
             {
                 checkTileHighlight(out, interDir[0], turn);
@@ -276,7 +250,7 @@ public class GameState {
             if(initDirB[1] == true || initDirB[3] == true)
             {
                 checkTileHighlight(out, interDir[1], turn);
-            } 
+            }
             if(initDirB[2] == true || initDirB[0] == true)
             {
                 checkTileHighlight(out, interDir[2], turn);
@@ -373,5 +347,66 @@ public class GameState {
             return false;
 
         }
+    }
+
+    public int[][] scanBoardForFriendlyUnits(ActorRef out)
+    {
+        int[][] friendlyUnitLocations = new int[45][2];
+        int count = 0;
+
+        for(int x = 0; x < 9; x++ )
+        {
+            for(int y = 0; y < 5; y ++)
+            {
+                if(Board.getInstance().getTile(x,y).hasFriendlyUnit(turn))
+                {
+                    //save ints into array x y
+                    friendlyUnitLocations[count][0] = x;
+                    friendlyUnitLocations[count][1] = y;
+                    count++;
+                    cardTileHighlight(out,x,y);
+                }
+            }
+        }
+        //Print comments in temirnal
+        for (int i=0; i<count;i++) {System.out.println("Unit " + count + ", x: " + friendlyUnitLocations[i][0] + " y: " + friendlyUnitLocations[i][1]); }
+        System.out.println(turn + " has " + count + " of friendly units");
+
+        return friendlyUnitLocations;
+    }
+
+    public void cardTileHighlight(ActorRef out,int x, int y)
+    {
+        int[][] initDir = getMoveTiles(x, y, 1, 0);
+
+        boolean[] initDirB = {true,true,true,true};
+
+        int[][] interDir = getMoveTiles(x, y, 1, 1);
+
+        int count = 0;
+        for (int[] is : initDir)                                    //for the inital directions you can move
+        {
+            initDirB[count] = checkTileHighlight(out, is, turn);       //if they are blocked record this
+            count++;
+        }
+
+        if(initDirB[0] == true || initDirB[1] == true)              //for the inter tiles do some logic
+        {
+            checkTileHighlight(out, interDir[0], turn);
+        }
+        if(initDirB[1] == true || initDirB[3] == true)
+        {
+            checkTileHighlight(out, interDir[1], turn);
+        }
+        if(initDirB[2] == true || initDirB[0] == true)
+        {
+            checkTileHighlight(out, interDir[2], turn);
+        }
+        if(initDirB[2] == true || initDirB[3] == true)
+        {
+            checkTileHighlight(out, interDir[3], turn);
+        }
+
+
     }
 }

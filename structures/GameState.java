@@ -3,15 +3,8 @@ package structures;
 import java.lang.reflect.Array;
 
 import akka.actor.ActorRef;
-import commandbuilders.CardInHandCommandBuilder;
-import commandbuilders.PlayerSetCommandsBuilder;
-import commandbuilders.UnitCommandBuilder;
-import commandbuilders.TileCommandBuilder;
-import commandbuilders.enums.CardInHandCommandMode;
-import commandbuilders.enums.PlayerStats;
-import commandbuilders.enums.Players;
-import commandbuilders.enums.States;
-import commandbuilders.enums.UnitCommandBuilderMode;
+import commandbuilders.*;
+import commandbuilders.enums.*;
 import commands.BasicCommands;
 import decks.*;
 import structures.basic.Card;
@@ -135,21 +128,21 @@ public class GameState {
 
     public void spawnAvatars(ActorRef out)
     {
-        Unit unit = BasicObjectBuilders.loadUnit(StaticConfFiles.humanAvatar, 0, Unit.class);
-        Unit unit2 = BasicObjectBuilders.loadUnit(StaticConfFiles.aiAvatar, 0, Unit.class);
+        Unit human = new UnitFactory().generateUnit(UnitType.HUMAN);
+        Unit ai = new UnitFactory().generateUnit(UnitType.AI);
 
         new UnitCommandBuilder(out)
                     .setMode(UnitCommandBuilderMode.DRAW)
                     .setTilePosition(1, 2)
                     .setPlayerID(Players.PLAYER1)
-                    .setUnit(unit)
+                    .setUnit(human)
                     .issueCommand();
 
         new UnitCommandBuilder(out)
                     .setMode(UnitCommandBuilderMode.DRAW)
                     .setTilePosition(7, 2)
                     .setPlayerID(Players.PLAYER2)
-                    .setUnit(unit2)
+                    .setUnit(ai)
                     .issueCommand();
                     
     }
@@ -179,8 +172,6 @@ public class GameState {
                             .setUnit(previousUnitLocation.getUnit())
                             .issueCommand();
 
-                    Board.getInstance().getTile(x, y)
-                            .setUnit(previousUnitLocation.getUnit());
                     previousUnitLocation.setUnit(null);
 
                     TileUnhighlight(out, activeTiles);
@@ -219,12 +210,12 @@ public class GameState {
 
     public void basicMoveHighlight(ActorRef out,int x, int y)
     {
-            int[][] initDir = getInitMoveTiles(x, y);
+            int[][] initDir = getMoveTiles(x, y, 1, 0);
             
             boolean[] initDirB = {true,true,true,true};
 
-            int[][] secondDir = getSecondayMoveTiles(x, y);
-            int[][] interDir = getInterMoveTiles(x, y);
+            int[][] secondDir = getMoveTiles(x, y,2, 0);
+            int[][] interDir = getMoveTiles(x, y, 1, 1);
 
             int count = 0;
             for (int[] is : initDir)                                    //for the inital directions you can move
@@ -283,41 +274,21 @@ public class GameState {
         }
     }
 
-    private int[][] getInitMoveTiles(int x, int y)
+    private int[][] getMoveTiles(int x, int y, int depth, int inter)
     {
-        int[] up = {x, y-1};
-        int[] left = {x-1, y};
-        int[] right = {x+1, y};
-        int[] down = {x, y+1};
-        int[][] initDir = {up, left, right, down};
-        return initDir;
-    }
-
-    private int[][] getSecondayMoveTiles(int x, int y)
-    {
-        int[] up2 = {x, y-2};
-        int[] left2 = {x-2, y};
-        int[] right2 = {x+2, y};
-        int[] down2 = {x, y+2};
-        int[][] secondDir = {up2, left2, right2, down2};
-        return secondDir;
-    }
-
-    private int[][] getInterMoveTiles(int x, int y)
-    {
-        int[] upL = {x-1, y-1};
-        int[] leftD = {x-1, y+1};
-        int[] rightU = {x+1, y-1};
-        int[] downR = {x+1, y+1};
-        int[][] interDir = {upL, leftD, rightU, downR};
-        return interDir;  
+        int[] up = {x-inter, y-depth};
+        int[] left = {x-depth, y+inter};
+        int[] right = {x+depth, y-inter};
+        int[] down = {x+inter, y+depth};
+        int[][] dir = {up, left, right, down};
+        return dir;
     }
 
     private int[][] getAllMoveTiles(int x, int y)
     {
-        int[][]a = getInitMoveTiles(x, y);
-        int[][]b = getSecondayMoveTiles(x, y);
-        int[][]c = getInterMoveTiles(x, y);
+        int[][]a = getMoveTiles(x, y, 1, 0);
+        int[][]b = getMoveTiles(x, y, 2, 0);
+        int[][]c = getMoveTiles(x, y, 1, 1);
         a=concatenate(a, b);
         a=concatenate(a, c);
         return a;

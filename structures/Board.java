@@ -31,4 +31,8 @@ public class Board {
     public void removeUnitFromTile(int x, int y) {
         board[x][y].setUnit(null);
     }
+
+    public static void reloadBoard() {
+        instance = new Board();
+    }
 }

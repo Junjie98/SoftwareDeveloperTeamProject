@@ -11,6 +11,7 @@ import structures.basic.Tile;
 import structures.basic.Unit;
 import structures.basic.UnitAnimationType;
 import utils.BasicObjectBuilders;
+import utils.StaticConfFiles;
 
 /**
  * This command builder is the most flexible command builder, with modes: DRAW, MOVE, SET, DELETE, ANIMATION.
@@ -88,6 +89,7 @@ public class UnitCommandBuilder extends CommandBuilder{
 
     @Override
     public void issueCommand() {
+        System.out.println("Issuing Command to move");
         if (mode == UnitCommandBuilderMode.DRAW) {
             Tile tile = Board.getInstance().getTile(tileX, tileY);
             tile.setUnit(unit);
@@ -95,10 +97,11 @@ public class UnitCommandBuilder extends CommandBuilder{
             unit.setPlayerID(this.player);
             BasicCommands.drawUnit(reference, unit, tile);
         } else if (mode == UnitCommandBuilderMode.MOVE) {
+            System.out.println("About to move");
             Tile tile = Board.getInstance().getTile(tileX, tileY);
             tile.setUnit(unit);
-            BasicCommands.moveUnitToTile(reference, unit, tile);
             unit.setPositionByTile(tile);
+            BasicCommands.moveUnitToTile(reference, unit, tile);
         } else if (mode == UnitCommandBuilderMode.SET) {
             if (stats == UnitStats.ATTACK) {
                 BasicCommands.setUnitAttack(reference, unit, value);

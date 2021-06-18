@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import akka.actor.ActorRef;
 import commandbuilders.TileCommandBuilder;
 import commandbuilders.enums.States;
+import structures.Board;
 import structures.GameState;
 import structures.basic.Tile;
 import utils.BasicObjectBuilders;
@@ -34,6 +35,8 @@ public class Initalize implements EventProcessor{
 						.issueCommand();
 			}
 		}
+
+		Board.reloadBoard();
 
 		// Create the two users
 		gameState.generateTwoUsers(out);

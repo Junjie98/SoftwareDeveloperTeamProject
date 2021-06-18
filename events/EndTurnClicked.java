@@ -22,6 +22,7 @@ public class EndTurnClicked implements EventProcessor{
 
 	@Override
 	public void processEvent(ActorRef out, GameState gameState, JsonNode message) {
+		// TODO: Unhighligh the tiles if any is highlighted.
 		gameState.nextTurn();
 		processChangedTurns(out, gameState);
 	}

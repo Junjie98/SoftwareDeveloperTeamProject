@@ -50,12 +50,7 @@ public class GameState {
 
     private boolean preMove = false;
     private Tile previousUnitLocation = null;
-    private Tile[][] board = new Tile[9][5];
 
-    public void loadBoardFromTile(int x, int y)
-    {
-        board[x][y] = BasicObjectBuilders.loadTile(x, y);
-    }
     //////////////////////////////////////////////////////////////////////////////
     public void nextTurn() {
         if (turn == Players.PLAYER1) {
@@ -138,27 +133,21 @@ public class GameState {
         }
     }
 
-
     public void spawnAvatars(ActorRef out)
     {
         Unit unit = BasicObjectBuilders.loadUnit(StaticConfFiles.humanAvatar, 0, Unit.class);
         Unit unit2 = BasicObjectBuilders.loadUnit(StaticConfFiles.aiAvatar, 0, Unit.class);
 
-		Tile tile = board[1][2];        //you can enum this if you want but honestly is it worth it?
-		Tile tile2 = board[7][2];
-        tile.setUnit(unit);
-        tile2.setUnit(unit2);
-
         new UnitCommandBuilder(out)
                     .setMode(UnitCommandBuilderMode.DRAW)
-                    .setTile(tile)
+                    .setTilePosition(1, 2)
                     .setPlayerID(Players.PLAYER1)
                     .setUnit(unit)
                     .issueCommand();
 
         new UnitCommandBuilder(out)
                     .setMode(UnitCommandBuilderMode.DRAW)
-                    .setTile(tile2)
+                    .setTilePosition(7, 2)
                     .setPlayerID(Players.PLAYER2)
                     .setUnit(unit2)
                     .issueCommand();
@@ -178,7 +167,7 @@ public class GameState {
             {
                 if(ip[0] == test[0] && ip[1] == test[1])        //valid move 
                 {
-                    if(board[x][y].getUnit()!=null)             //this space is occupied
+                    if(Board.getInstance().getTile(x, y).getUnit()!=null)             //this space is occupied
                     {
                         return;
                     }
@@ -186,11 +175,12 @@ public class GameState {
 
                     new UnitCommandBuilder(out)
                             .setMode(UnitCommandBuilderMode.MOVE)
-                            .setTile(board[x][y])
+                            .setTilePosition(x, y)
                             .setUnit(previousUnitLocation.getUnit())
                             .issueCommand();
 
-                    board[x][y].setUnit(previousUnitLocation.getUnit());
+                    Board.getInstance().getTile(x, y)
+                            .setUnit(previousUnitLocation.getUnit());
                     previousUnitLocation.setUnit(null);
 
                     TileUnhighlight(out, activeTiles);
@@ -203,13 +193,15 @@ public class GameState {
 
     public void unitClicked(ActorRef out,int x, int y)
     {
-        if(board[x][y].getUnit() != null)
+        System.out.println(x +"," + y + " Clicked");
+        System.out.println(Board.getInstance().getTile(x, y).getUnit());
+        if(Board.getInstance().getTile(x, y).getUnit() != null)
         { 
-            if(board[x][y].getUnit().getPlayerID() != turn) //you dont own this unit!
+            if(Board.getInstance().getTile(x, y).getUnit().getPlayerID() != turn) //you dont own this unit!
             {
                 return;
             }
-            previousUnitLocation = board[x][y];
+            previousUnitLocation = Board.getInstance().getTile(x, y);
             System.out.println("activates");
             if(preMove == true)
             {
@@ -357,7 +349,7 @@ public class GameState {
             return false;
         }
 
-        if(!board[pos[0]][pos[1]].hasUnit())    //empty so highlight
+        if(!Board.getInstance().getTile(pos[0], pos[1]).hasUnit())    //empty so highlight
         {
             new TileCommandBuilder(out)
 		 				.setX(pos[0]).setY(pos[1]).setState(States.HIGHLIGHTED)
@@ -366,7 +358,7 @@ public class GameState {
         }
         else
         {
-            if(board[pos[0]][pos[1]].getUnit().getPlayerID() != turn) //enemy
+            if(Board.getInstance().getTile(pos[0], pos[1]).getUnit().getPlayerID() != turn) //enemy
             {
                 new TileCommandBuilder(out)
                 .setX(pos[0]).setY(pos[1]).setState(States.NORMAL)    //RED give red, make red. @YU

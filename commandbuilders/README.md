@@ -139,7 +139,7 @@ You will first need to specify the mode by calling `.setMode(UnitCommandBuilderM
 
 You will need to specify a unit by calling `.setUnit(Unit)`.
 
-For `MOVE` and `DRAW` commands, just specify `.setTile(Tile)` to specify the target position.
+For `MOVE` and `DRAW` commands, just specify `.setTilePosition(x, y)` to specify the target position.
 
 For setting stats of a unit, use `.setStats(UnitStats, int)`, to set the `ATTACK` or `HEALTH` to the following value.
 
@@ -152,7 +152,7 @@ Sending a draw command will be *expected* to be like this:
 ```java
 new UnitCommandBuilder(out)
 		.setMode(UnitCommandBuilderMode.DRAW)
-		.setTile(tile)
+		.setTilePosition(x, y)
 		.issueCommand();
 ```
 

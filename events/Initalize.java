@@ -29,7 +29,6 @@ public class Initalize implements EventProcessor{
 		// Setup the board
 		for (int idx = 0; idx < 9; idx++) {
 			for (int jdx = 0; jdx < 5; jdx++) {
-				gameState.loadBoardFromTile(idx, jdx);
 				new TileCommandBuilder(out)
 						.setX(idx).setY(jdx).setState(States.NORMAL)
 						.issueCommand();

@@ -41,7 +41,7 @@ public class UnitCommandBuilder extends CommandBuilder{
     // For Move and Draw
     int tileX = -1;
     int tileY = -1;
-    private Players player;////////
+    private Players player;
 
     // For Stats
     private UnitStats stats = UnitStats.ATTACK;
@@ -76,7 +76,7 @@ public class UnitCommandBuilder extends CommandBuilder{
         return this;
     }
 
-    public UnitCommandBuilder setPlayerID(Players Player) //dunno where you want to put this but i kinda need it aha 
+    public UnitCommandBuilder setPlayerID(Players Player)
     {
         this.player = Player;
         return this;

@@ -106,7 +106,7 @@ The initialisation step takes the `ActorRef` that is used to send/receive comman
 
 You will need to specified the mode with `.setMode(TileCommandBuilderMode)`, with the following descriptions:
 
-You will need to call `.setX(int)` and `.setY(int)` to specify the position of the tile.
+You will need to call `.setTilePosition(x, y)` to specify the position of the tile.
 
 * mode `DRAW`: Use `.setState(States)` to decide `NORMAL` or `HIGHLIGHTED` state of the command.
 
@@ -116,7 +116,8 @@ Drawing a tile of state `NORMAL` at (`idx`, `jdx`) will look like:
 
 ```java
 new TileCommandBuilder(out)
-		.setX(idx).setY(jdx).setState(States.NORMAL)
+		.setTilePosition(idx, jdx)
+		.setState(States.NORMAL)
 		.issueCommand();
 ```
 
@@ -124,7 +125,7 @@ Drawing an animation on the tile is *expected* to be called like:
 
 ```java
 new TileCommandBuilder(out)
-		.setX(idx).setY(jdx)
+		.setTilePosition(idx, jdx)
 		.setEffectAnimation(TileEffectAnimation.BUFF)
 		.issueCommand();
 ```

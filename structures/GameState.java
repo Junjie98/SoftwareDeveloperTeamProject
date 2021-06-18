@@ -277,8 +277,7 @@ public class GameState {
             }
 
             new TileCommandBuilder(out)
-                .setX(at[0])
-                .setY(at[1])
+                .setTilePosition(at[0], at[1])
                 .setState(States.NORMAL)
                 .issueCommand();
         }
@@ -352,17 +351,19 @@ public class GameState {
         if(!Board.getInstance().getTile(pos[0], pos[1]).hasUnit())    //empty so highlight
         {
             new TileCommandBuilder(out)
-		 				.setX(pos[0]).setY(pos[1]).setState(States.HIGHLIGHTED)
-		 				.issueCommand();
-                         return true;
+                    .setTilePosition(pos[0], pos[1])
+                    .setState(States.HIGHLIGHTED)
+                    .issueCommand();
+            return true;
         }
         else
         {
             if(Board.getInstance().getTile(pos[0], pos[1]).getUnit().getPlayerID() != turn) //enemy
             {
                 new TileCommandBuilder(out)
-                .setX(pos[0]).setY(pos[1]).setState(States.NORMAL)    //RED give red, make red. @YU
-                .issueCommand();
+                        .setTilePosition(pos[0], pos[1])
+                        .setState(States.NORMAL)    //TODO: RED give red, make red. @YU
+                        .issueCommand();
             }
             return false;
 

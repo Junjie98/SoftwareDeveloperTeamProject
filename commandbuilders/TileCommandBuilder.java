@@ -18,7 +18,7 @@ import utils.StaticConfFiles;
  *
  * You will need to specified the mode with .setMode(TileCommandBuilderMode), with the following descriptions:
  *
- * You will need to call .setX(int) and .setY(int) to specify the position of the tile.
+ * You will need to call .setTilePosition(x, y) to specify the position of the tile.
  *
  * - mode DRAW: Use .setState(States) to decide NORMAL or HIGHLIGHTED state of the command.
  *
@@ -43,12 +43,9 @@ public class TileCommandBuilder extends CommandBuilder {
         return this;
     }
 
-    public TileCommandBuilder setX(int value) {
-        x = value;
-        return this;
-    }
-    public TileCommandBuilder setY(int value) {
-        y = value;
+    public TileCommandBuilder setTilePosition(int x, int y) {
+        this.x = x;
+        this.y = y;
         return this;
     }
 

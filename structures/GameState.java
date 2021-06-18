@@ -45,6 +45,32 @@ public class GameState {
     private Tile previousUnitLocation = null;
 
     //////////////////////////////////////////////////////////////////////////////
+
+    public int[][] scanBoardForFriendlyUnits()
+    {
+        int[][] friendlyUnitLocations = new int[45][2];
+        int count = 0;
+
+        for(int x = 0; x < 9; x++ )
+        {
+            for(int y = 0; y < 5; y ++)
+            {
+                if(Board.getInstance().getTile(x,y).hasFriendlyUnit(turn))
+                {
+                    //save ints into array x y
+                    friendlyUnitLocations[count][0] = x;
+                    friendlyUnitLocations[count][1] = y;
+                    count++;
+                }
+            }
+        }
+        //Print comments in temirnal
+        for (int i=0; i<count;i++) {System.out.println("Unit " + count + ", x: " + friendlyUnitLocations[i][0] + " y: " + friendlyUnitLocations[i][1]); }
+        System.out.println(turn + " has " + count + " of friendly units");
+
+        return friendlyUnitLocations;
+    }
+
     public void nextTurn() {
         if (turn == Players.PLAYER1) {
             turn = Players.PLAYER2;

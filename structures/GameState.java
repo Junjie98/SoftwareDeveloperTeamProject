@@ -47,6 +47,10 @@ public class GameState {
 
     //////////////////////////////////////////////////////////////////////////////
 
+    private int[][] friendlyUnits = null;
+
+    //////////////////////////////////////////////////////////////////////////////
+
     public void nextTurn() {
         if (turn == Players.PLAYER1) {
             turn = Players.PLAYER2;
@@ -365,7 +369,7 @@ public class GameState {
             return;
         }
 
-        scanBoardForFriendlyUnits(out);
+        friendlyUnits = scanBoardForFriendlyUnits(out);
         preClickCard = true;
     }
 
@@ -389,11 +393,17 @@ public class GameState {
                 }
             }
         }
+
+        int [][] output = new int[count][2];
+
         //Print comments in temirnal
-        for (int i=0; i<count;i++) {System.out.println("Unit " + count + ", x: " + friendlyUnitLocations[i][0] + " y: " + friendlyUnitLocations[i][1]); }
+        for (int i=0; i<count;i++) {
+            System.out.println("Unit " + count + ", x: " + friendlyUnitLocations[i][0] + " y: " + friendlyUnitLocations[i][1]);
+            output[i] = friendlyUnitLocations[i];
+        }
         System.out.println(turn + " has " + count + " of friendly units");
 
-        return friendlyUnitLocations;
+        return output;
     }
 
     public void cardTileHighlight(ActorRef out,int x, int y)
@@ -431,13 +441,18 @@ public class GameState {
 
     public void cardUnhighlight(ActorRef out)
     {
-        for (int x=0; x<9; x++) {
-            for(int y=0; y<5; y++ ) {
+        for (int[] array: friendlyUnits) {
+            int[][] setA = getMoveTiles(array[0], array[1], 1, 0);
+            int[][] setB = getMoveTiles(array[0], array[1], 1, 1);
 
-                new TileCommandBuilder(out)
-                        .setTilePosition(x,y)
-                        .setState(States.NORMAL)
-                        .issueCommand();
+            for (int[] res: concatenate(setA, setB)) {
+                if (res[0] >= 0 && res[0] <= 8 && res[1] >= 0 && res[1] <= 4) {
+                    new TileCommandBuilder(out)
+                            .setTilePosition(res[0], res[1])
+                            .setState(States.NORMAL)
+                            .setMode(TileCommandBuilderMode.DRAW)
+                            .issueCommand();
+                }
             }
         }
 

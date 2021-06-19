@@ -59,7 +59,7 @@ public class EndTurnClicked implements EventProcessor{
 					.issueCommand();
 			
 			//mana increment after endturn
-			if(gameState.getRound() > 0) { //Checks if it is round 0. If it is, dont increment the mana of Player2
+			if(gameState.getRound() > 1) { //Checks if it is round 0. If it is, dont increment the mana of Player2
 				gameState.ManaIncrementPerRound(out);
 			}
 

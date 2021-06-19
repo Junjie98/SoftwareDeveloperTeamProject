@@ -161,6 +161,10 @@ public class GameState {
         return preClickCard;
     }
 
+    public void setPreClickCard(){
+        preClickCard = false;
+    }
+
     public void highlightedMoveTileClicked(ActorRef out, int x, int y)       //test for selectex
     {
         if(preMove==true)                                       //if about to move

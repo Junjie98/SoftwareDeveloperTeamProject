@@ -31,6 +31,7 @@ public class EndTurnClicked implements EventProcessor{
 
 		if (gameState.getPreClickCard() == true) {
 			gameState.cardUnhighlight(out);
+			gameState.setPreClickCard();
 		}
 
 		gameState.nextTurn();

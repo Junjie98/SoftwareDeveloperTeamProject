@@ -29,6 +29,10 @@ public class EndTurnClicked implements EventProcessor{
 			gameState.TileUnhighlight(out, active);
 		}
 
+		if (gameState.getPreClickCard() == true) {
+			gameState.cardUnhighlight(out);
+		}
+
 		gameState.nextTurn();
 		processChangedTurns(out, gameState);
 	}

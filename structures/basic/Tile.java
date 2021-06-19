@@ -7,6 +7,8 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import commandbuilders.enums.Players;
+
 /**
  * A basic representation of a tile on the game board. Tiles have both a pixel position
  * and a grid position. Tiles also have a width and height in pixels and a series of urls
@@ -105,6 +107,15 @@ public class Tile {
 	public boolean hasUnit()
 	{
 		return unit != null;
+	}
+
+	public boolean hasFriendlyUnit(Players turn)
+	{
+		if (unit != null && unit.owningPlayer != null) {		//Check if unit is null, and if it has a players unit
+			return unit.owningPlayer == turn ? true : false;
+		} else {
+			return false;
+		}
 	}
 
 	public Unit getUnit()

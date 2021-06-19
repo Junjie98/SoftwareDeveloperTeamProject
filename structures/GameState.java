@@ -43,9 +43,15 @@ public class GameState {
     //////////////////////////////////////////////////////////////////////////////
 
     private boolean preMove = false;
+    private boolean preClickCard = false;
     private Tile previousUnitLocation = null;
 
     //////////////////////////////////////////////////////////////////////////////
+
+    private int[][] friendlyUnits = null;
+
+    //////////////////////////////////////////////////////////////////////////////
+
     public void nextTurn() {
         if (turn == Players.PLAYER1) {
             turn = Players.PLAYER2;
@@ -151,13 +157,16 @@ public class GameState {
                     
     }
 
-
     public Tile getPreviousUnitLocation() {
         return previousUnitLocation;
     }
-
+    
     public boolean getPreMove() {
         return preMove;
+    }
+
+    public boolean getPreClickCard() {
+        return preClickCard;
     }
 
     public void highlightedMoveTileClicked(ActorRef out, int x, int y)       //test for selectex
@@ -187,9 +196,7 @@ public class GameState {
                     previousUnitLocation.setUnit(null);
 
                     TileUnhighlight(out, activeTiles);
-                    preMove=false;
                 }
-
             }
         }
     }
@@ -211,7 +218,6 @@ public class GameState {
                 System.out.println("working");
                 int[][] activeTiles = getAllMoveTiles(x, y);
                 TileUnhighlight(out, activeTiles);
-                preMove = false;
                 return;
             }
 
@@ -245,8 +251,8 @@ public class GameState {
                 }
                 count++;
             }
-
-            
+//
+//
             if(initDirB[0] == true || initDirB[1] == true)              //for the inter tiles do some logic
             {
                 checkTileHighlight(out, interDir[0], turn);
@@ -254,7 +260,7 @@ public class GameState {
             if(initDirB[1] == true || initDirB[3] == true)
             {
                 checkTileHighlight(out, interDir[1], turn);
-            } 
+            }
             if(initDirB[2] == true || initDirB[0] == true)
             {
                 checkTileHighlight(out, interDir[2], turn);
@@ -284,6 +290,8 @@ public class GameState {
                 .setState(States.NORMAL)
                 .issueCommand();
         }
+
+        preMove = false;
     }
 
     private int[][] getMoveTiles(int x, int y, int depth, int inter)
@@ -373,11 +381,111 @@ public class GameState {
     	}
     }
     
-
     public int getRound() { //uses for validation. So round 0 will not increment the mana for player 2 after
     						//player1 ends his turn.
     	return this.roundNumber;
     	
     }
 
+    ////// Card methods
+    public void cardClicked(ActorRef out)
+    {
+        System.out.println("Card Clicked");
+
+        if(preClickCard == true)
+        {
+            System.out.println("preClickCard, unhighlight");
+            cardUnhighlight(out);
+            return;
+        }
+
+        friendlyUnits = scanBoardForFriendlyUnits(out);
+        preClickCard = true;
+    }
+
+
+    public int[][] scanBoardForFriendlyUnits(ActorRef out)
+    {
+        int[][] friendlyUnitLocations = new int[45][2];
+        int count = 0;
+
+        for(int x = 0; x < 9; x++ )
+        {
+            for(int y = 0; y < 5; y ++)
+            {
+                if(Board.getInstance().getTile(x,y).hasFriendlyUnit(turn))
+                {
+                    //save ints into array x y
+                    friendlyUnitLocations[count][0] = x;
+                    friendlyUnitLocations[count][1] = y;
+                    count++;
+                    cardTileHighlight(out,x,y);
+                }
+            }
+        }
+
+        int [][] output = new int[count][2];
+
+        //Print comments in temirnal
+        for (int i=0; i<count;i++) {
+            System.out.println("Unit " + count + ", x: " + friendlyUnitLocations[i][0] + " y: " + friendlyUnitLocations[i][1]);
+            output[i] = friendlyUnitLocations[i];
+        }
+        System.out.println(turn + " has " + count + " of friendly units");
+
+        return output;
+    }
+
+    public void cardTileHighlight(ActorRef out,int x, int y)
+    {
+        int[][] initDir = getMoveTiles(x, y, 1, 0);
+
+        boolean[] initDirB = {true,true,true,true};
+
+        int[][] interDir = getMoveTiles(x, y, 1, 1);
+
+        int count = 0;
+        for (int[] is : initDir)                                    //for the inital directions you can move
+        {
+            initDirB[count] = checkTileHighlight(out, is, turn);       //if they are blocked record this
+            count++;
+        }
+
+        if(initDirB[0] == true || initDirB[1] == true)              //for the inter tiles do some logic
+        {
+            checkTileHighlight(out, interDir[0], turn);
+        }
+        if(initDirB[1] == true || initDirB[3] == true)
+        {
+            checkTileHighlight(out, interDir[1], turn);
+        }
+        if(initDirB[2] == true || initDirB[0] == true)
+        {
+            checkTileHighlight(out, interDir[2], turn);
+        }
+        if(initDirB[2] == true || initDirB[3] == true)
+        {
+            checkTileHighlight(out, interDir[3], turn);
+        }
+    }
+
+    public void cardUnhighlight(ActorRef out)
+    {
+        for (int[] array: friendlyUnits) {
+            int[][] setA = getMoveTiles(array[0], array[1], 1, 0);
+            int[][] setB = getMoveTiles(array[0], array[1], 1, 1);
+
+            for (int[] res: concatenate(setA, setB)) {
+                if (res[0] >= 0 && res[0] <= 8 && res[1] >= 0 && res[1] <= 4) {
+                    new TileCommandBuilder(out)
+                            .setTilePosition(res[0], res[1])
+                            .setState(States.NORMAL)
+                            .setMode(TileCommandBuilderMode.DRAW)
+                            .issueCommand();
+                }
+            }
+        }
+
+        preClickCard = false;
+    }
 }

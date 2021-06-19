@@ -29,8 +29,9 @@ public class TileClicked implements EventProcessor{
 		int tiley = message.get("tiley").asInt();
 		
 		System.out.println("tilehook");
-		gameState.unitClicked(out, tilex, tiley);
-		gameState.highlightedMoveTileClicked(out, tilex, tiley);
+		//gameState.unitClicked(out, tilex, tiley);
+		//gameState.highlightedMoveTileClicked(out, tilex, tiley);
+		gameState.tileClicked(out, tilex, tiley);
 	}
 
 }

@@ -171,33 +171,51 @@ public class GameState {
 
     public void highlightedMoveTileClicked(ActorRef out, int x, int y)       //test for selectex
     {
+    
+        System.out.println("move logic");
+                                                                //what were the prev valid move squares?
+        int[][] activeTiles = getAllMoveTiles(previousUnitLocation.getTilex(), previousUnitLocation.getTiley());
+        int[] test = {x,y};                                 //what we testing?
+        for (int[] ip : activeTiles) 
+        {
+            if(ip[0] == test[0] && ip[1] == test[1])        //valid move 
+            {
+                if(Board.getInstance().getTile(x, y).getUnit()!=null)             //this space is occupied
+                {
+                    return;
+                }
+                System.out.println("move probs");
+
+                new UnitCommandBuilder(out)
+                        .setMode(UnitCommandBuilderMode.MOVE)
+                        .setTilePosition(x, y)
+                        .setUnit(previousUnitLocation.getUnit())
+                        .issueCommand();
+
+                previousUnitLocation.setUnit(null);
+
+                TileUnhighlight(out, activeTiles);
+            }
+        }
+
+        preMove = false;
+        
+    }
+
+    public void tileClicked(ActorRef out, int x, int y)
+    {
+        if (preClickCard==true)
+        {
+            TileUnhighlight(out, scanBoardForFriendlyUnits(out));
+            preClickCard = false;
+        }
         if(preMove==true)                                       //if about to move
         { 
-            System.out.println("move logic");
-                                                                  //what were the prev valid move squares?
-            int[][] activeTiles = getAllMoveTiles(previousUnitLocation.getTilex(), previousUnitLocation.getTiley());
-            int[] test = {x,y};                                 //what we testing?
-            for (int[] ip : activeTiles) 
-            {
-                if(ip[0] == test[0] && ip[1] == test[1])        //valid move 
-                {
-                    if(Board.getInstance().getTile(x, y).getUnit()!=null)             //this space is occupied
-                    {
-                        return;
-                    }
-                    System.out.println("move probs");
-
-                    new UnitCommandBuilder(out)
-                            .setMode(UnitCommandBuilderMode.MOVE)
-                            .setTilePosition(x, y)
-                            .setUnit(previousUnitLocation.getUnit())
-                            .issueCommand();
-
-                    previousUnitLocation.setUnit(null);
-
-                    TileUnhighlight(out, activeTiles);
-                }
-            }
+            highlightedMoveTileClicked(out, x, y);
+        }
+        else if(Board.getInstance().getTile(x, y).getUnit() != null)
+        {
+            unitClicked(out, x, y);
         }
     }
 
@@ -218,6 +236,7 @@ public class GameState {
                 System.out.println("working");
                 int[][] activeTiles = getAllMoveTiles(x, y);
                 TileUnhighlight(out, activeTiles);
+                preMove=false;
                 return;
             }
 
@@ -392,6 +411,13 @@ public class GameState {
     {
         System.out.println("Card Clicked");
 
+        if (preMove == true)
+        {
+            TileUnhighlight(out, getAllMoveTiles(previousUnitLocation.getTilex(), previousUnitLocation.getTiley()));
+
+            preMove = false;
+
+        }
         if(preClickCard == true)
         {
             System.out.println("preClickCard, unhighlight");
@@ -400,6 +426,7 @@ public class GameState {
         }
 
         friendlyUnits = scanBoardForFriendlyUnits(out);
+        
         preClickCard = true;
     }
 

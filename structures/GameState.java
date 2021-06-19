@@ -42,6 +42,7 @@ public class GameState {
     //////////////////////////////////////////////////////////////////////////////
 
     private boolean preMove = false;
+    private boolean preClickCard = false;
     private Tile previousUnitLocation = null;
 
     //////////////////////////////////////////////////////////////////////////////
@@ -154,6 +155,10 @@ public class GameState {
 
     public boolean getPreMove() {
         return preMove;
+    }
+
+    public boolean getPreClickCard() {
+        return preClickCard;
     }
 
     public void highlightedMoveTileClicked(ActorRef out, int x, int y)       //test for selectex
@@ -349,6 +354,24 @@ public class GameState {
         }
     }
 
+    ////// Card methods
+    public void cardClicked(ActorRef out)
+    {
+        System.out.println("Card Clicked");
+
+        if(preClickCard == true)
+        {
+            System.out.println("preClickCard, unhighlight");
+            cardUnhighlight(out);
+            preClickCard = false;
+            return;
+        }
+
+        scanBoardForFriendlyUnits(out);
+        preClickCard = true;
+    }
+
+
     public int[][] scanBoardForFriendlyUnits(ActorRef out)
     {
         int[][] friendlyUnitLocations = new int[45][2];
@@ -406,7 +429,18 @@ public class GameState {
         {
             checkTileHighlight(out, interDir[3], turn);
         }
+    }
 
+    public void cardUnhighlight(ActorRef out)
+    {
+        for (int x=0; x<9; x++) {
+            for(int y=0; y<5; y++ ) {
 
+                new TileCommandBuilder(out)
+                        .setTilePosition(x,y)
+                        .setState(States.NORMAL)
+                        .issueCommand();
+            }
+        }
     }
 }

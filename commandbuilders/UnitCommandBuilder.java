@@ -1,6 +1,7 @@
 package commandbuilders;
 
 import akka.actor.ActorRef;
+import commandbuilders.enums.MoveDirection;
 import commandbuilders.enums.Players;
 import commandbuilders.enums.UnitCommandBuilderMode;
 import commandbuilders.enums.UnitStats;
@@ -23,6 +24,8 @@ import utils.StaticConfFiles;
  *
  * For MOVE and DRAW commands, just specify .setTilePosition(x, y) to specify the target position.
  *
+ * For MOVE, you can also use .setDirection to set the direction to HORIZONTAL or VERTICAL.
+ *
  * For setting stats of a unit, use .setStats(UnitStats, int), to set the ATTACK or HEALTH to the following value.
  *
  * For ANIMATION, specify one of the UnitAnimationType by calling .setAnimationType(UnitAnimationType), to specify one of
@@ -42,6 +45,11 @@ public class UnitCommandBuilder extends CommandBuilder{
     int tileX = -1;
     int tileY = -1;
     private Players player;
+
+    // For Move Only
+    private MoveDirection direction = MoveDirection.HORIZONTAL;
+    // This is added to support directions.
+    // If it is not set, it defaults horizontal.
 
     // For Stats
     private UnitStats stats = UnitStats.ATTACK;
@@ -82,6 +90,10 @@ public class UnitCommandBuilder extends CommandBuilder{
         return this;
     }
 
+    public void setDirection(MoveDirection direction) {
+        this.direction = direction;
+    }
+
     public UnitCommandBuilder setAnimationType(UnitAnimationType animationType) {
         this.animationType = animationType;
         return this;
@@ -99,7 +111,8 @@ public class UnitCommandBuilder extends CommandBuilder{
             Tile tile = Board.getInstance().getTile(tileX, tileY);
             tile.setUnit(unit);
             unit.setPositionByTile(tile);
-            BasicCommands.moveUnitToTile(reference, unit, tile);
+            boolean dir = (direction == MoveDirection.VERTICAL);
+            BasicCommands.moveUnitToTile(reference, unit, tile, dir);
         } else if (mode == UnitCommandBuilderMode.SET) {
             if (stats == UnitStats.ATTACK) {
                 BasicCommands.setUnitAttack(reference, unit, value);

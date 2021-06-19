@@ -128,6 +128,29 @@ public class BasicCommands {
 	}
 	
 	/**
+	 * This command moves a unit sprite from one tile to another. It takes in the unit’s object and the target Tile. 
+	 * Note that this command will start the movement, it may take multiple seconds for the movement to complete.
+	 * yfirst sets whether the move should move the unit vertically first before moving horizontally
+	 * @param out
+	 * @param yfirst
+	 * @param unit
+	 * @param tile
+	 */
+	@SuppressWarnings({"deprecation"})
+	public static void moveUnitToTile(ActorRef out, Unit unit, Tile tile, boolean yfirst) {
+		try {
+			ObjectNode returnMessage = Json.newObject();
+			returnMessage.put("messagetype", "moveUnitToTile");
+			returnMessage.put("yfirst", yfirst);
+			returnMessage.put("unit", mapper.readTree(mapper.writeValueAsString(unit)));
+			returnMessage.put("tile", mapper.readTree(mapper.writeValueAsString(tile)));
+			out.tell(returnMessage, out);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	/**
 	 * This command makes a unit play a specified animation. It takes in the unit object which
 	 * contains all of the data needed to play the animations, and a UnitAnimation that specifies
 	 * which animation to switch to.

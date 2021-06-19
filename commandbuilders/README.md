@@ -142,6 +142,8 @@ You will need to specify a unit by calling `.setUnit(Unit)`.
 
 For `MOVE` and `DRAW` commands, just specify `.setTilePosition(x, y)` to specify the target position.
 
+For `MOVE`, you can also use `.setDirection` to set the direction to `HORIZONTAL` or `VERTICAL`.
+
 For setting stats of a unit, use `.setStats(UnitStats, int)`, to set the `ATTACK` or `HEALTH` to the following value.
 
 For `ANIMATION`, specify one of the `UnitAnimationType` by calling `.setAnimationType(UnitAnimationType)`, to specify one of `idle`, `death`, `attack`, `move`, `channel`, `hit`.

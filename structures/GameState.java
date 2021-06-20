@@ -401,6 +401,7 @@ public class GameState {
     {
         if(Board.getInstance().getTile(x, y).getUnit().getId() == 2) //@YU this is another place
         {
+            System.err.println("flyhighlight");
             flyingMoveHighlight(out);
         }
         else
@@ -504,7 +505,7 @@ public class GameState {
                 if(!Board.getInstance().getTile(x, y).hasUnit())
                 {
                     int[] temp = {x,y};
-                    //System.err.println("tile: " + x + "," + y);
+                    System.err.println("tile: " + x + "," + y);
                     maxContainer[count++] = temp;
                 }
             }

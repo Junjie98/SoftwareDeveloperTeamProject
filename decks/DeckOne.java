@@ -25,9 +25,9 @@ public class DeckOne {
                 StaticConfFiles.c_truestrike
         };
         for (int idx = 0; idx < deck1Cards.length; idx++) {
-            Card card1 = BasicObjectBuilders.loadCard(deck1Cards[idx], 0, Card.class);
+            Card card1 = BasicObjectBuilders.loadCard(deck1Cards[idx], 2*idx, Card.class);
             cards.add(card1);
-            Card card2 = BasicObjectBuilders.loadCard(deck1Cards[idx], 0, Card.class);
+            Card card2 = BasicObjectBuilders.loadCard(deck1Cards[idx], 2*idx+1, Card.class);
             cards.add(card2);
         }
         Collections.shuffle(cards);

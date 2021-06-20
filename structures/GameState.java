@@ -71,7 +71,7 @@ public class GameState {
     {
         Unit human = new UnitFactory().generateUnit(UnitType.HUMAN);
         Unit ai = new UnitFactory().generateUnit(UnitType.AI);
-        Unit flyer = new UnitFactory().generateUnit(UnitType.WINDSHRIKE);
+        // Unit flyer = new UnitFactory().generateUnit(UnitType.WINDSHRIKE);
 
         new UnitCommandBuilder(out)
                     .setMode(UnitCommandBuilderMode.DRAW)
@@ -87,12 +87,12 @@ public class GameState {
                     .setUnit(ai)
                     .issueCommand();
 
-         new UnitCommandBuilder(out)
-                    .setMode(UnitCommandBuilderMode.DRAW)
-                    .setTilePosition(1, 1)
-                    .setPlayerID(Players.PLAYER1)
-                    .setUnit(flyer)
-                    .issueCommand();
+        //  new UnitCommandBuilder(out)
+        //             .setMode(UnitCommandBuilderMode.DRAW)
+        //             .setTilePosition(1, 1)
+        //             .setPlayerID(Players.PLAYER1)
+        //             .setUnit(flyer)
+        //             .issueCommand();
                     
     }
 

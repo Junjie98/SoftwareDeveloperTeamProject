@@ -25,9 +25,9 @@ public class DeckTwo {
                 StaticConfFiles.c_windshrike,
         };
         for (int idx = 0; idx < deck2Cards.length; idx++) {
-            Card card1 = BasicObjectBuilders.loadCard(deck2Cards[idx], 20*idx, Card.class);
+            Card card1 = BasicObjectBuilders.loadCard(deck2Cards[idx], 20 + 2*idx, Card.class);
             cards.add(card1);
-            Card card2 = BasicObjectBuilders.loadCard(deck2Cards[idx], 20*idx+1, Card.class);
+            Card card2 = BasicObjectBuilders.loadCard(deck2Cards[idx], 20 + 2*idx+1, Card.class);
             cards.add(card2);
         }
         Collections.shuffle(cards);

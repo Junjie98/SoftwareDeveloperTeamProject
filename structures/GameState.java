@@ -123,39 +123,31 @@ public class GameState {
     }
     ////////////////////////////////////end///////////////////////////////////////
 
-
+    Card previousClickedCard = null;
 
     //////////////////////////////////////////////////////////////////////////////
             ///Drawing a New card, playing cards, card click logic///
     //////////////////////////////////////////////////////////////////////////////
     ////// Card methods
-    public void cardClicked(ActorRef out)
+    public void cardClicked(ActorRef out, int idx)
     {
         System.out.println("Card Clicked");
+        Card[] temp = (turn == Players.PLAYER1) ? player1CardsInHand : player2CardsInHand;
 
-        if (preMove == true)
-        {
-            //System.err.println("Get rid of the previously highlighted tiles");
-            TileUnhighlight(out, getAllMoveTiles(previousUnitLocation.getTilex(), previousUnitLocation.getTiley()));
-            preMove = false;
+        clearBoardHighlights(out);
+
+        if (previousClickedCard != null && previousClickedCard == temp[idx]) {
+            // Do not redraw the highlights if player clicks on the same card.
+            previousClickedCard = null;
+        } else {
+            // Redraw the highlights.
+            friendlyUnits = scanBoardForFriendlyUnits(out);
+            for (int[] unit: friendlyUnits) {
+                cardTileHighlight(out, unit[0], unit[1]);
+            }
+            preClickCard = true;
+            previousClickedCard = temp[idx];
         }
-
-        if(preClickCard == true)
-        {
-            // When you pressed a card and and you pressed another card,
-            //   it should cancel the highlight and return.
-
-            System.out.println("Highlight in place. Cancelling.");
-            cardUnhighlight(out);
-            preClickCard = false;
-            return;
-        }
-
-        friendlyUnits = scanBoardForFriendlyUnits(out);
-        for (int[] unit: friendlyUnits) {
-            cardTileHighlight(out, unit[0], unit[1]);
-        }
-        preClickCard = true;
     }
     
 
@@ -264,26 +256,12 @@ public class GameState {
     //////////////////////////////////////////////////////////////////////////////
     public void tileClicked(ActorRef out, int x, int y)
     {
-        if (preClickCard==true)
-        {
-            TileUnhighlight(out, scanBoardForFriendlyUnits(out));
-            preMove = false;
-            preClickCard = false;
-        }
-      
-        if(preMove==true && Board.getInstance().getTile(x, y).getUnit() == null)                                       //if about to move
-        {
+        if (preMove && Board.getInstance().getTile(x, y).getUnit() == null) {
             highlightedMoveTileClicked(out, x, y);
-        }
-        else if(Board.getInstance().getTile(x, y).getUnit() != null)
-        {
+        } else if (Board.getInstance().getTile(x, y).getUnit() != null) {
             unitClicked(out, x, y);
-        }
-        else if(Board.getInstance().getTile(x, y).getUnit() == null)
-        {
-            TileUnhighlight(out, scanBoardForFriendlyUnits(out));
-            preMove = false;
-            preClickCard = false;
+        } else {
+            clearBoardHighlights(out);
         }
     }
 
@@ -446,10 +424,17 @@ public class GameState {
             ///Helper Methods, methods used in multiple logics etc///
     //////////////////////////////////////////////////////////////////////////////
 
-    public void resetLogicAndClear(ActorRef out)
-    {
-        preMove = false;
-
+    private void clearBoardHighlights(ActorRef out) {
+        if (preMove == true)
+        {
+            TileUnhighlight(out, getAllMoveTiles(previousUnitLocation.getTilex(), previousUnitLocation.getTiley()));
+            preMove = false;
+        }
+        if(preClickCard == true)
+        {
+            cardUnhighlight(out);
+            preClickCard = false;
+        }
     }
 
 

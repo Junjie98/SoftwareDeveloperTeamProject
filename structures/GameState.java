@@ -35,13 +35,14 @@ public class GameState {
     private Card[] player2CardsInHand = new Card[MAX_CARD_COUNT_IN_HAND];
     private int player2CardsInHandCount = 0;
 
+
     private DeckOne deck1 = new DeckOne();
     private DeckTwo deck2 = new DeckTwo();
 
     private boolean preMove = false;
     private boolean preClickCard = false;
     private Tile previousUnitLocation = null;
-
+    private Card previousClickedCard = null;
 
     private int[][] friendlyUnits = null;
 
@@ -123,8 +124,6 @@ public class GameState {
     }
     ////////////////////////////////////end///////////////////////////////////////
 
-    Card previousClickedCard = null;
-
     //////////////////////////////////////////////////////////////////////////////
             ///Drawing a New card, playing cards, card click logic///
     //////////////////////////////////////////////////////////////////////////////
@@ -136,13 +135,15 @@ public class GameState {
 
         clearBoardHighlights(out);
 
-        if (previousClickedCard != null && previousClickedCard == temp[idx]) {
+        if (previousClickedCard != null && previousClickedCard == temp[idx])
+        {
             // Do not redraw the highlights if player clicks on the same card.
             previousClickedCard = null;
         } else {
             // Redraw the highlights.
             friendlyUnits = scanBoardForFriendlyUnits(out);
-            for (int[] unit: friendlyUnits) {
+            for (int[] unit: friendlyUnits)
+            {
                 cardTileHighlight(out, unit[0], unit[1]);
             }
             preClickCard = true;
@@ -256,11 +257,16 @@ public class GameState {
     //////////////////////////////////////////////////////////////////////////////
     public void tileClicked(ActorRef out, int x, int y)
     {
-        if (preMove && Board.getInstance().getTile(x, y).getUnit() == null) {
+        if (preMove && Board.getInstance().getTile(x, y).getUnit() == null)
+        {
             highlightedMoveTileClicked(out, x, y);
-        } else if (Board.getInstance().getTile(x, y).getUnit() != null) {
+        }
+        else if (Board.getInstance().getTile(x, y).getUnit() != null)
+        {
             unitClicked(out, x, y);
-        } else {
+        }
+        else
+        {
             clearBoardHighlights(out);
         }
     }
@@ -278,7 +284,7 @@ public class GameState {
     {
         int[][] activeTiles = getAllMoveTiles(previousUnitLocation.getTilex(), previousUnitLocation.getTiley());
         int[] test = {x,y};                                 //what we testing?
-        for (int[] ip : activeTiles) 
+        for (int[] ip : activeTiles)
         {
             if(ip[0] == test[0] && ip[1] == test[1])        //valid move 
             {
@@ -424,7 +430,8 @@ public class GameState {
             ///Helper Methods, methods used in multiple logics etc///
     //////////////////////////////////////////////////////////////////////////////
 
-    private void clearBoardHighlights(ActorRef out) {
+    private void clearBoardHighlights(ActorRef out)
+    {
         if (preMove == true)
         {
             TileUnhighlight(out, getAllMoveTiles(previousUnitLocation.getTilex(), previousUnitLocation.getTiley()));

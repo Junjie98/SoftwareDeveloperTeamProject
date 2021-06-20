@@ -23,7 +23,7 @@ import structures.basic.Unit;
 public class GameState {
     private final int MAX_CARD_COUNT_IN_HAND = 6;
     private final int INITIAL_CARD_COUNT = 3;
-    private int roundNumber = 0;
+    private int roundNumber = 1;
     
     private Players turn = Players.PLAYER1;
     // TODO: This should be randomised according to game loop.
@@ -51,8 +51,8 @@ public class GameState {
     //////////////////////////////////////////////////////////////////////////////
     //Creates the two players
     public void generateTwoUsers(ActorRef out) {
-    	player1 = new Player(20,0); //set players health and mana to 20,0
-        player2 = new Player(20,0); 
+    	player1 = new Player(20,2); //set players health and mana to 20
+        player2 = new Player(20,2); //player start with 2 mana in round 1.
 
         new PlayerSetCommandsBuilder(out)
                 .setPlayer(Players.PLAYER1)

@@ -1,20 +1,16 @@
 package structures;
 
 import java.lang.reflect.Array;
-
-import javax.lang.model.util.ElementScanner14;
+import java.util.ArrayList;
 
 import akka.actor.ActorRef;
 import commandbuilders.*;
 import commandbuilders.enums.*;
-import commands.BasicCommands;
 import decks.*;
 import structures.basic.Card;
 import structures.basic.Player;
 import structures.basic.Tile;
 import structures.basic.Unit;
-import utils.BasicObjectBuilders;
-import utils.StaticConfFiles;
 
 /**
  * This class can be used to hold information about the on-going game.
@@ -129,7 +125,6 @@ public class GameState {
 
 
 
-
     //////////////////////////////////////////////////////////////////////////////
             ///Drawing a New card, playing cards, card click logic///
     //////////////////////////////////////////////////////////////////////////////
@@ -142,27 +137,25 @@ public class GameState {
         {
             //System.err.println("Get rid of the previously highlighted tiles");
             TileUnhighlight(out, getAllMoveTiles(previousUnitLocation.getTilex(), previousUnitLocation.getTiley()));
-
             preMove = false;
-
         }
+
         if(preClickCard == true)
         {
-            //System.out.println("preClickCard, unhighlight");
+            // When you pressed a card and and you pressed another card,
+            //   it should cancel the highlight and return.
+
+            System.out.println("Highlight in place. Cancelling.");
             cardUnhighlight(out);
             preClickCard = false;
-        }
-        else
-        {
-        
-            preClickCard = true;
-            try {Thread.sleep(10);} catch (InterruptedException e) {e.printStackTrace();}
-
-            friendlyUnits = scanBoardForFriendlyUnits(out);
-
+            return;
         }
 
-    
+        friendlyUnits = scanBoardForFriendlyUnits(out);
+        for (int[] unit: friendlyUnits) {
+            cardTileHighlight(out, unit[0], unit[1]);
+        }
+        preClickCard = true;
     }
     
 
@@ -279,7 +272,7 @@ public class GameState {
         }
       
         if(preMove==true && Board.getInstance().getTile(x, y).getUnit() == null)                                       //if about to move
-        { 
+        {
             highlightedMoveTileClicked(out, x, y);
         }
         else if(Board.getInstance().getTile(x, y).getUnit() != null)
@@ -292,11 +285,6 @@ public class GameState {
             preMove = false;
             preClickCard = false;
         }
-        
-      
-
-
-        
     }
 
     public Tile getPreviousUnitLocation() {
@@ -540,6 +528,7 @@ public class GameState {
         int[][] friendlyUnitLocations = new int[45][2];
         int count = 0;
 
+
         for(int x = 0; x < 9; x++ )
         {
             for(int y = 0; y < 5; y ++)
@@ -551,14 +540,12 @@ public class GameState {
                     friendlyUnitLocations[count][0] = x;
                     friendlyUnitLocations[count][1] = y;
                     count++;
-                    cardTileHighlight(out,x,y);
                 }
             }
         }
 
         int [][] output = new int[count][2];
 
-        //Print comments in temirnal
         for (int i=0; i<count;i++) {
             System.out.println("Unit " + count + ", x: " + friendlyUnitLocations[i][0] + " y: " + friendlyUnitLocations[i][1]);
             output[i] = friendlyUnitLocations[i];
@@ -571,7 +558,7 @@ public class GameState {
 
 
     //////////////////////////////////////////////////////////////////////////////
-                               ///Mana incremention///
+                               ///Mana incrementation///
     //////////////////////////////////////////////////////////////////////////////
     public void ManaIncrementPerRound(ActorRef out) {
     	if(this.turn==Players.PLAYER1) {

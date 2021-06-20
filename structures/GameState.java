@@ -1,20 +1,16 @@
 package structures;
 
 import java.lang.reflect.Array;
-
-import javax.lang.model.util.ElementScanner14;
+import java.util.ArrayList;
 
 import akka.actor.ActorRef;
 import commandbuilders.*;
 import commandbuilders.enums.*;
-import commands.BasicCommands;
 import decks.*;
 import structures.basic.Card;
 import structures.basic.Player;
 import structures.basic.Tile;
 import structures.basic.Unit;
-import utils.BasicObjectBuilders;
-import utils.StaticConfFiles;
 
 /**
  * This class can be used to hold information about the on-going game.
@@ -39,13 +35,14 @@ public class GameState {
     private Card[] player2CardsInHand = new Card[MAX_CARD_COUNT_IN_HAND];
     private int player2CardsInHandCount = 0;
 
+
     private DeckOne deck1 = new DeckOne();
     private DeckTwo deck2 = new DeckTwo();
 
     private boolean preMove = false;
     private boolean preClickCard = false;
     private Tile previousUnitLocation = null;
-
+    private Card previousClickedCard = null;
 
     private int[][] friendlyUnits = null;
 
@@ -127,42 +124,31 @@ public class GameState {
     }
     ////////////////////////////////////end///////////////////////////////////////
 
-
-
-
     //////////////////////////////////////////////////////////////////////////////
             ///Drawing a New card, playing cards, card click logic///
     //////////////////////////////////////////////////////////////////////////////
     ////// Card methods
-    public void cardClicked(ActorRef out)
+    public void cardClicked(ActorRef out, int idx)
     {
         System.out.println("Card Clicked");
+        Card[] temp = (turn == Players.PLAYER1) ? player1CardsInHand : player2CardsInHand;
 
-        if (preMove == true)
+        clearBoardHighlights(out);
+
+        if (previousClickedCard != null && previousClickedCard == temp[idx])
         {
-            //System.err.println("Get rid of the previously highlighted tiles");
-            TileUnhighlight(out, getAllMoveTiles(previousUnitLocation.getTilex(), previousUnitLocation.getTiley()));
-
-            preMove = false;
-
-        }
-        if(preClickCard == true)
-        {
-            //System.out.println("preClickCard, unhighlight");
-            cardUnhighlight(out);
-            preClickCard = false;
-        }
-        else
-        {
-        
-            preClickCard = true;
-            try {Thread.sleep(10);} catch (InterruptedException e) {e.printStackTrace();}
-
+            // Do not redraw the highlights if player clicks on the same card.
+            previousClickedCard = null;
+        } else {
+            // Redraw the highlights.
             friendlyUnits = scanBoardForFriendlyUnits(out);
-
+            for (int[] unit: friendlyUnits)
+            {
+                cardTileHighlight(out, unit[0], unit[1]);
+            }
+            preClickCard = true;
+            previousClickedCard = temp[idx];
         }
-
-    
     }
     
 
@@ -271,32 +257,18 @@ public class GameState {
     //////////////////////////////////////////////////////////////////////////////
     public void tileClicked(ActorRef out, int x, int y)
     {
-        if (preClickCard==true)
+        if (preMove && Board.getInstance().getTile(x, y).getUnit() == null)
         {
-            TileUnhighlight(out, scanBoardForFriendlyUnits(out));
-            preMove = false;
-            preClickCard = false;
-        }
-      
-        if(preMove==true && Board.getInstance().getTile(x, y).getUnit() == null)                                       //if about to move
-        { 
             highlightedMoveTileClicked(out, x, y);
         }
-        else if(Board.getInstance().getTile(x, y).getUnit() != null)
+        else if (Board.getInstance().getTile(x, y).getUnit() != null)
         {
             unitClicked(out, x, y);
         }
-        else if(Board.getInstance().getTile(x, y).getUnit() == null)
+        else
         {
-            TileUnhighlight(out, scanBoardForFriendlyUnits(out));
-            preMove = false;
-            preClickCard = false;
+            clearBoardHighlights(out);
         }
-        
-      
-
-
-        
     }
 
     public Tile getPreviousUnitLocation() {
@@ -312,7 +284,7 @@ public class GameState {
     {
         int[][] activeTiles = getAllMoveTiles(previousUnitLocation.getTilex(), previousUnitLocation.getTiley());
         int[] test = {x,y};                                 //what we testing?
-        for (int[] ip : activeTiles) 
+        for (int[] ip : activeTiles)
         {
             if(ip[0] == test[0] && ip[1] == test[1])        //valid move 
             {
@@ -458,10 +430,18 @@ public class GameState {
             ///Helper Methods, methods used in multiple logics etc///
     //////////////////////////////////////////////////////////////////////////////
 
-    public void resetLogicAndClear(ActorRef out)
+    private void clearBoardHighlights(ActorRef out)
     {
-        preMove = false;
-
+        if (preMove == true)
+        {
+            TileUnhighlight(out, getAllMoveTiles(previousUnitLocation.getTilex(), previousUnitLocation.getTiley()));
+            preMove = false;
+        }
+        if(preClickCard == true)
+        {
+            cardUnhighlight(out);
+            preClickCard = false;
+        }
     }
 
 
@@ -540,6 +520,7 @@ public class GameState {
         int[][] friendlyUnitLocations = new int[45][2];
         int count = 0;
 
+
         for(int x = 0; x < 9; x++ )
         {
             for(int y = 0; y < 5; y ++)
@@ -551,14 +532,12 @@ public class GameState {
                     friendlyUnitLocations[count][0] = x;
                     friendlyUnitLocations[count][1] = y;
                     count++;
-                    cardTileHighlight(out,x,y);
                 }
             }
         }
 
         int [][] output = new int[count][2];
 
-        //Print comments in temirnal
         for (int i=0; i<count;i++) {
             System.out.println("Unit " + count + ", x: " + friendlyUnitLocations[i][0] + " y: " + friendlyUnitLocations[i][1]);
             output[i] = friendlyUnitLocations[i];
@@ -571,7 +550,7 @@ public class GameState {
 
 
     //////////////////////////////////////////////////////////////////////////////
-                               ///Mana incremention///
+                               ///Mana incrementation///
     //////////////////////////////////////////////////////////////////////////////
     public void ManaIncrementPerRound(ActorRef out) {
     	if(this.turn==Players.PLAYER1) {

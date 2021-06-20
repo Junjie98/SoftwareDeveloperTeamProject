@@ -75,6 +75,7 @@ public class TileCommandBuilder extends CommandBuilder {
             }
 
             BasicCommands.drawTile(reference, tile, drawMode);
+            try {Thread.sleep(30);} catch (InterruptedException e) {e.printStackTrace();}
         } else if (mode == TileCommandBuilderMode.ANIMATION) {
             Tile tile = BasicObjectBuilders.loadTile(x, y);
             String temp = StaticConfFiles.f1_inmolation;

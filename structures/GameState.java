@@ -288,22 +288,41 @@ public class GameState {
     }
 
    
-    public boolean checkMoveValidity(ActorRef out, int x, int y)
+    public boolean checkMoveValidity(ActorRef out, int x, int y, boolean flying)
     {
-        int[][] activeTiles = getAllMoveTiles(previousUnitLocation.getTilex(), previousUnitLocation.getTiley());
         int[] test = {x,y};                                 //what we testing?
-        for (int[] ip : activeTiles)
+
+        if(!flying)
         {
-            if(ip[0] == test[0] && ip[1] == test[1])        //valid move 
+            int[][] activeTiles = getAllMoveTiles(previousUnitLocation.getTilex(), previousUnitLocation.getTiley());
+            for (int[] ip : activeTiles)
             {
-                if(Board.getInstance().getTile(x, y).getUnit()!=null)             //this space is occupied
+                if(ip[0] == test[0] && ip[1] == test[1])        //valid move 
                 {
-                    return false;
+                    if(Board.getInstance().getTile(x, y).getUnit()!=null)             //this space is occupied
+                    {
+                        return false;
+                    }
+                    return true;
                 }
-                return true;
             }
+            return false;
         }
-        return false;
+        else
+        {
+            for (int[] is : getFlyMoveTiles(out))                   //check the fly tiles for validity
+            {
+                if(is[0] == test[0] && is[1] == test[1])
+                {
+                    if(Board.getInstance().getTile(x, y).getUnit()!=null)             //this space is occupied
+                    {
+                        return false;
+                    }
+                    return true;
+                }
+            }
+            return false;
+        }
     }
 
 
@@ -311,7 +330,7 @@ public class GameState {
     {
     
         System.out.println("move logic");
-        if(checkMoveValidity(out, x, y))
+        if(checkMoveValidity(out, x, y, previousUnitLocation.getUnit().getId()==2?true:false)) //@YU another here
         {
 
         
@@ -323,9 +342,10 @@ public class GameState {
                     .setUnit(previousUnitLocation.getUnit())
                     .issueCommand();
 
-            previousUnitLocation.setUnit(null);
 
             clearBoardHighlights(out);
+            previousUnitLocation.setUnit(null);
+
         }
         else
         {
@@ -462,10 +482,10 @@ public class GameState {
     {
         for (int[] ti : getFlyMoveTiles(out))           //available tiles
         {
-            System.err.println("print fly tile" + ti[0] + " "+ ti[1]);
+            //System.err.println("print fly tile" + ti[0] + " "+ ti[1]);
             checkTileHighlight(out, ti);            
         }
-        for (int[] bl : scanBoardForFriendlyUnits(out)) //Blocked tiles
+        for (int[] bl : scanBoardForUnits(out)) //Blocked tiles
         {
             checkTileHighlight(out, bl);            
         } 
@@ -484,7 +504,7 @@ public class GameState {
                 if(!Board.getInstance().getTile(x, y).hasUnit())
                 {
                     int[] temp = {x,y};
-                    System.err.println("tile: " + x + "," + y);
+                    //System.err.println("tile: " + x + "," + y);
                     maxContainer[count++] = temp;
                 }
             }
@@ -543,8 +563,8 @@ public class GameState {
         int[][] outArr = new int[count][2];
         for(int i = 0; i < count; i++)
         {
-            outArr[i][0] = maxContainer[count][0];
-            outArr[i][1] = maxContainer[count][1];
+            outArr[i][0] = maxContainer[i][0];
+            outArr[i][1] = maxContainer[i][1];
         }
         return outArr;
     }

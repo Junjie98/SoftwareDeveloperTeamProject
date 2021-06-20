@@ -71,6 +71,7 @@ public class GameState {
     {
         Unit human = new UnitFactory().generateUnit(UnitType.HUMAN);
         Unit ai = new UnitFactory().generateUnit(UnitType.AI);
+        // Unit flyer = new UnitFactory().generateUnit(UnitType.WINDSHRIKE);
 
         new UnitCommandBuilder(out)
                     .setMode(UnitCommandBuilderMode.DRAW)
@@ -85,6 +86,13 @@ public class GameState {
                     .setPlayerID(Players.PLAYER2)
                     .setUnit(ai)
                     .issueCommand();
+
+        //  new UnitCommandBuilder(out)
+        //             .setMode(UnitCommandBuilderMode.DRAW)
+        //             .setTilePosition(1, 1)
+        //             .setPlayerID(Players.PLAYER1)
+        //             .setUnit(flyer)
+        //             .issueCommand();
                     
     }
 
@@ -280,22 +288,41 @@ public class GameState {
     }
 
    
-    public boolean checkMoveValidity(ActorRef out, int x, int y)
+    public boolean checkMoveValidity(ActorRef out, int x, int y, boolean flying)
     {
-        int[][] activeTiles = getAllMoveTiles(previousUnitLocation.getTilex(), previousUnitLocation.getTiley());
         int[] test = {x,y};                                 //what we testing?
-        for (int[] ip : activeTiles)
+
+        if(!flying)
         {
-            if(ip[0] == test[0] && ip[1] == test[1])        //valid move 
+            int[][] activeTiles = getAllMoveTiles(previousUnitLocation.getTilex(), previousUnitLocation.getTiley());
+            for (int[] ip : activeTiles)
             {
-                if(Board.getInstance().getTile(x, y).getUnit()!=null)             //this space is occupied
+                if(ip[0] == test[0] && ip[1] == test[1])        //valid move 
                 {
-                    return false;
+                    if(Board.getInstance().getTile(x, y).getUnit()!=null)             //this space is occupied
+                    {
+                        return false;
+                    }
+                    return true;
                 }
-                return true;
             }
+            return false;
         }
-        return false;
+        else
+        {
+            for (int[] is : getFlyMoveTiles(out))                   //check the fly tiles for validity
+            {
+                if(is[0] == test[0] && is[1] == test[1])
+                {
+                    if(Board.getInstance().getTile(x, y).getUnit()!=null)             //this space is occupied
+                    {
+                        return false;
+                    }
+                    return true;
+                }
+            }
+            return false;
+        }
     }
 
 
@@ -303,11 +330,11 @@ public class GameState {
     {
     
         System.out.println("move logic");
-        if(checkMoveValidity(out, x, y))
+        if(checkMoveValidity(out, x, y, previousUnitLocation.getUnit().getId()==2?true:false)) //@YU another here
         {
 
         
-            //System.out.println("move probs");
+            System.out.println("move valid");
 
             new UnitCommandBuilder(out)
                     .setMode(UnitCommandBuilderMode.MOVE)
@@ -315,14 +342,15 @@ public class GameState {
                     .setUnit(previousUnitLocation.getUnit())
                     .issueCommand();
 
+
+            clearBoardHighlights(out);
             previousUnitLocation.setUnit(null);
 
-            TileUnhighlight(out, getAllMoveTiles(previousUnitLocation.getTilex(), previousUnitLocation.getTiley()));
-       
         }
         else
         {
-            TileUnhighlight(out, getAllMoveTiles(previousUnitLocation.getTilex(), previousUnitLocation.getTiley()));
+            clearBoardHighlights(out);
+
         }
         preMove = false;
         
@@ -331,28 +359,57 @@ public class GameState {
     public void unitClicked(ActorRef out,int x, int y)
     {
         System.out.println(x +"," + y + " Clicked");
-        System.out.println(Board.getInstance().getTile(x, y).getUnit());
-        if(Board.getInstance().getTile(x, y).getUnit() != null)
-        { 
-            if(Board.getInstance().getTile(x, y).getUnit().getPlayerID() != turn) //you dont own this unit!
-            {
-                return;
-            }
-            previousUnitLocation = Board.getInstance().getTile(x, y);
-            //System.out.println("activates");
-            if(preMove == true)
-            {
-                //System.out.println("working");
-                int[][] activeTiles = getAllMoveTiles(x, y);
-                TileUnhighlight(out, activeTiles);
-                preMove=false;
-                return;
-            }
+        System.out.println(Board.getInstance().getTile(x, y).getUnit().getId());
+       
+        if(Board.getInstance().getTile(x, y).getUnit().getPlayerID() != turn) //you dont own this unit!
+        {
+            System.err.println("you dont own this unit");
+            return;
+        }
 
+        //Unhighlight previously selected unit
+        if(preMove == true)
+        {
+
+            if (previousUnitLocation !=  Board.getInstance().getTile(x, y))
+            {
+                //if new unit
+                clearBoardHighlights(out);
+                
+                preMove = true;
+                moveHighlight(out, x, y);
+
+                previousUnitLocation = Board.getInstance().getTile(x, y);
+            }
+            else
+            {
+                clearBoardHighlights(out);
+
+                preMove=false;
+            }
+        }
+        else
+        {
             preMove = true;
+            moveHighlight(out, x, y);
+          
+            previousUnitLocation = Board.getInstance().getTile(x, y);
+        }   
+    }
+
+    public void moveHighlight(ActorRef out, int x, int y)
+    {
+        if(Board.getInstance().getTile(x, y).getUnit().getId() == 2) //@YU this is another place
+        {
+            System.err.println("flyhighlight");
+            flyingMoveHighlight(out);
+        }
+        else
+        {
             basicMoveHighlight(out, x, y);
         }
     }
+
 
     public void basicMoveHighlight(ActorRef out,int x, int y)
     {
@@ -421,6 +478,61 @@ public class GameState {
         return a;
         
     }
+
+    public void flyingMoveHighlight(ActorRef out)
+    {
+        for (int[] ti : getFlyMoveTiles(out))           //available tiles
+        {
+            //System.err.println("print fly tile" + ti[0] + " "+ ti[1]);
+            checkTileHighlight(out, ti);            
+        }
+        for (int[] bl : scanBoardForUnits(out)) //Blocked tiles
+        {
+            checkTileHighlight(out, bl);            
+        } 
+
+    }
+
+    public int[][] getFlyMoveTiles(ActorRef out)
+    {
+        int[][] maxContainer = new int[45][2];
+        int count = 0 ;
+
+        for(int x = 0; x < 9; x++ )
+        {
+            for(int y = 0; y < 5; y ++)
+            {
+                if(!Board.getInstance().getTile(x, y).hasUnit())
+                {
+                    int[] temp = {x,y};
+                    System.err.println("tile: " + x + "," + y);
+                    maxContainer[count++] = temp;
+                }
+            }
+        }
+
+        int[][] outArr = new int[count][2];
+        for(int i = 0; i < count; i++)
+        {
+            outArr[i][0] = maxContainer[i][0];
+            outArr[i][1] = maxContainer[i][1];
+        }
+        return outArr;
+    }    
+    
+    public void clearFlyingHighlight(ActorRef out)
+    {
+        for(int x = 0; x < 9; x++ )
+        {
+            for(int y = 0; y < 5; y ++)
+            {
+                new TileCommandBuilder(out)
+                .setTilePosition(x, y)
+                .setState(States.NORMAL)
+                .issueCommand();            
+            }
+        }
+    }
     ////////////////////////////////////end///////////////////////////////////////
 
 
@@ -430,11 +542,46 @@ public class GameState {
             ///Helper Methods, methods used in multiple logics etc///
     //////////////////////////////////////////////////////////////////////////////
 
+
+    
+    public int[][] scanBoardForUnits(ActorRef out)
+    {
+        int[][] maxContainer = new int[45][2];
+        int count = 0 ;
+
+        for(int x = 0; x < 9; x++ )
+        {
+            for(int y = 0; y < 5; y ++)
+            {
+                if(Board.getInstance().getTile(x, y).hasUnit())
+                {
+                    int[] temp = {x,y};
+                    maxContainer[count++] = temp;
+                }
+            }
+        }
+
+        int[][] outArr = new int[count][2];
+        for(int i = 0; i < count; i++)
+        {
+            outArr[i][0] = maxContainer[i][0];
+            outArr[i][1] = maxContainer[i][1];
+        }
+        return outArr;
+    }
+
     private void clearBoardHighlights(ActorRef out)
     {
         if (preMove == true)
         {
-            TileUnhighlight(out, getAllMoveTiles(previousUnitLocation.getTilex(), previousUnitLocation.getTiley()));
+            if(previousUnitLocation.getUnit().getId() == 2) //@YU this is where you might need to change
+            {
+                clearFlyingHighlight(out);
+            }
+            else
+            {
+                TileUnhighlight(out, getAllMoveTiles(previousUnitLocation.getTilex(), previousUnitLocation.getTiley()));
+            }
             preMove = false;
         }
         if(preClickCard == true)
@@ -480,6 +627,12 @@ public class GameState {
         return c;
     }
 
+    //overload
+    public boolean checkTileHighlight(ActorRef out, int x, int y)
+    {
+        int[] pos = {x,y};
+        return checkTileHighlight(out, pos);
+    }
 
     public boolean checkTileHighlight(ActorRef out, int[] pos)
     {
@@ -494,6 +647,7 @@ public class GameState {
 
         if(!Board.getInstance().getTile(pos[0], pos[1]).hasUnit())    //empty so highlight
         {
+            System.err.println("highlight");
             new TileCommandBuilder(out)
                     .setTilePosition(pos[0], pos[1])
                     .setState(States.HIGHLIGHTED)
@@ -508,6 +662,13 @@ public class GameState {
                         .setTilePosition(pos[0], pos[1])
                         .setState(States.RED)
                         .issueCommand();
+            }
+            else    //friendly
+            {
+                new TileCommandBuilder(out)
+                .setTilePosition(pos[0], pos[1])
+                .setState(States.NORMAL)
+                .issueCommand();
             }
             return false;
 

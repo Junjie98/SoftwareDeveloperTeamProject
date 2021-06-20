@@ -109,6 +109,7 @@ public class Tile {
 		return unit != null;
 	}
 
+
 	public boolean hasFriendlyUnit(Players turn)
 	{
 		if (unit != null && unit.owningPlayer != null) {		//Check if unit is null, and if it has a players unit

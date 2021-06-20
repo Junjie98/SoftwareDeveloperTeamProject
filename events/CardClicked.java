@@ -25,7 +25,7 @@ public class CardClicked implements EventProcessor{
 		
 		int handPosition = message.get("position").asInt();
 //		gameState.scanBoardForFriendlyUnits(out);
-		gameState.cardClicked(out);
+		gameState.cardClicked(out, handPosition);
 	}
 
 }

@@ -27,6 +27,7 @@ public class Unit {
 	UnitAnimationSet animations;
 	ImageCorrection correction;
 	Players owningPlayer;
+	boolean hasMoved = false;
 	
 	public Unit() {}
 	
@@ -60,6 +61,19 @@ public class Unit {
 		this.position = position;
 		this.animations = animations;
 		this.correction = correction;
+	}
+
+	public boolean getHasMoved()
+	{
+		return hasMoved;
+	}
+	public void resetHasMoved()
+	{
+		hasMoved = false;
+	}
+	public void hasMoved()
+	{
+		hasMoved =true;
 	}
 
 	public int getId() {

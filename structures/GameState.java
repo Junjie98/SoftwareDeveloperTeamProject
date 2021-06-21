@@ -118,7 +118,8 @@ public class GameState {
                             ///Board and turn logic///
     //////////////////////////////////////////////////////////////////////////////
     //iterates turn
-    public void nextTurn() {
+    public void nextTurn(ActorRef out) {
+        clearBoardHighlights(out);
         if (turn == Players.PLAYER1) {
             turn = Players.PLAYER2;
 
@@ -128,7 +129,6 @@ public class GameState {
             ++roundNumber;//new round when player2 has finished their turn
             resetUnitMoves();
         }
-        preClickCard = false;       //To avoid bugs like next player being able to add Units to tiles before click a card
     }
 
     public void resetUnitMoves()
@@ -612,7 +612,7 @@ public class GameState {
         return outArr;
     }
 
-    private void clearBoardHighlights(ActorRef out)
+    public void clearBoardHighlights(ActorRef out)
     {
         if (preMove == true)
         {

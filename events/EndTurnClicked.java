@@ -23,17 +23,7 @@ public class EndTurnClicked implements EventProcessor{
 
 	@Override
 	public void processEvent(ActorRef out, GameState gameState, JsonNode message) {
-		if (gameState.getPreMove() == true) {
-			Tile prev = gameState.getPreviousUnitLocation();
-			int[][] active = gameState.getAllMoveTiles(prev.getTilex(), prev.getTiley());
-			gameState.TileUnhighlight(out, active);
-		}
-
-		if (gameState.getPreClickCard() == true) {
-			gameState.cardUnhighlight(out);
-		}
-
-		gameState.nextTurn();
+		gameState.nextTurn(out);
 		processChangedTurns(out, gameState);
 	}
 

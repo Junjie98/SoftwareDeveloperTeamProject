@@ -105,6 +105,7 @@ public class GameState {
                     .setPlayerID(Players.PLAYER2)
                     .setUnit(ai)
                     .issueCommand();
+<<<<<<< HEAD
         
         //NELSON TESTCASE//
 //        new UnitCommandBuilder(out)
@@ -115,6 +116,16 @@ public class GameState {
 //        	.issueCommand();
         //TESTCASE//
         
+=======
+
+        new UnitCommandBuilder(out)
+                .setMode(UnitCommandBuilderMode.SET)
+                .setUnit(human)
+                .setStats(UnitStats.ATTACK, 10)
+                .issueCommand();
+
+
+>>>>>>> develop
         // Are you peeking here @Nelson :P
         // Nice C++ style btw
          Unit flyer = new UnitFactory().generateUnit(UnitType.WINDSHRIKE);

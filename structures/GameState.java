@@ -258,7 +258,7 @@ public class GameState {
 
     private void displayCardsOnScreenFor(ActorRef out, Players player) {
         Card[] currentCardInHand = (player == Players.PLAYER1) ? player1CardsInHand : player2CardsInHand;
-        int currentCardInHandCount = (player == Players.PLAYER2) ? player1CardsInHandCount : player2CardsInHandCount;
+        int currentCardInHandCount = (player == Players.PLAYER1) ? player1CardsInHandCount : player2CardsInHandCount;
         for (int idx = 0; idx < currentCardInHand.length; idx++) {
             if (idx < currentCardInHandCount) {
                 new CardInHandCommandBuilder(out)
@@ -290,39 +290,28 @@ public class GameState {
     }
 
     public void deleteCardFromHand(ActorRef out, int pos) {
-        int k = 0;
-        if(turn == PLAYER1) {
-            Card[] temp = new Card[this.player1CardsInHandCount];
-            for(int i=0; i<this.player1CardsInHandCount; i++){
-                if(i != pos) {
-                    temp[k] = this.player1CardsInHand[i];
-                    System.out.println(temp[k]);
-                    k++;
-                }
+        Card[] current = (turn == PLAYER1) ? player1CardsInHand : player2CardsInHand;
+        int count = (turn == PLAYER1) ? player1CardsInHandCount : player2CardsInHandCount;
+        Card[] temp = new Card[MAX_CARD_COUNT_IN_HAND];
+        int idx = 0;
+
+        for (int i = 0; i < count; i++) {
+            if (i != pos) {
+                temp[idx++] = current[i];
             }
-            this.player1CardsInHand = temp;
-            this.player1CardsInHandCount--;
-            System.out.print(turn +" played card " + pos + " and now he has " + player1CardsInHandCount +" cards");
         }
-        else {
-            Card[] temp = player2CardsInHand;
-            for(int i=0; i<player2CardsInHandCount; i++){
-                if(i != pos) {
-                    temp[k] = this.player2CardsInHand[i];
-                    k++;
-                }
-            }
-            this.player1CardsInHand = temp;
+
+        if (turn == PLAYER1) {
+            player1CardsInHand = temp;
+            player1CardsInHandCount--;
+        } else {
+            player2CardsInHand = temp;
             player2CardsInHandCount--;
-            System.out.print(turn +" played card " + pos + " and now he has " + player2CardsInHandCount +" cards");
         }
+
         displayCardsOnScreenFor(out, turn);
     }
-
     ////////////////////////////////////end///////////////////////////////////////
-
-
-
 
     //////////////////////////////////////////////////////////////////////////////
                 ///Unit selection, unit moving, unit logic///

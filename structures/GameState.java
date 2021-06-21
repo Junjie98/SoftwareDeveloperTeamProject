@@ -2,6 +2,7 @@ package structures;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import akka.actor.ActorRef;
 import commandbuilders.*;
@@ -35,16 +36,18 @@ public class GameState {
     private Card[] player2CardsInHand = new Card[MAX_CARD_COUNT_IN_HAND];
     private int player2CardsInHandCount = 0;
 
-
     private DeckOne deck1 = new DeckOne();
     private DeckTwo deck2 = new DeckTwo();
 
+    private boolean unitsCanMove = true;
     private boolean preMove = false;
     private boolean preClickCard = false;
     private Tile previousUnitLocation = null;
     private Card previousClickedCard = null;
 
     private int[][] friendlyUnits = null;
+
+    private HashMap<Unit, UnitStatus> units = new HashMap<>();
 
     //////////////////////////////////////////////////////////////////////////////
                 ///Initalisation and functions related to such///
@@ -71,7 +74,6 @@ public class GameState {
     {
         Unit human = new UnitFactory().generateUnit(UnitType.HUMAN);
         Unit ai = new UnitFactory().generateUnit(UnitType.AI);
-        // Unit flyer = new UnitFactory().generateUnit(UnitType.WINDSHRIKE);
 
         new UnitCommandBuilder(out)
                     .setMode(UnitCommandBuilderMode.DRAW)
@@ -87,13 +89,16 @@ public class GameState {
                     .setUnit(ai)
                     .issueCommand();
 
-        //  new UnitCommandBuilder(out)
-        //             .setMode(UnitCommandBuilderMode.DRAW)
-        //             .setTilePosition(1, 1)
-        //             .setPlayerID(Players.PLAYER1)
-        //             .setUnit(flyer)
-        //             .issueCommand();
-                    
+        // Are you peeking here @Nelson :P
+        // Nice C++ style btw
+        // Unit flyer = new UnitFactory().generateUnit(UnitType.WINDSHRIKE);
+        // units.put(flyer, UnitStatus.FLYING);
+        // new UnitCommandBuilder(out)
+        //         .setMode(UnitCommandBuilderMode.DRAW)
+        //         .setTilePosition(1, 1)
+        //         .setPlayerID(Players.PLAYER1)
+        //         .setUnit(flyer)
+        //         .issueCommand();
     }
 
 
@@ -297,12 +302,15 @@ public class GameState {
         return preMove;
     }
 
-   
-    public boolean checkMoveValidity(ActorRef out, int x, int y, boolean flying)
+    public void setUnitsCanMove(boolean unitsCanMove) {
+        this.unitsCanMove = unitsCanMove;
+    }
+
+    public boolean checkMoveValidity(ActorRef out, int x, int y, Unit unit)
     {
         int[] test = {x,y};                                 //what we testing?
 
-        if(!flying)
+        if(units.get(unit) != UnitStatus.FLYING)
         {
             int[][] activeTiles = getAllMoveTiles(previousUnitLocation.getTilex(), previousUnitLocation.getTiley());
             for (int[] ip : activeTiles)
@@ -340,9 +348,9 @@ public class GameState {
     {
     
         System.out.println("move logic");
-        if(checkMoveValidity(out, x, y, previousUnitLocation.getUnit().getId()==2?true:false)) //@YU another here
+        if(checkMoveValidity(out, x, y, previousUnitLocation.getUnit()))
         {
-
+            unitsCanMove = false;   // Prevent other units from moving.
         
             System.out.println("move valid");
 
@@ -398,18 +406,21 @@ public class GameState {
                 preMove=false;
             }
         }
-        else
+        else if (unitsCanMove)
         {
             preMove = true;
             moveHighlight(out, x, y);
           
             previousUnitLocation = Board.getInstance().getTile(x, y);
-        }   
+        } else {
+            System.err.println("Unit movement locked due to other units moving.");
+        }
     }
 
     public void moveHighlight(ActorRef out, int x, int y)
     {
-        if(Board.getInstance().getTile(x, y).getUnit().getId() == 2) //@YU this is another place
+        Unit temp = Board.getInstance().getTile(x, y).getUnit();
+        if(units.get(temp) == UnitStatus.FLYING)
         {
             System.err.println("flyhighlight");
             flyingMoveHighlight(out);
@@ -584,7 +595,8 @@ public class GameState {
     {
         if (preMove == true)
         {
-            if(previousUnitLocation.getUnit().getId() == 2) //@YU this is where you might need to change
+            Unit temp = previousUnitLocation.getUnit();
+            if(units.get(temp) == UnitStatus.FLYING)
             {
                 clearFlyingHighlight(out);
             }
@@ -592,6 +604,8 @@ public class GameState {
             {
                 TileUnhighlight(out, getAllMoveTiles(previousUnitLocation.getTilex(), previousUnitLocation.getTiley()));
             }
+
+
             preMove = false;
         }
         if(preClickCard == true)

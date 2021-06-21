@@ -7,6 +7,7 @@ import java.util.HashMap;
 import akka.actor.ActorRef;
 import commandbuilders.*;
 import commandbuilders.enums.*;
+import commands.BasicCommands;
 import decks.*;
 import structures.basic.Card;
 import structures.basic.Player;
@@ -74,7 +75,10 @@ public class GameState {
     {
         Unit human = new UnitFactory().generateUnit(UnitType.HUMAN);
         Unit ai = new UnitFactory().generateUnit(UnitType.AI);
-
+        
+        //Nelson testcase//
+//        Unit humanUnit = new UnitFactory().generateUnit(UnitType.WINDSHRIKE);
+        //TESTCASE//
         new UnitCommandBuilder(out)
                     .setMode(UnitCommandBuilderMode.DRAW)
                     .setTilePosition(1, 2)
@@ -82,23 +86,49 @@ public class GameState {
                     .setUnit(human)
                     .issueCommand();
 
+        //attempt to increase attack and unit health to the ui board.
+        try {Thread.sleep(2000);} catch (InterruptedException e) {e.printStackTrace();}
+        new UnitCommandBuilder(out)
+        	.setMode(UnitCommandBuilderMode.SET)
+        	.setUnit(human)
+        	.setStats(UnitStats.ATTACK, 2) //avatar has 2 attack
+        	.setStats(UnitStats.HEALTH, 20)//20 lifes
+        	.issueCommand();
+        try {Thread.sleep(2000);} catch (InterruptedException e) {e.printStackTrace();}
+//        BasicCommands.setUnitHealth(out, human, 20);
+//        BasicCommands.setUnitAttack(out, human, 2);
+        
+
         new UnitCommandBuilder(out)
                     .setMode(UnitCommandBuilderMode.DRAW)
                     .setTilePosition(7, 2)
                     .setPlayerID(Players.PLAYER2)
                     .setUnit(ai)
                     .issueCommand();
-
+        
+        //NELSON TESTCASE//
+//        new UnitCommandBuilder(out)
+//        	.setMode(UnitCommandBuilderMode.DRAW)
+//        	.setTilePosition(1, 1)
+//        	.setPlayerID(Players.PLAYER1)
+//        	.setUnit(humanUnit)
+//        	.issueCommand();
+        //TESTCASE//
+        
         // Are you peeking here @Nelson :P
         // Nice C++ style btw
-        // Unit flyer = new UnitFactory().generateUnit(UnitType.WINDSHRIKE);
-        // units.put(flyer, UnitStatus.FLYING);
-        // new UnitCommandBuilder(out)
-        //         .setMode(UnitCommandBuilderMode.DRAW)
-        //         .setTilePosition(1, 1)
-        //         .setPlayerID(Players.PLAYER1)
-        //         .setUnit(flyer)
-        //         .issueCommand();
+         Unit flyer = new UnitFactory().generateUnit(UnitType.WINDSHRIKE);
+         units.put(flyer, UnitStatus.FLYING);
+         new UnitCommandBuilder(out)
+                 .setMode(UnitCommandBuilderMode.DRAW)
+                 .setTilePosition(1, 1)
+                 .setPlayerID(Players.PLAYER1)
+                 .setUnit(flyer)
+                 .setStats(UnitStats.ATTACK, 2) //avatar has 2 attack
+                 .setStats(UnitStats.HEALTH, 20)//20 lifes
+                 .issueCommand();
+         
+
     }
 
 
@@ -757,7 +787,7 @@ public class GameState {
     	}
     }
     
-    public int getRound() { //uses for validation. So round 0 will not increment the mana for player 2 after
+    public int getRound() { //uses for validation. So round 1 will not increment the mana for player 2 after
         //player1 ends his turn.
         return this.roundNumber;
 

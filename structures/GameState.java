@@ -128,6 +128,7 @@ public class GameState {
             ++roundNumber;//new round when player2 has finished their turn
             resetUnitMoves();
         }
+        preClickCard = false;       //To avoid bugs like next player being able to add Units to tiles before click a card
     }
 
     public void resetUnitMoves()

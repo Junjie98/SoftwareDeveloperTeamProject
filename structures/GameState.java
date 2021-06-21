@@ -89,6 +89,13 @@ public class GameState {
                     .setUnit(ai)
                     .issueCommand();
 
+        new UnitCommandBuilder(out)
+                .setMode(UnitCommandBuilderMode.SET)
+                .setUnit(human)
+                .setStats(UnitStats.ATTACK, 10)
+                .issueCommand();
+
+
         // Are you peeking here @Nelson :P
         // Nice C++ style btw
         // Unit flyer = new UnitFactory().generateUnit(UnitType.WINDSHRIKE);

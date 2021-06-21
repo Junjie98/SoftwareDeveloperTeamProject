@@ -124,5 +124,6 @@ public class UnitCommandBuilder extends CommandBuilder{
         } else if (mode == UnitCommandBuilderMode.ANIMATION) {
             BasicCommands.playUnitAnimation(reference, unit, animationType);
         }
+        try {Thread.sleep(30);} catch (InterruptedException e) {e.printStackTrace();}
     }
 }

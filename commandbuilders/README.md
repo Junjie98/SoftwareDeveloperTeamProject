@@ -154,6 +154,7 @@ Sending a draw command will be *expected* to be like this:
 
 ```java
 new UnitCommandBuilder(out)
+		.setUnit(unit)
 		.setMode(UnitCommandBuilderMode.DRAW)
 		.setTilePosition(x, y)
 		.issueCommand();
@@ -163,6 +164,7 @@ Sending a set stats command will be *expected* to be like this:
 
 ```java
 new UnitCommandBuilder(out)
+		.setUnit(unit)
 		.setMode(UnitCommandBuilderMode.SET)
 		.setStats(UnitStats.ATTACK, 20)
 		.issueCommand();
@@ -172,6 +174,7 @@ Sending an animaton command will be *expected* to be like this:
 
 ```java
 new UnitCommandBuilder(out)
+		.setUnit(unit)
 		.setMode(UnitCommandBuilderMode.ANIMATION)
 		.setAnimationType(UnitAnimationType.attack)
 		.issueCommand();

@@ -13,6 +13,8 @@ import structures.basic.Player;
 import structures.basic.Tile;
 import structures.basic.Unit;
 
+import static commandbuilders.enums.Players.PLAYER1;
+
 /**
  * This class can be used to hold information about the on-going game.
  * Its created with the GameActor.
@@ -284,8 +286,38 @@ public class GameState {
                  .setUnit(flyer)
                  .issueCommand();
 
+         deleteCardFromHand(out,positionOfCardClicked);
     }
 
+    public void deleteCardFromHand(ActorRef out, int pos) {
+        int k = 0;
+        if(turn == PLAYER1) {
+            Card[] temp = new Card[this.player1CardsInHandCount];
+            for(int i=0; i<this.player1CardsInHandCount; i++){
+                if(i != pos) {
+                    temp[k] = this.player1CardsInHand[i];
+                    System.out.println(temp[k]);
+                    k++;
+                }
+            }
+            this.player1CardsInHand = temp;
+            this.player1CardsInHandCount--;
+            System.out.print(turn +" played card " + pos + " and now he has " + player1CardsInHandCount +" cards");
+        }
+        else {
+            Card[] temp = player2CardsInHand;
+            for(int i=0; i<player2CardsInHandCount; i++){
+                if(i != pos) {
+                    temp[k] = this.player2CardsInHand[i];
+                    k++;
+                }
+            }
+            this.player1CardsInHand = temp;
+            player2CardsInHandCount--;
+            System.out.print(turn +" played card " + pos + " and now he has " + player2CardsInHandCount +" cards");
+        }
+        displayCardsOnScreenFor(out, turn);
+    }
 
     ////////////////////////////////////end///////////////////////////////////////
 
@@ -309,7 +341,7 @@ public class GameState {
         {
             System.out.println("preClickCard is true, the tile has x" + x + " and y " + y);
             //TO-DO I should check if the tile is part of the highlighted tiles
-          cardToBoard(out, x, y);
+            cardToBoard(out, x, y);
         } else {
             clearBoardHighlights(out);
         }

@@ -13,6 +13,7 @@ import structures.basic.Card;
 import structures.basic.Player;
 import structures.basic.Tile;
 import structures.basic.Unit;
+import structures.basic.UnitAnimationType;
 
 /**
  * This class can be used to hold information about the on-going game.
@@ -86,18 +87,21 @@ public class GameState {
                     .setUnit(human)
                     .issueCommand();
 
-        //attempt to increase attack and unit health to the ui board.
-        try {Thread.sleep(2000);} catch (InterruptedException e) {e.printStackTrace();}
+        //setting health & attack to board. *They doesnt stack*
+        //Avatar1
         new UnitCommandBuilder(out)
         	.setMode(UnitCommandBuilderMode.SET)
-        	.setUnit(human)
-        	.setStats(UnitStats.ATTACK, 2) //avatar has 2 attack
-        	.setStats(UnitStats.HEALTH, 20)//20 lifes
+        	.setUnit(human) 
+        	//uses the health that has been initialised earlier with the player constructor
+        	.setStats(UnitStats.HEALTH, player1.getHealth())
         	.issueCommand();
-        try {Thread.sleep(2000);} catch (InterruptedException e) {e.printStackTrace();}
-//        BasicCommands.setUnitHealth(out, human, 20);
-//        BasicCommands.setUnitAttack(out, human, 2);
         
+        new UnitCommandBuilder(out)
+    	.setMode(UnitCommandBuilderMode.SET)
+    	.setUnit(human)
+    	.setStats(UnitStats.ATTACK, 2)
+    	.issueCommand();
+        ////
 
         new UnitCommandBuilder(out)
                     .setMode(UnitCommandBuilderMode.DRAW)
@@ -105,27 +109,23 @@ public class GameState {
                     .setPlayerID(Players.PLAYER2)
                     .setUnit(ai)
                     .issueCommand();
-<<<<<<< HEAD
-        
-        //NELSON TESTCASE//
-//        new UnitCommandBuilder(out)
-//        	.setMode(UnitCommandBuilderMode.DRAW)
-//        	.setTilePosition(1, 1)
-//        	.setPlayerID(Players.PLAYER1)
-//        	.setUnit(humanUnit)
-//        	.issueCommand();
-        //TESTCASE//
-        
-=======
 
+        //Avatar2
         new UnitCommandBuilder(out)
-                .setMode(UnitCommandBuilderMode.SET)
-                .setUnit(human)
-                .setStats(UnitStats.ATTACK, 10)
-                .issueCommand();
-
-
->>>>>>> develop
+        	.setMode(UnitCommandBuilderMode.SET)
+        	.setUnit(ai) 
+        	//uses the health that has been initialised earlier with the player constructor
+        	.setStats(UnitStats.HEALTH, player2.getHealth())
+        	.issueCommand();
+        
+        new UnitCommandBuilder(out)
+    	.setMode(UnitCommandBuilderMode.SET)
+    	.setUnit(ai)
+    	.setStats(UnitStats.ATTACK, 2)
+    	.issueCommand();
+        ////
+        
+        //TEST
         // Are you peeking here @Nelson :P
         // Nice C++ style btw
          Unit flyer = new UnitFactory().generateUnit(UnitType.WINDSHRIKE);
@@ -138,6 +138,34 @@ public class GameState {
                  .setStats(UnitStats.ATTACK, 2) //avatar has 2 attack
                  .setStats(UnitStats.HEALTH, 20)//20 lifes
                  .issueCommand();
+         
+         //testUnit
+         new UnitCommandBuilder(out)
+         	.setMode(UnitCommandBuilderMode.SET)
+         	.setUnit(flyer) 
+         	.setStats(UnitStats.HEALTH, 3)
+         	.issueCommand();
+         
+         new UnitCommandBuilder(out)
+     	.setMode(UnitCommandBuilderMode.SET)
+     	.setUnit(flyer)
+     	.setStats(UnitStats.ATTACK, 1)
+     	.issueCommand();
+         
+         
+         //Animation of attack
+         new UnitCommandBuilder(out)
+         .setMode(UnitCommandBuilderMode.ANIMATION)
+         .setUnit(flyer)
+         .setAnimationType(UnitAnimationType.attack)
+         .issueCommand();
+         
+         
+//         new ProjectTileAnimationCommandBuilder(out)
+//         .setUnit1(human, ai)
+//         .setUnit2(unit2, tile2)
+//         .issueCommand();
+         ////
          
 
     }

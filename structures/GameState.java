@@ -120,9 +120,19 @@ public class GameState {
             turn = Players.PLAYER1;
 
             ++roundNumber;//new round when player2 has finished their turn
+            resetUnitMoves();
         }
     }
 
+    public void resetUnitMoves()
+    {
+        int[][] unitsOnBoard = scanBoardForUnits();
+
+        for (int[] is : unitsOnBoard) 
+        {
+            Board.getInstance().getTile(is[0], is[1]).getUnit().resetHasMoved();    
+        }
+    }
     public Players getTurn() {
         return turn;
     }
@@ -269,7 +279,7 @@ public class GameState {
         {
             highlightedMoveTileClicked(out, x, y);
         }
-        else if (Board.getInstance().getTile(x, y).getUnit() != null)
+        else if (Board.getInstance().getTile(x, y).getUnit() != null && Board.getInstance().getTile(x, y).getUnit().getHasMoved()!=true)
         {
             unitClicked(out, x, y);
         }
@@ -342,7 +352,7 @@ public class GameState {
                     .setUnit(previousUnitLocation.getUnit())
                     .issueCommand();
 
-
+            previousUnitLocation.getUnit().hasMoved();
             clearBoardHighlights(out);
             previousUnitLocation.setUnit(null);
 
@@ -486,7 +496,7 @@ public class GameState {
             //System.err.println("print fly tile" + ti[0] + " "+ ti[1]);
             checkTileHighlight(out, ti);            
         }
-        for (int[] bl : scanBoardForUnits(out)) //Blocked tiles
+        for (int[] bl : scanBoardForUnits()) //Blocked tiles
         {
             checkTileHighlight(out, bl);            
         } 
@@ -544,7 +554,7 @@ public class GameState {
 
 
     
-    public int[][] scanBoardForUnits(ActorRef out)
+    public int[][] scanBoardForUnits()
     {
         int[][] maxContainer = new int[45][2];
         int count = 0 ;

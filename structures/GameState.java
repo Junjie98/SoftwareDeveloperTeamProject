@@ -25,7 +25,8 @@ public class GameState {
     private final int MAX_CARD_COUNT_IN_HAND = 6;
     private final int INITIAL_CARD_COUNT = 3;
     private int roundNumber = 1;
-    
+    private int positionOfCardClicked;
+
     private Players turn = Players.PLAYER1;
     // TODO: This should be randomised according to game loop.
 
@@ -120,7 +121,7 @@ public class GameState {
     public void nextTurn() {
         if (turn == Players.PLAYER1) {
             turn = Players.PLAYER2;
-            
+
         } else {
             turn = Players.PLAYER1;
 
@@ -133,9 +134,9 @@ public class GameState {
     {
         int[][] unitsOnBoard = scanBoardForUnits();
 
-        for (int[] is : unitsOnBoard) 
+        for (int[] is : unitsOnBoard)
         {
-            Board.getInstance().getTile(is[0], is[1]).getUnit().resetHasMoved();    
+            Board.getInstance().getTile(is[0], is[1]).getUnit().resetHasMoved();
         }
     }
     public Players getTurn() {
@@ -153,6 +154,7 @@ public class GameState {
     ////// Card methods
     public void cardClicked(ActorRef out, int idx)
     {
+        positionOfCardClicked = idx;                    //we have to save it and use it in other methods
         System.out.println("Card Clicked");
         Card[] temp = (turn == Players.PLAYER1) ? player1CardsInHand : player2CardsInHand;
 
@@ -173,7 +175,7 @@ public class GameState {
             previousClickedCard = temp[idx];
         }
     }
-    
+
 
     public void cardTileHighlight(ActorRef out,int x, int y)
     {
@@ -270,6 +272,20 @@ public class GameState {
             }
         }
     }
+
+    public void cardToBoard(ActorRef out, int x, int y) {
+         Unit flyer = new UnitFactory().generateUnit(UnitType.WINDSHRIKE);
+         units.put(flyer, UnitStatus.FLYING);
+         new UnitCommandBuilder(out)
+                 .setMode(UnitCommandBuilderMode.DRAW)
+                 .setTilePosition(x, y)
+                 .setPlayerID(turn)
+                 .setUnit(flyer)
+                 .issueCommand();
+
+    }
+
+
     ////////////////////////////////////end///////////////////////////////////////
 
 
@@ -288,8 +304,12 @@ public class GameState {
         {
             unitClicked(out, x, y);
         }
-        else
+        else if (preClickCard)
         {
+            System.out.println("preClickCard is true, the tile has x" + x + " and y " + y);
+            //TO-DO I should check if the tile is part of the highlighted tiles
+          cardToBoard(out, x, y);
+        } else {
             clearBoardHighlights(out);
         }
     }

@@ -39,6 +39,7 @@ public class GameState {
     private DeckOne deck1 = new DeckOne();
     private DeckTwo deck2 = new DeckTwo();
 
+    private boolean unitsCanMove = true;
     private boolean preMove = false;
     private boolean preClickCard = false;
     private Tile previousUnitLocation = null;
@@ -301,7 +302,10 @@ public class GameState {
         return preMove;
     }
 
-   
+    public void setUnitsCanMove(boolean unitsCanMove) {
+        this.unitsCanMove = unitsCanMove;
+    }
+
     public boolean checkMoveValidity(ActorRef out, int x, int y, Unit unit)
     {
         int[] test = {x,y};                                 //what we testing?
@@ -346,7 +350,7 @@ public class GameState {
         System.out.println("move logic");
         if(checkMoveValidity(out, x, y, previousUnitLocation.getUnit()))
         {
-
+            unitsCanMove = false;   // Prevent other units from moving.
         
             System.out.println("move valid");
 
@@ -402,13 +406,15 @@ public class GameState {
                 preMove=false;
             }
         }
-        else
+        else if (unitsCanMove)
         {
             preMove = true;
             moveHighlight(out, x, y);
           
             previousUnitLocation = Board.getInstance().getTile(x, y);
-        }   
+        } else {
+            System.err.println("Unit movement locked due to other units moving.");
+        }
     }
 
     public void moveHighlight(ActorRef out, int x, int y)

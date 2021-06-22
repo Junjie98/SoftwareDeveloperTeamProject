@@ -67,7 +67,11 @@ public class Unit {
 	
 	public void setHealth(int health) 
 	{
+		if(health<=0) {
+			unitHealth = 0;
+		}else {
 		unitHealth = health;
+		}
 	}
 	public int getHealth()
 	{

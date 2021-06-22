@@ -479,14 +479,14 @@ public class GameState {
             	int enemyHealth = enemy.getHealth();
             	int HealthAfterDamage =  enemyHealth-previousUnitLocation.getUnit().getDamage(); //test//should take attackers atk damage
 
-                UnitCommandBuilder enermyCommandBuilder = new UnitCommandBuilder(out).setUnit(enemy);
+                UnitCommandBuilder enemyCommandBuilder = new UnitCommandBuilder(out).setUnit(enemy);
 
 //                enermyCommandBuilder
 //                        .setMode(UnitCommandBuilderMode.ANIMATION)
 //                        .setAnimationType(UnitAnimationType.hit)
 //                        .issueCommand();
 
-                enermyCommandBuilder
+                enemyCommandBuilder
                         .setMode(UnitCommandBuilderMode.SET)
                         .setStats(UnitStats.HEALTH, HealthAfterDamage)
                         .issueCommand();

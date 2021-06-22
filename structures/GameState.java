@@ -486,15 +486,16 @@ public class GameState {
 //                        .setAnimationType(UnitAnimationType.hit)
 //                        .issueCommand();
 
-                new ProjectTileAnimationCommandBuilder(out)
-                        .setSource(previousUnitLocation)
-                        .setDistination(Board.getInstance().getTile(x, y))
-                        .issueCommand();
-
                 enermyCommandBuilder
                         .setMode(UnitCommandBuilderMode.SET)
                         .setStats(UnitStats.HEALTH, HealthAfterDamage)
                         .issueCommand();
+                
+                new ProjectTileAnimationCommandBuilder(out)
+                .setSource(previousUnitLocation)
+                .setDistination(Board.getInstance().getTile(x, y))
+                .issueCommand();
+                
             	return;
                 }else {
                 	return;

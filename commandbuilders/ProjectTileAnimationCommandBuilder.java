@@ -45,7 +45,13 @@ public class ProjectTileAnimationCommandBuilder extends CommandBuilder {
         BasicCommands.playUnitAnimation(reference, tile1.getUnit(), UnitAnimationType.attack);
         try {Thread.sleep(1000);} catch (InterruptedException e) {e.printStackTrace();}
         BasicCommands.playProjectileAnimation(reference, projectile, 0, tile1, tile2);
-        try {Thread.sleep(2000);} catch (InterruptedException e) {e.printStackTrace();}
-        BasicCommands.playUnitAnimation(reference, tile2.getUnit(), UnitAnimationType.death);
+        
+        if(tile2.getUnit().getHealth() <= 0) {
+        	try {Thread.sleep(2000);} catch (InterruptedException e) {e.printStackTrace();}
+        	BasicCommands.playUnitAnimation(reference, tile2.getUnit(), UnitAnimationType.death);
+        }else {
+        	try {Thread.sleep(2000);} catch (InterruptedException e) {e.printStackTrace();}
+            BasicCommands.playUnitAnimation(reference, tile2.getUnit(), UnitAnimationType.hit);
+        }
     }
 }

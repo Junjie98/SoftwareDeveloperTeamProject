@@ -184,8 +184,8 @@ public class GameState {
             turn = Players.PLAYER1;
 
             ++roundNumber;//new round when player2 has finished their turn
-            resetUnitMoves();
         }
+        resetUnitMoves();
     }
 
     public void resetUnitMoves()

@@ -478,18 +478,23 @@ public class GameState {
             	Unit enemy = Board.getInstance().getTile(x, y).getUnit();
             	int enemyHealth = enemy.getHealth();
             	int HealthAfterDamage =  enemyHealth-previousUnitLocation.getUnit().getDamage(); //test//should take attackers atk damage
-            	
-                new UnitCommandBuilder(out)
-                .setMode(UnitCommandBuilderMode.ANIMATION)
-                .setUnit(enemy)
-                .setAnimationType(UnitAnimationType.hit)
-                .issueCommand();
-                
-                new UnitCommandBuilder(out)
-                .setUnit(enemy)
-                .setMode(UnitCommandBuilderMode.SET)
-                .setStats(UnitStats.HEALTH, HealthAfterDamage)
-                .issueCommand();
+
+                UnitCommandBuilder enermyCommandBuilder = new UnitCommandBuilder(out).setUnit(enemy);
+
+//                enermyCommandBuilder
+//                        .setMode(UnitCommandBuilderMode.ANIMATION)
+//                        .setAnimationType(UnitAnimationType.hit)
+//                        .issueCommand();
+
+                new ProjectTileAnimationCommandBuilder(out)
+                        .setSource(previousUnitLocation)
+                        .setDistination(Board.getInstance().getTile(x, y))
+                        .issueCommand();
+
+                enermyCommandBuilder
+                        .setMode(UnitCommandBuilderMode.SET)
+                        .setStats(UnitStats.HEALTH, HealthAfterDamage)
+                        .issueCommand();
             	return;
                 }else {
                 	return;

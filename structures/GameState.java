@@ -469,16 +469,16 @@ public class GameState {
         if(Board.getInstance().getTile(x, y).getUnit().getPlayerID() != turn) //you dont own this unit!
         {
         	try {
-        	if(attackCheck(out, x,y)) {
-        		
+        	if(attackCheck(out, x,y))
+        	{
         		int[] pos2 = {x,y};
         		if(Board.getInstance().getTile(pos2[0], pos2[1]).getUnit().getPlayerID() != turn) //Enemy in that pos
                 {
             		
             	Unit enemy = Board.getInstance().getTile(x, y).getUnit();
             	int enemyHealth = enemy.getHealth();
-            	int HealthAfterDamage =  enemyHealth-1; //test//should take attackers atk damage
-            	//BasicCommands.playUnitAnimation(out, t, UnitAnimationType.death);
+            	int HealthAfterDamage =  enemyHealth-previousUnitLocation.getUnit().getDamage(); //test//should take attackers atk damage
+            	
                 new UnitCommandBuilder(out)
                 .setMode(UnitCommandBuilderMode.ANIMATION)
                 .setUnit(enemy)

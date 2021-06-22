@@ -22,7 +22,9 @@ public class CardClicked implements EventProcessor{
 
 	@Override
 	public void processEvent(ActorRef out, GameState gameState, JsonNode message) {
-		
+
+		// TODO: Should set cards to highlighted somewhere.
+
 		int handPosition = message.get("position").asInt();
 //		gameState.scanBoardForFriendlyUnits(out);
 		gameState.cardClicked(out, handPosition);

@@ -626,7 +626,11 @@ public class GameState {
             ///Helper Methods, methods used in multiple logics etc///
     //////////////////////////////////////////////////////////////////////////////
 
-
+    // --
+    // TODO: Storing friendly units of each side would be a good idea.
+    // If we are scanning everytime, the animation will get laggy.
+    // Maintain a list of friendly units of each side on generation and remove on killed.
+    // This way we can get rid of this function and just iterate thru the stored ones.
     
     public int[][] scanBoardForUnits()
     {
@@ -656,10 +660,11 @@ public class GameState {
 
     public int[][] scanBoardForFriendlyUnits(ActorRef out)
     {
+
+
         //System.err.println("scan out board");
         int[][] friendlyUnitLocations = new int[45][2];
         int count = 0;
-
 
         for(int x = 0; x < 9; x++ )
         {
@@ -686,6 +691,7 @@ public class GameState {
 
         return output;
     }
+    // --
 
     public void clearBoardHighlights(ActorRef out)
     {

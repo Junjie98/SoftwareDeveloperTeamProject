@@ -277,8 +277,12 @@ public class GameState {
     }
 
     public void cardToBoard(ActorRef out, int x, int y) {
-         Unit flyer = new UnitFactory().generateUnit(UnitType.WINDSHRIKE);
-         units.put(flyer, UnitStatus.FLYING);
+        Card current = (turn == PLAYER1) ? player1CardsInHand[positionOfCardClicked] : player2CardsInHand[positionOfCardClicked];
+        String cardname = current.getCardname();
+//        System.out.println(cardname);
+
+        Unit flyer = typeOfUnitCard(cardname);      //Helper method with many cases
+        units.put(flyer, UnitStatus.FLYING);
          new UnitCommandBuilder(out)
                  .setMode(UnitCommandBuilderMode.DRAW)
                  .setTilePosition(x, y)
@@ -384,7 +388,6 @@ public class GameState {
             return false;
         }
     }
-
 
     public void highlightedMoveTileClicked(ActorRef out, int x, int y)       //test for selectex
     {
@@ -633,6 +636,39 @@ public class GameState {
         return outArr;
     }
 
+    public int[][] scanBoardForFriendlyUnits(ActorRef out)
+    {
+        //System.err.println("scan out board");
+        int[][] friendlyUnitLocations = new int[45][2];
+        int count = 0;
+
+
+        for(int x = 0; x < 9; x++ )
+        {
+            for(int y = 0; y < 5; y ++)
+            {
+                if(Board.getInstance().getTile(x,y).hasFriendlyUnit(turn))
+                {
+                    //save ints into array x y
+                    System.err.println("Found friendly go for highlight");
+                    friendlyUnitLocations[count][0] = x;
+                    friendlyUnitLocations[count][1] = y;
+                    count++;
+                }
+            }
+        }
+
+        int [][] output = new int[count][2];
+
+        for (int i=0; i<count;i++) {
+            System.out.println("Unit " + count + ", x: " + friendlyUnitLocations[i][0] + " y: " + friendlyUnitLocations[i][1]);
+            output[i] = friendlyUnitLocations[i];
+        }
+        //System.out.println(turn + " has " + count + " of friendly units");
+
+        return output;
+    }
+
     public void clearBoardHighlights(ActorRef out)
     {
         if (preMove == true)
@@ -679,8 +715,6 @@ public class GameState {
 
     }
 
-  
-
     public <T> T[] concatenate(T[] a, T[] b) {
         int aLen = a.length;
         int bLen = b.length;
@@ -713,7 +747,7 @@ public class GameState {
 
         if(!Board.getInstance().getTile(pos[0], pos[1]).hasUnit())    //empty so highlight
         {
-            System.err.println("highlight");
+//            System.err.println("highlight");
             new TileCommandBuilder(out)
                     .setTilePosition(pos[0], pos[1])
                     .setState(States.HIGHLIGHTED)
@@ -741,38 +775,48 @@ public class GameState {
         }
     }
 
-    public int[][] scanBoardForFriendlyUnits(ActorRef out)
-    {
-        //System.err.println("scan out board");
-        int[][] friendlyUnitLocations = new int[45][2];
-        int count = 0;
-
-
-        for(int x = 0; x < 9; x++ )
-        {
-            for(int y = 0; y < 5; y ++)
-            {
-                if(Board.getInstance().getTile(x,y).hasFriendlyUnit(turn))
-                {
-                    //save ints into array x y
-                    System.err.println("Found friendly go for highlight");
-                    friendlyUnitLocations[count][0] = x;
-                    friendlyUnitLocations[count][1] = y;
-                    count++;
-                }
-            }
+    public Unit typeOfUnitCard(String cardname){
+        Unit flyer;
+        if(cardname.equals("Pureblade Enforcer")) {
+            flyer = new UnitFactory().generateUnit(UnitType.PUREBLADE_ENFORCER);
+        } else if(cardname.equals("Azure Herald")) {
+            flyer = new UnitFactory().generateUnit(UnitType.AZURE_HERALD);
+        } else if(cardname.equals("Azurite Lion")) {
+            flyer = new UnitFactory().generateUnit(UnitType.AZURITE_LION);
+        } else if(cardname.equals("Comodo Charger")) {
+            flyer = new UnitFactory().generateUnit(UnitType.COMODO_CHARGER);
+        } else if(cardname.equals("Fire_Spitter")) {
+            flyer = new UnitFactory().generateUnit(UnitType.FIRE_SPITTER);
+        } else if(cardname.equals("Hailstone Golem")) {
+            flyer = new UnitFactory().generateUnit(UnitType.HAILSTONE_GOLEM);
+        } else if(cardname.equals("Ironcliff Guardian")) {
+            flyer = new UnitFactory().generateUnit(UnitType.IRONCLIFF_GUARDIAN);
+        } else if(cardname.equals("Pudeblade Enforcer")) {
+            flyer = new UnitFactory().generateUnit(UnitType.PUREBLADE_ENFORCER);
+        } else if(cardname.equals("Silverguard Knight")) {
+            flyer = new UnitFactory().generateUnit(UnitType.SILVERGUARD_KNIGHT);
+        } else if(cardname.equals("Blaze Hound")) {
+            flyer = new UnitFactory().generateUnit(UnitType.BLAZE_HOUND);
+        } else if(cardname.equals("Bloodshard Golem")) {
+            flyer = new UnitFactory().generateUnit(UnitType.BLOODSHARD_GOLEM);
+        } else if(cardname.equals("Hailstone Golder R")){
+            flyer = new UnitFactory().generateUnit(UnitType.HAILSTONE_GOLEM_R);
+        } else if(cardname.equals("Planar Scout")){
+            flyer = new UnitFactory().generateUnit(UnitType.PLANAR_SCOUT);
+        } else if(cardname.equals("Pyromancer")){
+            flyer = new UnitFactory().generateUnit(UnitType.PYROMANCER);
+        } else if(cardname.equals("Rock_Pulveriser")){
+            flyer = new UnitFactory().generateUnit(UnitType.ROCK_PULVERISER);
+        } else if(cardname.equals("Serpenti")){
+            flyer = new UnitFactory().generateUnit(UnitType.SERPENTI);
+        } else if(cardname.equals("Windshrike")){
+            flyer = new UnitFactory().generateUnit(UnitType.WINDSHRIKE);
+        }  else {
+            flyer = new UnitFactory().generateUnit(UnitType.WINDSHRIKE);
         }
-
-        int [][] output = new int[count][2];
-
-        for (int i=0; i<count;i++) {
-            System.out.println("Unit " + count + ", x: " + friendlyUnitLocations[i][0] + " y: " + friendlyUnitLocations[i][1]);
-            output[i] = friendlyUnitLocations[i];
-        }
-        //System.out.println(turn + " has " + count + " of friendly units");
-
-        return output;
+        return flyer;
     }
+
     ////////////////////////////////////end///////////////////////////////////////
 
 

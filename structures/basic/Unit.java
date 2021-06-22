@@ -28,6 +28,8 @@ public class Unit {
 	ImageCorrection correction;
 	Players owningPlayer;
 	boolean hasMoved = false;
+	int unitHealth = 0;
+	int unitDamage =  0;
 	
 	public Unit() {}
 	
@@ -61,6 +63,23 @@ public class Unit {
 		this.position = position;
 		this.animations = animations;
 		this.correction = correction;
+	}
+	
+	public void setHealth(int health) 
+	{
+		unitHealth = health;
+	}
+	public int getHealth()
+	{
+		return unitHealth;
+	}
+	public void setDamage(int health) 
+	{
+		unitDamage = health;
+	}
+	public int getDamage()
+	{
+		return unitDamage;
 	}
 
 	public boolean getHasMoved()

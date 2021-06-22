@@ -152,19 +152,9 @@ public class GameState {
      	.setStats(UnitStats.ATTACK, 1)
      	.issueCommand();
          
-         
-         //Animation of attack
-         new UnitCommandBuilder(out)
-         .setMode(UnitCommandBuilderMode.ANIMATION)
-         .setUnit(flyer)
-         .setAnimationType(UnitAnimationType.attack)
-         .issueCommand();
+
          
          
-//         new ProjectTileAnimationCommandBuilder(out)
-//         .setUnit1(human, ai)
-//         .setUnit2(unit2, tile2)
-//         .issueCommand();
          ////
          
 
@@ -347,11 +337,13 @@ public class GameState {
     //////////////////////////////////////////////////////////////////////////////
                 ///Unit selection, unit moving, unit logic///
     //////////////////////////////////////////////////////////////////////////////
+    
     public void tileClicked(ActorRef out, int x, int y)
     {
         if (preMove && Board.getInstance().getTile(x, y).getUnit() == null)
         {
             highlightedMoveTileClicked(out, x, y);
+            
         }
         else if (Board.getInstance().getTile(x, y).getUnit() != null && Board.getInstance().getTile(x, y).getUnit().getHasMoved()!=true)
         {
@@ -361,6 +353,7 @@ public class GameState {
         {
             clearBoardHighlights(out);
         }
+        
     }
 
     public Tile getPreviousUnitLocation() {
@@ -442,6 +435,31 @@ public class GameState {
         preMove = false;
         
     }
+    
+    
+    ////NELSON
+    public boolean attackCheck(ActorRef out, int x, int y)
+    {
+    	int[] acPos = {x,y};
+    	int tileActive [][] = getAllMoveTiles(previousUnitLocation.getTilex(), previousUnitLocation.getTiley());
+    	for (int[] ip : tileActive)
+        {
+            if(ip[0] == acPos[0] && ip[1] == acPos[1])        
+            {
+                if(Board.getInstance().getTile(x, y).getUnit()!=null)//enemy is in this tile
+                {
+                    return true;
+                }
+                return false;
+            }
+            
+        }
+		return false;
+    }
+    
+    ////NELSON
+    
+    
 
     public void unitClicked(ActorRef out,int x, int y)
     {
@@ -450,8 +468,38 @@ public class GameState {
        
         if(Board.getInstance().getTile(x, y).getUnit().getPlayerID() != turn) //you dont own this unit!
         {
-            System.err.println("you dont own this unit");
-            return;
+        	try {
+        	if(attackCheck(out, x,y)) {
+        		
+        		int[] pos2 = {x,y};
+        		if(Board.getInstance().getTile(pos2[0], pos2[1]).getUnit().getPlayerID() != turn) //Enemy in that pos
+                {
+            		
+            	Unit enemy = Board.getInstance().getTile(x, y).getUnit();
+            	int enemyHealth = enemy.getHealth();
+            	int HealthAfterDamage =  enemyHealth-1; //test//should take attackers atk damage
+            	//BasicCommands.playUnitAnimation(out, t, UnitAnimationType.death);
+                new UnitCommandBuilder(out)
+                .setMode(UnitCommandBuilderMode.ANIMATION)
+                .setUnit(enemy)
+                .setAnimationType(UnitAnimationType.hit)
+                .issueCommand();
+                
+                new UnitCommandBuilder(out)
+                .setUnit(enemy)
+                .setMode(UnitCommandBuilderMode.SET)
+                .setStats(UnitStats.HEALTH, HealthAfterDamage)
+                .issueCommand();
+            	return;
+                }else {
+                	return;
+                	}
+        	}
+        	}catch(NullPointerException e) {
+        		System.err.println("Select your avatar/unit before selecting enemy");
+        		
+        	}
+        	return;
         }
 
         //Unhighlight previously selected unit
@@ -484,6 +532,8 @@ public class GameState {
         } else {
             System.err.println("Unit movement locked due to other units moving.");
         }
+        
+        //test attack
     }
 
     public void moveHighlight(ActorRef out, int x, int y)

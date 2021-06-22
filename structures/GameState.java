@@ -280,24 +280,35 @@ public class GameState {
         Card current = (turn == PLAYER1) ? player1CardsInHand[positionOfCardClicked] : player2CardsInHand[positionOfCardClicked];
         String cardname = current.getCardname();
         System.out.println(cardname);
-//        Unit flyer;
-//        if(cardname.equals("Entropic Decay") || cardname.equals("Staff Of Ykir")
-//                || cardname.equals("Truestrike") || cardname.equals("Sundrop Elixir")) {
-//            flyer = typeOfSpellCard(cardname);      //Helper method with many cases
-//        } else {
-//            flyer = typeOfUnitCard(cardname);      //Helper method with many cases
-//        }
-        Unit flyer = typeOfUnitCard(cardname);      //Helper method with many cases
+        if (current.isSpell()) {
+            if (cardname.equals("Truestrike") || cardname.equals("Entropic Decay")) {
+                // Highlight enemy units
+            }
+            if (cardname.equals("Sundrop Elixir") || cardname.equals("Staff of Y'Kir'")) {
+                // Highlight friendly units
+                // After player selected a square to play highlight.
+            }
 
-        units.put(flyer, UnitStatus.FLYING);
-        new UnitCommandBuilder(out)
-                 .setMode(UnitCommandBuilderMode.DRAW)
-                 .setTilePosition(x, y)
-                 .setPlayerID(turn)
-                 .setUnit(flyer)
-                 .issueCommand();
+            // Set a buff animation and the effects like this.
+            // new TileCommandBuilder(out)
+            // .setMode(TileCommandBuilderMode.ANIMATION)
+            // .setTilePosition(tilex, tiley)
+            // .setEffectAnimation(TileEffectAnimation.BUFF) <- Choose your animation here
+            // .issueCommand();
+        } else {
+            Unit flyer = typeOfUnitCard(cardname);      //Helper method with many cases
+            units.put(flyer, UnitStatus.FLYING);
+            new UnitCommandBuilder(out)
+                    .setMode(UnitCommandBuilderMode.DRAW)
+                    .setTilePosition(x, y)
+                    .setPlayerID(turn)
+                    .setUnit(flyer)
+                    .issueCommand();
 
-         deleteCardFromHand(out,positionOfCardClicked);
+            deleteCardFromHand(out,positionOfCardClicked);
+        }
+
+        clearBoardHighlights(out);
     }
 
     public void deleteCardFromHand(ActorRef out, int pos) {
@@ -782,6 +793,9 @@ public class GameState {
         }
     }
 
+    // TODO: You can do this in some other files, like in UnitFactory make a generate unit by cardname method? @Mer
+    // If you don't know what I am talking about, just leave it to me
+
     public Unit typeOfUnitCard(String cardname){
         Unit flyer;
         if(cardname.equals("Pureblade Enforcer")) {
@@ -831,21 +845,6 @@ public class GameState {
         }
         return flyer;
     }
-
-    public Unit typeOfSpellCard(String cardname){
-        Unit flyer;
-        if(cardname.equals("Staff Of Ykir")) {
-            flyer = new SpellFactory().generateSpell(SpellType.STAFF_OF_YKIR);
-        } else if(cardname.equals("Entropic Decay")) {
-            flyer = new SpellFactory().generateSpell(SpellType.ENTROPIC_DECAY);
-        } else if(cardname.equals("Sundrop Elixer")){
-            flyer = new SpellFactory().generateSpell(SpellType.SUNDROP_ELIXIR);
-        }  else {
-            flyer = new SpellFactory().generateSpell(SpellType.TRUESTRIKE);
-        }
-        return flyer;
-    }
-
     ////////////////////////////////////end///////////////////////////////////////
 
 

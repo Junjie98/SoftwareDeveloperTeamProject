@@ -65,6 +65,18 @@ public class UnitFactory {
             case SILVERGUARD_KNIGHT:
                 conf = StaticConfFiles.u_silverguard_knight;
                 break;
+            case ENTROPIC_DECAY:                            /// Extra the spells
+                conf = StaticConfFiles.c_entropic_decay;
+                break;
+            case STAFF_OF_YKIR:
+                conf = StaticConfFiles.c_staff_of_ykir;
+                break;
+            case TRUESTRIKE:
+                conf = StaticConfFiles.c_truestrike;
+                break;
+            case SUNDROP_ELIXIR:
+                conf = StaticConfFiles.c_sundrop_elixir;
+                break;
         }
         return BasicObjectBuilders.loadUnit(conf, counter++, Unit.class);
     }

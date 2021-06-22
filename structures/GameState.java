@@ -279,11 +279,18 @@ public class GameState {
     public void cardToBoard(ActorRef out, int x, int y) {
         Card current = (turn == PLAYER1) ? player1CardsInHand[positionOfCardClicked] : player2CardsInHand[positionOfCardClicked];
         String cardname = current.getCardname();
-//        System.out.println(cardname);
-
+        System.out.println(cardname);
+//        Unit flyer;
+//        if(cardname.equals("Entropic Decay") || cardname.equals("Staff Of Ykir")
+//                || cardname.equals("Truestrike") || cardname.equals("Sundrop Elixir")) {
+//            flyer = typeOfSpellCard(cardname);      //Helper method with many cases
+//        } else {
+//            flyer = typeOfUnitCard(cardname);      //Helper method with many cases
+//        }
         Unit flyer = typeOfUnitCard(cardname);      //Helper method with many cases
+
         units.put(flyer, UnitStatus.FLYING);
-         new UnitCommandBuilder(out)
+        new UnitCommandBuilder(out)
                  .setMode(UnitCommandBuilderMode.DRAW)
                  .setTilePosition(x, y)
                  .setPlayerID(turn)
@@ -785,7 +792,7 @@ public class GameState {
             flyer = new UnitFactory().generateUnit(UnitType.AZURITE_LION);
         } else if(cardname.equals("Comodo Charger")) {
             flyer = new UnitFactory().generateUnit(UnitType.COMODO_CHARGER);
-        } else if(cardname.equals("Fire_Spitter")) {
+        } else if(cardname.equals("Fire Spitter")) {
             flyer = new UnitFactory().generateUnit(UnitType.FIRE_SPITTER);
         } else if(cardname.equals("Hailstone Golem")) {
             flyer = new UnitFactory().generateUnit(UnitType.HAILSTONE_GOLEM);
@@ -811,8 +818,30 @@ public class GameState {
             flyer = new UnitFactory().generateUnit(UnitType.SERPENTI);
         } else if(cardname.equals("Windshrike")){
             flyer = new UnitFactory().generateUnit(UnitType.WINDSHRIKE);
-        }  else {
+        } else if(cardname.equals("Staff Of Ykir")) {
+            flyer = new UnitFactory().generateUnit(UnitType.STAFF_OF_YKIR);
+        } else if(cardname.equals("Entropic Decay")) {
+            flyer = new UnitFactory().generateUnit(UnitType.ENTROPIC_DECAY);
+        } else if(cardname.equals("Sundrop Elixer")){
+            flyer = new UnitFactory().generateUnit(UnitType.SUNDROP_ELIXIR);
+        }  else if(cardname.equals("Truestrike")) {
+            flyer = new UnitFactory().generateUnit(UnitType.TRUESTRIKE);
+        }else {
             flyer = new UnitFactory().generateUnit(UnitType.WINDSHRIKE);
+        }
+        return flyer;
+    }
+
+    public Unit typeOfSpellCard(String cardname){
+        Unit flyer;
+        if(cardname.equals("Staff Of Ykir")) {
+            flyer = new SpellFactory().generateSpell(SpellType.STAFF_OF_YKIR);
+        } else if(cardname.equals("Entropic Decay")) {
+            flyer = new SpellFactory().generateSpell(SpellType.ENTROPIC_DECAY);
+        } else if(cardname.equals("Sundrop Elixer")){
+            flyer = new SpellFactory().generateSpell(SpellType.SUNDROP_ELIXIR);
+        }  else {
+            flyer = new SpellFactory().generateSpell(SpellType.TRUESTRIKE);
         }
         return flyer;
     }

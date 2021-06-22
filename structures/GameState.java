@@ -479,6 +479,7 @@ public class GameState {
             	int enemyHealth = enemy.getHealth();
             	int HealthAfterDamage =  enemyHealth-previousUnitLocation.getUnit().getDamage(); //test//should take attackers atk damage
             	
+            	//enemy animation
                 new UnitCommandBuilder(out)
                 .setMode(UnitCommandBuilderMode.ANIMATION)
                 .setUnit(enemy)
@@ -490,6 +491,18 @@ public class GameState {
                 .setMode(UnitCommandBuilderMode.SET)
                 .setStats(UnitStats.HEALTH, HealthAfterDamage)
                 .issueCommand();
+                
+                
+                //attacker animation
+                Unit attacker = previousUnitLocation.getUnit();
+                
+                new UnitCommandBuilder(out)
+                .setMode(UnitCommandBuilderMode.ANIMATION)
+                .setUnit(attacker)
+                .setAnimationType(UnitAnimationType.hit)
+                .issueCommand();
+                
+                
             	return;
                 }else {
                 	return;

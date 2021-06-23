@@ -112,6 +112,7 @@ public class GameState {
         for (int idx = 0; idx < INITIAL_CARD_COUNT; idx++) {
             drawNewCardFor(Players.PLAYER1);
             drawNewCardFor(Players.PLAYER2);
+
         }
         displayCardsOnScreenFor(out, turn);
     }
@@ -336,20 +337,24 @@ public class GameState {
         System.out.println(cardname);
         if (current.isSpell()) {
             if (cardname.equals("Truestrike") || cardname.equals("Entropic Decay")) {
-                // Highlight enemy units
+                // Set a buff animation and the effects like this.
+                new TileCommandBuilder(out)
+                        .setMode(TileCommandBuilderMode.ANIMATION)
+                        .setTilePosition(x, y)
+                        .setEffectAnimation(TileEffectAnimation.INMOLATION)
+                        .issueCommand();
 
             }
             if (cardname.equals("Sundrop Elixir") || cardname.equals("Staff of Y'Kir'")) {
                 // Highlight friendly units
-                // After player selected a square to play highlight.
+                // After player selected a square to play highlight. // I did the highlight on cardTileHighlight
+                // Set a buff animation and the effects like this.
+                new TileCommandBuilder(out)
+                        .setMode(TileCommandBuilderMode.ANIMATION)
+                        .setTilePosition(x, y)
+                        .setEffectAnimation(TileEffectAnimation.MARTYRDOM) //<- Choose your animation here
+                        .issueCommand();
             }
-
-            // Set a buff animation and the effects like this.
-            // new TileCommandBuilder(out)
-            // .setMode(TileCommandBuilderMode.ANIMATION)
-            // .setTilePosition(tilex, tiley)
-            // .setEffectAnimation(TileEffectAnimation.BUFF) <- Choose your animation here
-            // .issueCommand();
         } else {
             Unit flyer = typeOfUnitCard(cardname);      //Helper method with many cases
             units.put(flyer, UnitStatus.FLYING);
@@ -359,10 +364,8 @@ public class GameState {
                     .setPlayerID(turn)
                     .setUnit(flyer)
                     .issueCommand();
-
-            deleteCardFromHand(out,positionOfCardClicked);
         }
-
+        deleteCardFromHand(out,positionOfCardClicked);
         clearBoardHighlights(out);
     }
 

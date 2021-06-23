@@ -28,6 +28,7 @@ public class GameState {
     private final int INITIAL_CARD_COUNT = 3;
     private int roundNumber = 1;
     private int positionOfCardClicked;
+    private String cardname;
 
     private Players turn = Players.PLAYER1;
     // TODO: This should be randomised according to game loop.
@@ -158,7 +159,10 @@ public class GameState {
     public void cardClicked(ActorRef out, int idx)
     {
         positionOfCardClicked = idx;                    //we have to save it and use it in other methods
-        System.out.println("Card Clicked");
+        Card current = (turn == PLAYER1) ? player1CardsInHand[positionOfCardClicked] : player2CardsInHand[positionOfCardClicked];
+        cardname = current.getCardname();
+
+        System.out.println("Card Clicked: " + cardname);
         Card[] temp = (turn == Players.PLAYER1) ? player1CardsInHand : player2CardsInHand;
 
         clearBoardHighlights(out);
@@ -180,36 +184,63 @@ public class GameState {
     }
 
 
-    public void cardTileHighlight(ActorRef out,int x, int y)
-    {
-        int[][] initDir = getMoveTiles(x, y, 1, 0);
+    public void cardTileHighlight(ActorRef out,int x, int y) {
+        if (cardname.equals("Truestrike") || cardname.equals("Entropic Decay")) {
+            // Highlight enemy units
+            Players Enemy = (turn == PLAYER1) ? Players.PLAYER2 : PLAYER1;
+            for(int i = 0; i < 9; i++ ) {
+                for (int j = 0; j < 5; j++) {
+                    if (Board.getInstance().getTile(i, j).hasFriendlyUnit(Enemy)) {
+                        new TileCommandBuilder(out)
+                                .setTilePosition(i, j)
+                                .setState(States.RED)
+                                .issueCommand();
 
-        boolean[] initDirB = {true,true,true,true};
+                    }
+                }
+            }
 
-        int[][] interDir = getMoveTiles(x, y, 1, 1);
+        } else if (cardname.equals("Sundrop Elixir") || cardname.equals("Staff of Y'Kir'")) {
+            // Highlight friendly units
+            // After player sel
+            for(int i = 0; i < 9; i++ ) {
+                for (int j = 0; j < 5; j++) {
+                    if (Board.getInstance().getTile(i, j).hasFriendlyUnit(turn)) {
+                        new TileCommandBuilder(out)
+                                .setTilePosition(i, j)
+                                .setState(States.HIGHLIGHTED)
+                                .issueCommand();
 
-        int count = 0;
-        for (int[] is : initDir)                                    //for the inital directions you can move
-        {
-            initDirB[count] = checkTileHighlight(out, is);       //if they are blocked record this
-            count++;
-        }
+                    }
+                }
+            }
+        } else {
+            int[][] initDir = getMoveTiles(x, y, 1, 0);
 
-        if(initDirB[0] == true || initDirB[1] == true)              //for the inter tiles do some logic
-        {
-            checkTileHighlight(out, interDir[0]);
-        }
-        if(initDirB[1] == true || initDirB[3] == true)
-        {
-            checkTileHighlight(out, interDir[1]);
-        }
-        if(initDirB[2] == true || initDirB[0] == true)
-        {
-            checkTileHighlight(out, interDir[2]);
-        }
-        if(initDirB[2] == true || initDirB[3] == true)
-        {
-            checkTileHighlight(out, interDir[3]);
+            boolean[] initDirB = {true, true, true, true};
+
+            int[][] interDir = getMoveTiles(x, y, 1, 1);
+
+            int count = 0;
+            for (int[] is : initDir)                                    //for the inital directions you can move
+            {
+                initDirB[count] = checkTileHighlight(out, is);       //if they are blocked record this
+                count++;
+            }
+
+            if (initDirB[0] == true || initDirB[1] == true)              //for the inter tiles do some logic
+            {
+                checkTileHighlight(out, interDir[0]);
+            }
+            if (initDirB[1] == true || initDirB[3] == true) {
+                checkTileHighlight(out, interDir[1]);
+            }
+            if (initDirB[2] == true || initDirB[0] == true) {
+                checkTileHighlight(out, interDir[2]);
+            }
+            if (initDirB[2] == true || initDirB[3] == true) {
+                checkTileHighlight(out, interDir[3]);
+            }
         }
     }
 
@@ -279,10 +310,12 @@ public class GameState {
     public void cardToBoard(ActorRef out, int x, int y) {
         Card current = (turn == PLAYER1) ? player1CardsInHand[positionOfCardClicked] : player2CardsInHand[positionOfCardClicked];
         String cardname = current.getCardname();
+
         System.out.println(cardname);
         if (current.isSpell()) {
             if (cardname.equals("Truestrike") || cardname.equals("Entropic Decay")) {
                 // Highlight enemy units
+
             }
             if (cardname.equals("Sundrop Elixir") || cardname.equals("Staff of Y'Kir'")) {
                 // Highlight friendly units

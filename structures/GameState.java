@@ -50,6 +50,7 @@ public class GameState {
     private Card previousClickedCard = null;
 
     private int[][] friendlyUnits = null;
+    private int[][] enemyUnitsPosition = new int[20][2];
 
     private HashMap<Unit, UnitStatus> units = new HashMap<>();
 
@@ -188,14 +189,16 @@ public class GameState {
         if (cardname.equals("Truestrike") || cardname.equals("Entropic Decay")) {
             // Highlight enemy units
             Players Enemy = (turn == PLAYER1) ? Players.PLAYER2 : PLAYER1;
+            int count = 0;
             for(int i = 0; i < 9; i++ ) {
                 for (int j = 0; j < 5; j++) {
                     if (Board.getInstance().getTile(i, j).hasFriendlyUnit(Enemy)) {
+                        enemyUnitsPosition[count][0] = i;       //Save the position of the Enemy to unhighlight them
+                        enemyUnitsPosition[count++][1] = j;
                         new TileCommandBuilder(out)
                                 .setTilePosition(i, j)
                                 .setState(States.RED)
                                 .issueCommand();
-
                     }
                 }
             }
@@ -210,7 +213,6 @@ public class GameState {
                                 .setTilePosition(i, j)
                                 .setState(States.HIGHLIGHTED)
                                 .issueCommand();
-
                     }
                 }
             }
@@ -264,8 +266,28 @@ public class GameState {
                 }
             }
         }
-
+        unitUnhighlight(out);
     }
+
+    public void unitUnhighlight(ActorRef out)
+    {
+        for (int[] array: friendlyUnits) {
+                new TileCommandBuilder(out)
+                        .setTilePosition(array[0], array[1])
+                        .setState(States.NORMAL)
+                        .setMode(TileCommandBuilderMode.DRAW)
+                        .issueCommand();
+        }
+        for (int[] array : enemyUnitsPosition) {
+            new TileCommandBuilder(out)
+                    .setTilePosition(array[0], array[1])
+                    .setState(States.NORMAL)
+                    .setMode(TileCommandBuilderMode.DRAW)
+                    .issueCommand();
+        }
+    }
+
+
 
     public void drawCard(ActorRef out, Players player) {
         drawNewCardFor(player);
@@ -720,7 +742,6 @@ public class GameState {
             System.out.println("Unit " + count + ", x: " + friendlyUnitLocations[i][0] + " y: " + friendlyUnitLocations[i][1]);
             output[i] = friendlyUnitLocations[i];
         }
-        //System.out.println(turn + " has " + count + " of friendly units");
 
         return output;
     }

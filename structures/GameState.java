@@ -50,8 +50,15 @@ public class GameState {
     private int[][] friendlyUnits = null;
 
     private HashMap<Unit, UnitStatus> units = new HashMap<>();
+    
+    // Ana: counter attack
+    private Tile currentUnitLocation = null;
 
-    //////////////////////////////////////////////////////////////////////////////
+    public Tile getCurrentUnitLocation() {
+		return currentUnitLocation;
+	}
+
+	//////////////////////////////////////////////////////////////////////////////
                 ///Initalisation and functions related to such///
     //////////////////////////////////////////////////////////////////////////////
     //Creates the two players
@@ -76,6 +83,27 @@ public class GameState {
     {
         Unit human = new UnitFactory().generateUnit(UnitType.HUMAN);
         Unit ai = new UnitFactory().generateUnit(UnitType.AI);
+        
+//       Unit avatar = new UnitFactory().generateUnit(UnitType.AZURE_HERALD);
+//       new UnitCommandBuilder(out)
+//   					.setMode(UnitCommandBuilderMode.DRAW)
+//   					.setTilePosition(1, 2)
+//   					.setPlayerID(Players.PLAYER1)
+//   					.setUnit(avatar)
+//   					.issueCommand();
+//       
+//       new UnitCommandBuilder(out)
+//			    	.setMode(UnitCommandBuilderMode.SET)
+//			    	.setUnit(avatar) 
+//			    	.setStats(UnitStats.HEALTH, 20)
+//			    	.issueCommand();
+//       
+//       new UnitCommandBuilder(out)
+//				   	.setMode(UnitCommandBuilderMode.SET)
+//				   	.setUnit(avatar) 
+//				   	.setStats(UnitStats.ATTACK, 2)
+//				   	.issueCommand();
+       
         
         //Nelson testcase//
 //        Unit humanUnit = new UnitFactory().generateUnit(UnitType.WINDSHRIKE);
@@ -151,12 +179,8 @@ public class GameState {
      	.setUnit(flyer)
      	.setStats(UnitStats.ATTACK, 1)
      	.issueCommand();
-         
 
-         
-         
          ////
-         
 
     }
 
@@ -442,11 +466,16 @@ public class GameState {
     {
     	int[] acPos = {x,y};
     	int tileActive [][] = getAllMoveTiles(previousUnitLocation.getTilex(), previousUnitLocation.getTiley());
+    	
+    	//Ana: for counter attack
+    	if (Board.getInstance().getTile(x, y).getUnit() != null && Board.getInstance().getTile(x, y).getUnit().isHasGotAttacked())
+    		return false;
+    	
     	for (int[] ip : tileActive)
         {
             if(ip[0] == acPos[0] && ip[1] == acPos[1])        
             {
-                if(Board.getInstance().getTile(x, y).getUnit()!=null)//enemy is in this tile
+                if(Board.getInstance().getTile(x, y).getUnit() != null) //enemy is in this tile
                 {
                     return true;
                 }
@@ -460,47 +489,57 @@ public class GameState {
     ////NELSON
     
     
+    // Ana: Counter attack, ranged attack not included
+    public int attack(ActorRef out, Tile attackerLocation, Unit enemy, Unit attacker, int x, int y) {
+			UnitCommandBuilder enemyCommandBuilder = new UnitCommandBuilder(out).setUnit(enemy);
+			int enemyHealth = enemy.getHealth();
+	    	int healthAfterDamage =  enemyHealth - attacker.getDamage();
+	  
+	      new ProjectTileAnimationCommandBuilder(out)
+	              .setSource(attackerLocation)
+	              .setDistination(Board.getInstance().getTile(x, y))
+	              .issueCommand();
+	      
+	
+	      enemyCommandBuilder
+	              .setMode(UnitCommandBuilderMode.SET)
+	              .setStats(UnitStats.HEALTH, healthAfterDamage)
+	              .issueCommand();
+	      
+	      //unhighlight all the tiles
+	      clearBoardHighlights(out);
+          
+	      //restrict human player to attack again
+	      enemy.setHasGotAttacked(true);
+	      
+	      // Win condition: should be moved to a method where we are checking player's health
+	      if (player1.getHealth() < 1)
+	    	  BasicCommands.addPlayer1Notification(out, "Player1 Won", 4);
+	      else if (player2.getHealth() < 1)
+	    	  BasicCommands.addPlayer1Notification(out, "Player2 Won", 4);
+	      
+	      return enemy.getHealth();
+    }
 
     public void unitClicked(ActorRef out,int x, int y)
     {
-        System.out.println(x +"," + y + " Clicked");
-        System.out.println(Board.getInstance().getTile(x, y).getUnit().getId());
-       
+    	currentUnitLocation = Board.getInstance().getTile(x, y);
         if(Board.getInstance().getTile(x, y).getUnit().getPlayerID() != turn) //you dont own this unit!
         {
         	try {
-        	if(attackCheck(out, x,y))
-        	{
-        		int[] pos2 = {x,y};
-        		if(Board.getInstance().getTile(pos2[0], pos2[1]).getUnit().getPlayerID() != turn) //Enemy in that pos
-                {
-            		
-            	Unit enemy = Board.getInstance().getTile(x, y).getUnit();
-            	int enemyHealth = enemy.getHealth();
-            	int HealthAfterDamage =  enemyHealth-previousUnitLocation.getUnit().getDamage(); //test//should take attackers atk damage
-
-                UnitCommandBuilder enemyCommandBuilder = new UnitCommandBuilder(out).setUnit(enemy);
-
-//                enermyCommandBuilder
-//                        .setMode(UnitCommandBuilderMode.ANIMATION)
-//                        .setAnimationType(UnitAnimationType.hit)
-//                        .issueCommand();
-
-                enemyCommandBuilder
-                        .setMode(UnitCommandBuilderMode.SET)
-                        .setStats(UnitStats.HEALTH, HealthAfterDamage)
-                        .issueCommand();
-                
-                new ProjectTileAnimationCommandBuilder(out)
-                .setSource(previousUnitLocation)
-                .setDistination(Board.getInstance().getTile(x, y))
-                .issueCommand();
-                
-            	return;
-                }else {
-                	return;
-                	}
-        	}
+	        	if(attackCheck(out, x,y)) {
+	        		Tile enemyLocation = Board.getInstance().getTile(x, y);
+	        		Unit enemy = enemyLocation.getUnit();
+	        		Unit attacker = previousUnitLocation.getUnit();
+	        		
+	        		// Attack & Checking health before counter attack
+	        		int enemyHealthAfterAttack = attack(out, previousUnitLocation, enemy, attacker, x, y);
+	    
+	        		if (enemyHealthAfterAttack > 0) {
+		        		//Counter Attack
+		        		attack(out, enemyLocation, attacker, enemy, attacker.getPosition().getTilex(), attacker.getPosition().getTiley());
+	        		}
+	        	}
         	}catch(NullPointerException e) {
         		System.err.println("Select your avatar/unit before selecting enemy");
         		
@@ -863,6 +902,7 @@ public class GameState {
                                ///Mana incrementation///
     //////////////////////////////////////////////////////////////////////////////
     public void ManaIncrementPerRound(ActorRef out) {
+    	
     	if(this.turn==Players.PLAYER1) {
     		int player1Mana = player1.getMana();
     		player1.setMana(player1Mana + roundNumber + 1);
@@ -874,6 +914,26 @@ public class GameState {
     	}else {
         	int player2Mana = player2.getMana();
         	player2.setMana(player2Mana + roundNumber + 1);
+        	new PlayerSetCommandsBuilder(out)
+            	.setPlayer(Players.PLAYER2)
+            	.setStats(PlayerStats.MANA)
+            	.setInstance(player2)
+            	.issueCommand();
+    	}
+    }
+    
+    public void resetMana(ActorRef out) {
+    	
+		// Ana: Reset mana after end turn is clicked
+    	if(this.turn == Players.PLAYER1) {
+    		player1.setMana(0);
+    		new PlayerSetCommandsBuilder(out)
+        		.setPlayer(Players.PLAYER1)
+        		.setStats(PlayerStats.MANA)
+        		.setInstance(player1)
+        		.issueCommand();
+    	}else {
+        	player2.setMana(0);
         	new PlayerSetCommandsBuilder(out)
             	.setPlayer(Players.PLAYER2)
             	.setStats(PlayerStats.MANA)

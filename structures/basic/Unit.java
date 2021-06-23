@@ -31,6 +31,18 @@ public class Unit {
 	int unitHealth = 0;
 	int unitDamage =  0;
 	
+	//Ana: for counter attack
+	boolean hasGotAttacked = false;
+	
+	public boolean isHasGotAttacked() {
+		return hasGotAttacked;
+	}
+
+	public void setHasGotAttacked(boolean hasGotAttacked) {
+		this.hasGotAttacked = hasGotAttacked;
+	}
+	//
+	
 	public Unit() {}
 	
 	public Unit(int id, UnitAnimationSet animations, ImageCorrection correction) {

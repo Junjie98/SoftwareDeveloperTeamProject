@@ -11,7 +11,9 @@ package structures.basic;
  *
  */
 public class Card {
-	
+
+	static final String[] spellcards = {"Entropic Decay", "Staff of Y'Kir'", "Truestrike", "Sundrop Elixir"};
+
 	int id;
 	
 	String cardname;
@@ -60,6 +62,15 @@ public class Card {
 	}
 	public void setBigCard(BigCard bigCard) {
 		this.bigCard = bigCard;
+	}
+
+	public boolean isSpell() {
+		for (String item: spellcards) {
+			if (item.equals(cardname)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	

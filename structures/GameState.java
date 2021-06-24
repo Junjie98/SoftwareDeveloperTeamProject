@@ -15,6 +15,8 @@ import structures.basic.Tile;
 import structures.basic.Unit;
 import structures.basic.UnitAnimationType;
 
+import static commandbuilders.enums.Players.PLAYER1;
+
 /**
  * This class can be used to hold information about the on-going game.
  * Its created with the GameActor.
@@ -29,6 +31,9 @@ public class GameState {
     private int roundNumber = 1;
     private ArrayList<Unit> unitMoved = new ArrayList<Unit>();
     
+    private int positionOfCardClicked;
+    private String cardname;
+
     private Players turn = Players.PLAYER1;
     // TODO: This should be randomised according to game loop.
 
@@ -49,6 +54,7 @@ public class GameState {
     private Card previousClickedCard = null;
 
     private int[][] friendlyUnits = null;
+    private int[][] enemyUnitsPosition = new int[20][2];
 
     private HashMap<Unit, UnitStatus> units = new HashMap<>();
     
@@ -196,6 +202,7 @@ public class GameState {
         for (int idx = 0; idx < INITIAL_CARD_COUNT; idx++) {
             drawNewCardFor(Players.PLAYER1);
             drawNewCardFor(Players.PLAYER2);
+
         }
         displayCardsOnScreenFor(out, turn);
     }
@@ -206,10 +213,11 @@ public class GameState {
                             ///Board and turn logic///
     //////////////////////////////////////////////////////////////////////////////
     //iterates turn
-    public void nextTurn() {
+    public void nextTurn(ActorRef out) {
+        clearBoardHighlights(out);
         if (turn == Players.PLAYER1) {
             turn = Players.PLAYER2;
-            
+
         } else {
             turn = Players.PLAYER1;
 
@@ -222,9 +230,9 @@ public class GameState {
     {
         int[][] unitsOnBoard = scanBoardForUnits();
 
-        for (int[] is : unitsOnBoard) 
+        for (int[] is : unitsOnBoard)
         {
-            Board.getInstance().getTile(is[0], is[1]).getUnit().resetHasMoved();    
+            Board.getInstance().getTile(is[0], is[1]).getUnit().resetHasMoved();
         }
     }
     public Players getTurn() {
@@ -242,7 +250,11 @@ public class GameState {
     ////// Card methods
     public void cardClicked(ActorRef out, int idx)
     {
-        System.out.println("Card Clicked");
+        positionOfCardClicked = idx;                    //we have to save it and use it in other methods
+        Card current = (turn == PLAYER1) ? player1CardsInHand[positionOfCardClicked] : player2CardsInHand[positionOfCardClicked];
+        cardname = current.getCardname();
+
+        System.out.println("Card Clicked: " + cardname);
         Card[] temp = (turn == Players.PLAYER1) ? player1CardsInHand : player2CardsInHand;
 
         clearBoardHighlights(out);
@@ -262,38 +274,66 @@ public class GameState {
             previousClickedCard = temp[idx];
         }
     }
-    
 
-    public void cardTileHighlight(ActorRef out,int x, int y)
-    {
-        int[][] initDir = getMoveTiles(x, y, 1, 0);
 
-        boolean[] initDirB = {true,true,true,true};
+    public void cardTileHighlight(ActorRef out,int x, int y) {
+        if (cardname.equals("Truestrike") || cardname.equals("Entropic Decay")) {
+            // Highlight enemy units
+            Players Enemy = (turn == PLAYER1) ? Players.PLAYER2 : PLAYER1;
+            int count = 0;
+            for(int i = 0; i < 9; i++ ) {
+                for (int j = 0; j < 5; j++) {
+                    if (Board.getInstance().getTile(i, j).hasFriendlyUnit(Enemy)) {
+                        enemyUnitsPosition[count][0] = i;       //Save the position of the Enemy to unhighlight them
+                        enemyUnitsPosition[count++][1] = j;
+                        new TileCommandBuilder(out)
+                                .setTilePosition(i, j)
+                                .setState(States.RED)
+                                .issueCommand();
+                    }
+                }
+            }
 
-        int[][] interDir = getMoveTiles(x, y, 1, 1);
+        } else if (cardname.equals("Sundrop Elixir") || cardname.equals("Staff of Y'Kir'")) {
+            // Highlight friendly units
+            // After player sel
+            for(int i = 0; i < 9; i++ ) {
+                for (int j = 0; j < 5; j++) {
+                    if (Board.getInstance().getTile(i, j).hasFriendlyUnit(turn)) {
+                        new TileCommandBuilder(out)
+                                .setTilePosition(i, j)
+                                .setState(States.HIGHLIGHTED)
+                                .issueCommand();
+                    }
+                }
+            }
+        } else {
+            int[][] initDir = getMoveTiles(x, y, 1, 0);
 
-        int count = 0;
-        for (int[] is : initDir)                                    //for the inital directions you can move
-        {
-            initDirB[count] = checkTileHighlight(out, is);       //if they are blocked record this
-            count++;
-        }
+            boolean[] initDirB = {true, true, true, true};
 
-        if(initDirB[0] == true || initDirB[1] == true)              //for the inter tiles do some logic
-        {
-            checkTileHighlight(out, interDir[0]);
-        }
-        if(initDirB[1] == true || initDirB[3] == true)
-        {
-            checkTileHighlight(out, interDir[1]);
-        }
-        if(initDirB[2] == true || initDirB[0] == true)
-        {
-            checkTileHighlight(out, interDir[2]);
-        }
-        if(initDirB[2] == true || initDirB[3] == true)
-        {
-            checkTileHighlight(out, interDir[3]);
+            int[][] interDir = getMoveTiles(x, y, 1, 1);
+
+            int count = 0;
+            for (int[] is : initDir)                                    //for the inital directions you can move
+            {
+                initDirB[count] = checkTileHighlight(out, is);       //if they are blocked record this
+                count++;
+            }
+
+            if (initDirB[0] == true || initDirB[1] == true)              //for the inter tiles do some logic
+            {
+                checkTileHighlight(out, interDir[0]);
+            }
+            if (initDirB[1] == true || initDirB[3] == true) {
+                checkTileHighlight(out, interDir[1]);
+            }
+            if (initDirB[2] == true || initDirB[0] == true) {
+                checkTileHighlight(out, interDir[2]);
+            }
+            if (initDirB[2] == true || initDirB[3] == true) {
+                checkTileHighlight(out, interDir[3]);
+            }
         }
     }
 
@@ -317,8 +357,28 @@ public class GameState {
                 }
             }
         }
-
+        unitUnhighlight(out);
     }
+
+    public void unitUnhighlight(ActorRef out)
+    {
+        for (int[] array: friendlyUnits) {
+                new TileCommandBuilder(out)
+                        .setTilePosition(array[0], array[1])
+                        .setState(States.NORMAL)
+                        .setMode(TileCommandBuilderMode.DRAW)
+                        .issueCommand();
+        }
+        for (int[] array : enemyUnitsPosition) {
+            new TileCommandBuilder(out)
+                    .setTilePosition(array[0], array[1])
+                    .setState(States.NORMAL)
+                    .setMode(TileCommandBuilderMode.DRAW)
+                    .issueCommand();
+        }
+    }
+
+
 
     public void drawCard(ActorRef out, Players player) {
         drawNewCardFor(player);
@@ -342,7 +402,7 @@ public class GameState {
 
     private void displayCardsOnScreenFor(ActorRef out, Players player) {
         Card[] currentCardInHand = (player == Players.PLAYER1) ? player1CardsInHand : player2CardsInHand;
-        int currentCardInHandCount = (player == Players.PLAYER2) ? player1CardsInHandCount : player2CardsInHandCount;
+        int currentCardInHandCount = (player == Players.PLAYER1) ? player1CardsInHandCount : player2CardsInHandCount;
         for (int idx = 0; idx < currentCardInHand.length; idx++) {
             if (idx < currentCardInHandCount) {
                 new CardInHandCommandBuilder(out)
@@ -359,10 +419,69 @@ public class GameState {
             }
         }
     }
+
+    public void cardToBoard(ActorRef out, int x, int y) {
+        Card current = (turn == PLAYER1) ? player1CardsInHand[positionOfCardClicked] : player2CardsInHand[positionOfCardClicked];
+        String cardname = current.getCardname();
+
+        System.out.println(cardname);
+        if (current.isSpell()) {
+            if (cardname.equals("Truestrike") || cardname.equals("Entropic Decay")) {
+                // Set a buff animation and the effects like this.
+                new TileCommandBuilder(out)
+                        .setMode(TileCommandBuilderMode.ANIMATION)
+                        .setTilePosition(x, y)
+                        .setEffectAnimation(TileEffectAnimation.INMOLATION)
+                        .issueCommand();
+
+            }
+            if (cardname.equals("Sundrop Elixir") || cardname.equals("Staff of Y'Kir'")) {
+                // Highlight friendly units
+                // After player selected a square to play highlight. // I did the highlight on cardTileHighlight
+                // Set a buff animation and the effects like this.
+                new TileCommandBuilder(out)
+                        .setMode(TileCommandBuilderMode.ANIMATION)
+                        .setTilePosition(x, y)
+                        .setEffectAnimation(TileEffectAnimation.MARTYRDOM) //<- Choose your animation here
+                        .issueCommand();
+            }
+        } else {
+            Unit flyer = typeOfUnitCard(cardname);      //Helper method with many cases
+            units.put(flyer, UnitStatus.FLYING);
+            new UnitCommandBuilder(out)
+                    .setMode(UnitCommandBuilderMode.DRAW)
+                    .setTilePosition(x, y)
+                    .setPlayerID(turn)
+                    .setUnit(flyer)
+                    .issueCommand();
+        }
+        deleteCardFromHand(out,positionOfCardClicked);
+        clearBoardHighlights(out);
+    }
+
+    public void deleteCardFromHand(ActorRef out, int pos) {
+        Card[] current = (turn == PLAYER1) ? player1CardsInHand : player2CardsInHand;
+        int count = (turn == PLAYER1) ? player1CardsInHandCount : player2CardsInHandCount;
+        Card[] temp = new Card[MAX_CARD_COUNT_IN_HAND];
+        int idx = 0;
+
+        for (int i = 0; i < count; i++) {
+            if (i != pos) {
+                temp[idx++] = current[i];
+            }
+        }
+
+        if (turn == PLAYER1) {
+            player1CardsInHand = temp;
+            player1CardsInHandCount--;
+        } else {
+            player2CardsInHand = temp;
+            player2CardsInHandCount--;
+        }
+
+        displayCardsOnScreenFor(out, turn);
+    }
     ////////////////////////////////////end///////////////////////////////////////
-
-
-
 
     //////////////////////////////////////////////////////////////////////////////
                 ///Unit selection, unit moving, unit logic///
@@ -386,18 +505,20 @@ public class GameState {
         {
         		unitClicked(out, x,y);     
         }
+        else if (preClickCard)
+        {
+            System.out.println("preClickCard is true, the tile has x" + x + " and y " + y);
+            //TO-DO I should check if the tile is part of the highlighted tiles
+            cardToBoard(out, x, y);
+        }
         else if(Board.getInstance().getTile(x, y).getUnit() != null && Board.getInstance().getTile(x, y).getUnit().getHasMoved() == false 
         		&& Board.getInstance().getTile(x, y).getUnit().getHasAttacked() == true)
         {
         	clearBoardHighlights(out);
         }
-        else
-        {
+        else {
             clearBoardHighlights(out);
         }
-        
-        
-        
     }
 
     public Tile getPreviousUnitLocation() {
@@ -448,7 +569,6 @@ public class GameState {
             return false;
         }
     }
-
 
     public void highlightedMoveTileClicked(ActorRef out, int x, int y)       //test for selectex
     {
@@ -808,7 +928,11 @@ public class GameState {
             ///Helper Methods, methods used in multiple logics etc///
     //////////////////////////////////////////////////////////////////////////////
 
-
+    // --
+    // TODO: Storing friendly units of each side would be a good idea.
+    // If we are scanning everytime, the animation will get laggy.
+    // Maintain a list of friendly units of each side on generation and remove on killed.
+    // This way we can get rid of this function and just iterate thru the stored ones.
     
     public int[][] scanBoardForUnits()
     {
@@ -836,7 +960,41 @@ public class GameState {
         return outArr;
     }
 
-    private void clearBoardHighlights(ActorRef out)
+    public int[][] scanBoardForFriendlyUnits(ActorRef out)
+    {
+
+
+        //System.err.println("scan out board");
+        int[][] friendlyUnitLocations = new int[45][2];
+        int count = 0;
+
+        for(int x = 0; x < 9; x++ )
+        {
+            for(int y = 0; y < 5; y ++)
+            {
+                if(Board.getInstance().getTile(x,y).hasFriendlyUnit(turn))
+                {
+                    //save ints into array x y
+                    System.err.println("Found friendly go for highlight");
+                    friendlyUnitLocations[count][0] = x;
+                    friendlyUnitLocations[count][1] = y;
+                    count++;
+                }
+            }
+        }
+
+        int [][] output = new int[count][2];
+
+        for (int i=0; i<count;i++) {
+            System.out.println("Unit " + count + ", x: " + friendlyUnitLocations[i][0] + " y: " + friendlyUnitLocations[i][1]);
+            output[i] = friendlyUnitLocations[i];
+        }
+
+        return output;
+    }
+    // --
+
+    public void clearBoardHighlights(ActorRef out)
     {
         if (preMove == true)
         {
@@ -882,8 +1040,6 @@ public class GameState {
 
     }
 
-  
-
     public <T> T[] concatenate(T[] a, T[] b) {
         int aLen = a.length;
         int bLen = b.length;
@@ -916,7 +1072,7 @@ public class GameState {
 
         if(!Board.getInstance().getTile(pos[0], pos[1]).hasUnit())    //empty so highlight
         {
-            System.err.println("highlight");
+//            System.err.println("highlight");
             new TileCommandBuilder(out)
                     .setTilePosition(pos[0], pos[1])
                     .setState(States.HIGHLIGHTED)
@@ -944,37 +1100,57 @@ public class GameState {
         }
     }
 
-    public int[][] scanBoardForFriendlyUnits(ActorRef out)
-    {
-        //System.err.println("scan out board");
-        int[][] friendlyUnitLocations = new int[45][2];
-        int count = 0;
+    // TODO: You can do this in some other files, like in UnitFactory make a generate unit by cardname method? @Mer
+    // If you don't know what I am talking about, just leave it to me
 
-
-        for(int x = 0; x < 9; x++ )
-        {
-            for(int y = 0; y < 5; y ++)
-            {
-                if(Board.getInstance().getTile(x,y).hasFriendlyUnit(turn))
-                {
-                    //save ints into array x y
-                    System.err.println("Found friendly go for highlight");
-                    friendlyUnitLocations[count][0] = x;
-                    friendlyUnitLocations[count][1] = y;
-                    count++;
-                }
-            }
+    public Unit typeOfUnitCard(String cardname){
+        Unit flyer;
+        if(cardname.equals("Pureblade Enforcer")) {
+            flyer = new UnitFactory().generateUnit(UnitType.PUREBLADE_ENFORCER);
+        } else if(cardname.equals("Azure Herald")) {
+            flyer = new UnitFactory().generateUnit(UnitType.AZURE_HERALD);
+        } else if(cardname.equals("Azurite Lion")) {
+            flyer = new UnitFactory().generateUnit(UnitType.AZURITE_LION);
+        } else if(cardname.equals("Comodo Charger")) {
+            flyer = new UnitFactory().generateUnit(UnitType.COMODO_CHARGER);
+        } else if(cardname.equals("Fire Spitter")) {
+            flyer = new UnitFactory().generateUnit(UnitType.FIRE_SPITTER);
+        } else if(cardname.equals("Hailstone Golem")) {
+            flyer = new UnitFactory().generateUnit(UnitType.HAILSTONE_GOLEM);
+        } else if(cardname.equals("Ironcliff Guardian")) {
+            flyer = new UnitFactory().generateUnit(UnitType.IRONCLIFF_GUARDIAN);
+        } else if(cardname.equals("Pudeblade Enforcer")) {
+            flyer = new UnitFactory().generateUnit(UnitType.PUREBLADE_ENFORCER);
+        } else if(cardname.equals("Silverguard Knight")) {
+            flyer = new UnitFactory().generateUnit(UnitType.SILVERGUARD_KNIGHT);
+        } else if(cardname.equals("Blaze Hound")) {
+            flyer = new UnitFactory().generateUnit(UnitType.BLAZE_HOUND);
+        } else if(cardname.equals("Bloodshard Golem")) {
+            flyer = new UnitFactory().generateUnit(UnitType.BLOODSHARD_GOLEM);
+        } else if(cardname.equals("Hailstone Golder R")){
+            flyer = new UnitFactory().generateUnit(UnitType.HAILSTONE_GOLEM_R);
+        } else if(cardname.equals("Planar Scout")){
+            flyer = new UnitFactory().generateUnit(UnitType.PLANAR_SCOUT);
+        } else if(cardname.equals("Pyromancer")){
+            flyer = new UnitFactory().generateUnit(UnitType.PYROMANCER);
+        } else if(cardname.equals("Rock_Pulveriser")){
+            flyer = new UnitFactory().generateUnit(UnitType.ROCK_PULVERISER);
+        } else if(cardname.equals("Serpenti")){
+            flyer = new UnitFactory().generateUnit(UnitType.SERPENTI);
+        } else if(cardname.equals("Windshrike")){
+            flyer = new UnitFactory().generateUnit(UnitType.WINDSHRIKE);
+        } else if(cardname.equals("Staff Of Ykir")) {
+            flyer = new UnitFactory().generateUnit(UnitType.STAFF_OF_YKIR);
+        } else if(cardname.equals("Entropic Decay")) {
+            flyer = new UnitFactory().generateUnit(UnitType.ENTROPIC_DECAY);
+        } else if(cardname.equals("Sundrop Elixer")){
+            flyer = new UnitFactory().generateUnit(UnitType.SUNDROP_ELIXIR);
+        }  else if(cardname.equals("Truestrike")) {
+            flyer = new UnitFactory().generateUnit(UnitType.TRUESTRIKE);
+        }else {
+            flyer = new UnitFactory().generateUnit(UnitType.WINDSHRIKE);
         }
-
-        int [][] output = new int[count][2];
-
-        for (int i=0; i<count;i++) {
-            System.out.println("Unit " + count + ", x: " + friendlyUnitLocations[i][0] + " y: " + friendlyUnitLocations[i][1]);
-            output[i] = friendlyUnitLocations[i];
-        }
-        //System.out.println(turn + " has " + count + " of friendly units");
-
-        return output;
+        return flyer;
     }
     ////////////////////////////////////end///////////////////////////////////////
 

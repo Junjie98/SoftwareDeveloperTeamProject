@@ -14,7 +14,7 @@ import java.util.ArrayList;
 
 public class UnitMovementAndAttack {
     Pair<Integer, Integer> activeUnit = null;
-    GameState parent;
+    private GameState parent;
 
     ArrayList<Unit> moveAttackAndCounterAttack = new ArrayList<>();
 
@@ -36,7 +36,7 @@ public class UnitMovementAndAttack {
         if(activeUnit != null) {
             //Unhighlight previously selected unit
             Tile previousUnitLocation = Board.getInstance().getTile(activeUnit);
-            parent.clearBoardHighlights(out);
+            parent.getHighlighter().clearBoardHighlights(out);
             if (previousUnitLocation != tile) {
                 // A new unit is clicked
                 moveHighlight(out, x, y);
@@ -60,7 +60,7 @@ public class UnitMovementAndAttack {
         int count = 0;
         for (Pair<Integer, Integer> is: initDir) {
             //for the initial directions you can move
-            initDirB[count] = parent.checkTileHighlight(out, is);       //if they are blocked record this
+            initDirB[count] = parent.getHighlighter().checkTileHighlight(out, is);       //if they are blocked record this
             count++;
         }
 
@@ -69,23 +69,23 @@ public class UnitMovementAndAttack {
             //for the next tiles
             if(initDirB[count] == true) {
                 //if the previous one is clear
-                parent.checkTileHighlight(out, sd);                  //check for units then highlight
+                parent.getHighlighter().checkTileHighlight(out, sd);                  //check for units then highlight
             }
             count++;
         }
 
         //for the inter tiles do some logic
         if(initDirB[0] == true || initDirB[1] == true) {
-            parent.checkTileHighlight(out, interDir.get(0));
+            parent.getHighlighter().checkTileHighlight(out, interDir.get(0));
         }
         if(initDirB[1] == true || initDirB[3] == true) {
-            parent.checkTileHighlight(out, interDir.get(1));
+            parent.getHighlighter().checkTileHighlight(out, interDir.get(1));
         }
         if(initDirB[2] == true || initDirB[0] == true) {
-            parent.checkTileHighlight(out, interDir.get(2));
+            parent.getHighlighter().checkTileHighlight(out, interDir.get(2));
         }
         if(initDirB[2] == true || initDirB[3] == true) {
-            parent.checkTileHighlight(out, interDir.get(3));
+            parent.getHighlighter().checkTileHighlight(out, interDir.get(3));
         }
     }
 
@@ -104,7 +104,7 @@ public class UnitMovementAndAttack {
     public void flyingMoveHighlight(ActorRef out) {
         for (Pair<Integer, Integer> ti : getFlyMoveTiles()) {
             //available tiles
-            parent.checkTileHighlight(out, ti);
+            parent.getHighlighter().checkTileHighlight(out, ti);
         }
 
         ArrayList<Pair<Integer, Integer>> units = new ArrayList<>();
@@ -113,7 +113,7 @@ public class UnitMovementAndAttack {
 
         for (Pair<Integer, Integer> bl : units) {
             //Blocked tiles
-            parent.checkTileHighlight(out, bl);
+            parent.getHighlighter().checkTileHighlight(out, bl);
         }
     }
 
@@ -197,15 +197,15 @@ public class UnitMovementAndAttack {
                 }
 
                 pool.add(new Pair<>(x, y));
-                parent.clearBoardHighlights(out);
+                parent.getHighlighter().clearBoardHighlights(out);
                 previousUnitLocation.getUnit().setHasMoved(true);
                 moveAttackAndCounterAttack.add(previousUnitLocation.getUnit());
                 previousUnitLocation.setUnit(null);
             } else {
-                parent.clearBoardHighlights(out);
+                parent.getHighlighter().clearBoardHighlights(out);
             }
         } else {
-            parent.clearBoardHighlights(out);
+            parent.getHighlighter().clearBoardHighlights(out);
         }
     }
 
@@ -238,7 +238,7 @@ public class UnitMovementAndAttack {
                         }
                     }
                     }
-                parent.clearBoardHighlights(out);
+                parent.getHighlighter().clearBoardHighlights(out);
             }
         }
     }
@@ -262,7 +262,7 @@ public class UnitMovementAndAttack {
                 .issueCommand();
 
         //unhighlight all the tiles
-        parent.clearBoardHighlights(out);
+        parent.getHighlighter().clearBoardHighlights(out);
 
         //restrict human player to attack again
         enemy.setHasGotAttacked(true);

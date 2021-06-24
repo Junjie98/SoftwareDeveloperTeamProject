@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import akka.actor.ActorRef;
 import commandbuilders.*;
 import commandbuilders.enums.*;
-import commands.BasicCommands;
 import structures.basic.Card;
 import structures.basic.Player;
 import structures.basic.Tile;
@@ -39,6 +38,7 @@ public class GameState {
     private UnitMovementAndAttack unitMovementAndAttack = new UnitMovementAndAttack(this);
     private CardDrawing cardDrawing = new CardDrawing(this);
     private CardPlayed cardPlayed = new CardPlayed(this);
+    private Highlighter highlighter = new Highlighter(this);
 
     // Ana: counter attack
     // private Tile currentUnitLocation = null;
@@ -133,7 +133,7 @@ public class GameState {
     // Handlers
     // ===========================================================================
     public void endTurnClicked(ActorRef out) {
-        clearBoardHighlights(out);
+        highlighter.clearBoardHighlights(out);
         turn = (turn == Players.PLAYER1) ? PLAYER2 : PLAYER1;
         unitMovementAndAttack.resetMoveAttackAndCounterAttack();
         setManaByRound(out);
@@ -148,14 +148,14 @@ public class GameState {
         Card current = (turn == PLAYER1) ? player1CardsInHand.get(idx) : player2CardsInHand.get(idx);
         System.out.println("Card Clicked: " + current.getCardname());
 
-        clearBoardHighlights(out);
+        highlighter.clearBoardHighlights(out);
 
         if (cardPlayed.getActiveCard() == null || cardPlayed.getActiveCard().getSecond() != idx) {
             cardPlayed.setActiveCard(current, idx);
             ArrayList<Pair<Integer, Integer>> friendlyUnits =
                     (turn == PLAYER1) ? player1UnitsPosition : player2UnitsPosition;
             for (Pair<Integer, Integer> position: friendlyUnits) {
-                cardPlayed.cardTileHighlight(out, position.getFirst(), position.getSecond());
+                highlighter.cardTileHighlight(out, position.getFirst(), position.getSecond());
             }
         }
     }
@@ -258,133 +258,6 @@ public class GameState {
         return output;
     }
 
-    // ===========================================================================
-    // TODO: Class Highlighter
-    // ===========================================================================
-    public boolean checkTileHighlight(ActorRef out, Pair<Integer, Integer> pos)  {
-        int x = pos.getFirst();
-        int y = pos.getSecond();
-
-        //limiting input
-        if(x < 0 || x > 8) {
-            return false;
-        }
-        if(y < 0 || y > 4) {
-            return false;
-        }
-
-        Tile tile = Board.getInstance().getTile(x, y);
-
-        if(!tile.hasUnit()) {
-            // empty so highlight
-            new TileCommandBuilder(out)
-                    .setTilePosition(pos.getFirst(), pos.getSecond())
-                    .setState(States.HIGHLIGHTED)
-                    .issueCommand();
-
-            tile.setTileState(States.HIGHLIGHTED);
-
-            return true;
-        } else {
-            if(Board.getInstance().getTile(pos.getFirst(), pos.getSecond()).getUnit().getPlayerID() != turn) {
-                // Tile has enemy
-                // friendly
-                new TileCommandBuilder(out)
-                        .setTilePosition(x, y)
-                        .setState(States.RED)
-                        .issueCommand();
-
-                tile.setTileState(States.RED);
-            } else {
-                // Tile has friendly
-                new TileCommandBuilder(out)
-                        .setTilePosition(x, y)
-                        .setState(States.NORMAL)
-                        .issueCommand();
-
-                tile.setTileState(States.NORMAL);
-            }
-            return false;
-
-        }
-    }
-    public void clearBoardHighlights(ActorRef out) {
-        if (unitMovementAndAttack.getActiveUnit() != null) {
-            unitsUnhighlight(out);
-            unitMovementAndAttack.setActiveUnit(null);
-        }
-        if(cardPlayed.getActiveCard() != null) {
-            cardUnhighlight(out);
-            cardPlayed.clearActiveCard();
-        }
-    }
-
-    private void unitsUnhighlight(ActorRef out) {
-        int x = unitMovementAndAttack.getActiveUnit().getFirst();
-        int y = unitMovementAndAttack.getActiveUnit().getSecond();
-        Tile previousUnitLocation = Board.getInstance().getTile(x, y);
-        Unit temp = previousUnitLocation.getUnit();
-
-        if(temp.isFlying()) {
-            clearFlyingHighlight(out);
-        } else {
-            TileUnhighlight(out, unitMovementAndAttack.getAllMoveTiles(x, y));
-        }
-    }
-    public void cardUnhighlight(ActorRef out) {
-        ArrayList<Pair<Integer, Integer>> units = (turn == PLAYER1) ? player1UnitsPosition : player2UnitsPosition;
-
-        for (Pair<Integer, Integer> array: units) {
-            ArrayList<Pair<Integer, Integer>> allHighlighted = getMoveTiles(array.getFirst(), array.getSecond(), 1, 0);
-            allHighlighted.addAll(getMoveTiles(array.getFirst(), array.getSecond(), 1, 1));
-            for (Pair<Integer, Integer> res: allHighlighted) {
-                if (res.getFirst() >= 0 && res.getFirst() <= 8 && res.getSecond() >= 0 && res.getSecond() <= 4) {
-                    new TileCommandBuilder(out)
-                            .setTilePosition(res.getFirst(), res.getSecond())
-                            .setState(States.NORMAL)
-                            .setMode(TileCommandBuilderMode.DRAW)
-                            .issueCommand();
-                    Tile tile = Board.getInstance().getTile(res);
-                    tile.setTileState(States.NORMAL);
-                }
-            }
-        }
-        unhighlightUnits(out);
-    }
-
-    public void clearFlyingHighlight(ActorRef out)
-    {
-        for(int x = 0; x < 9; x++ ) {
-            for(int y = 0; y < 5; y ++) {
-                Tile tile = Board.getInstance().getTile(x, y);
-                new TileCommandBuilder(out)
-                        .setTilePosition(x, y)
-                        .setState(States.NORMAL)
-                        .issueCommand();
-
-                tile.setTileState(States.NORMAL);
-            }
-        }
-    }
-
-    public void unhighlightUnits(ActorRef out) {
-        for (Pair<Integer, Integer> array: player1UnitsPosition) {
-            new TileCommandBuilder(out)
-                    .setTilePosition(array.getFirst(), array.getSecond())
-                    .setState(States.NORMAL)
-                    .setMode(TileCommandBuilderMode.DRAW)
-                    .issueCommand();
-        }
-
-        for (Pair<Integer, Integer> array : player2UnitsPosition) {
-            new TileCommandBuilder(out)
-                    .setTilePosition(array.getFirst(), array.getSecond())
-                    .setState(States.NORMAL)
-                    .setMode(TileCommandBuilderMode.DRAW)
-                    .issueCommand();
-        }
-    }
-
     public void TileUnhighlight(ActorRef out, ArrayList<Pair<Integer, Integer>> activeTiles) {
         for (Pair<Integer, Integer> at : activeTiles) {
             int x = at.getFirst();
@@ -418,6 +291,14 @@ public class GameState {
 
     public CardDrawing getCardDrawing() {
         return cardDrawing;
+    }
+
+    public CardPlayed getCardPlayed() {
+        return cardPlayed;
+    }
+
+    public Highlighter getHighlighter() {
+        return highlighter;
     }
 
     public Player getPlayer1() {

@@ -157,35 +157,36 @@ public class GameState {
     	.setStats(UnitStats.ATTACK, 2)
     	.issueCommand();
         ////
-        
-        //TEST
+   
+        //////////////////////////////////////////////////////////////////////////////////////
+        //TEST **THORFINN OR YS Here's the flyer test set if you're intrested in debugging**
         // Are you peeking here @Nelson :P
         // Nice C++ style btw
-         Unit flyer = new UnitFactory().generateUnit(UnitType.WINDSHRIKE);
-         units.put(flyer, UnitStatus.FLYING);
-         new UnitCommandBuilder(out)
-                 .setMode(UnitCommandBuilderMode.DRAW)
-                 .setTilePosition(1, 1)
-                 .setPlayerID(Players.PLAYER1)
-                 .setUnit(flyer)
-                 .setStats(UnitStats.ATTACK, 2) //avatar has 2 attack
-                 .setStats(UnitStats.HEALTH, 20)//20 lifes
-                 .issueCommand();
+//         Unit flyer = new UnitFactory().generateUnit(UnitType.WINDSHRIKE);
+//         units.put(flyer, UnitStatus.FLYING);
+//         new UnitCommandBuilder(out)
+//                 .setMode(UnitCommandBuilderMode.DRAW)
+//                 .setTilePosition(1, 1)
+//                 .setPlayerID(Players.PLAYER1)
+//                 .setUnit(flyer)
+//                 .issueCommand();
          
          //testUnit
-         new UnitCommandBuilder(out)
-         	.setMode(UnitCommandBuilderMode.SET)
-         	.setUnit(flyer) 
-         	.setStats(UnitStats.HEALTH, 3)
-         	.issueCommand();
-         
-         new UnitCommandBuilder(out)
-     	.setMode(UnitCommandBuilderMode.SET)
-     	.setUnit(flyer)
-     	.setStats(UnitStats.ATTACK, 1)
-     	.issueCommand();
+//         new UnitCommandBuilder(out)
+//         	.setMode(UnitCommandBuilderMode.SET)
+//         	.setUnit(flyer) 
+//         	.setStats(UnitStats.HEALTH, 3)
+//         	.issueCommand();
+//         
+//         new UnitCommandBuilder(out)
+//     	.setMode(UnitCommandBuilderMode.SET)
+//     	.setUnit(flyer)
+//     	.setStats(UnitStats.ATTACK, 1)
+//     	.issueCommand();
 
-         ////
+         //////////////////////////////////////////////////////////////////////////////////////
+        
+        ////
 
     }
 

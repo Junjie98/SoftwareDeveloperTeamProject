@@ -109,7 +109,4 @@ public class ImageCorrection {
 	public double getCorrectedImgHeight() {
 		return imgHeight*(1+(spriteTopLeftY/imgHeight));
 	}
-	
-	
-	
 }

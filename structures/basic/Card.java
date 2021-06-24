@@ -15,10 +15,8 @@ public class Card {
 	static final String[] spellcards = {"Entropic Decay", "Staff of Y'Kir'", "Truestrike", "Sundrop Elixir"};
 
 	int id;
-	
 	String cardname;
 	int manacost;
-	
 	MiniCard miniCard;
 	BigCard bigCard;
 	
@@ -63,7 +61,6 @@ public class Card {
 	public void setBigCard(BigCard bigCard) {
 		this.bigCard = bigCard;
 	}
-
 	public boolean isSpell() {
 		for (String item: spellcards) {
 			if (item.equals(cardname)) {
@@ -72,6 +69,4 @@ public class Card {
 		}
 		return false;
 	}
-
-	
 }

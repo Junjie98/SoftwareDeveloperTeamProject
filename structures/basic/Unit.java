@@ -32,10 +32,9 @@ public class Unit {
 	int unitIdentifier = 0; //0==unit & 1==player avatar
 
 	boolean isFlying = false;
-	
+
 	//Ana: for counter attack
 	boolean hasGotAttacked = false;
-	
 	//JJ: for attack logic. If attacked without move, it forfeits the move ability
 	boolean hasMoved = false; //moved this for visibility
 	boolean hasAttacked = false;
@@ -157,32 +156,7 @@ public class Unit {
 	public void setAnimations(UnitAnimationSet animations) {
 		this.animations = animations;
 	}
-	
-	public void setPlayerID(Players Player) 
-	{
-		this.owningPlayer = Player;
-	}
-	public Players getPlayerID()
-	{
-		return this.owningPlayer;
-	}
 
-	public boolean getHasGotAttacked() {
-		return hasGotAttacked;
-	}
-
-	public void setHasGotAttacked(boolean hasGotAttacked) {
-		this.hasGotAttacked = hasGotAttacked;
-	}
-
-	public void setHasAttacked(boolean hasAttacked) {
-		this.hasAttacked = hasAttacked;
-	}
-	
-	public boolean getHasAttacked() {
-		return hasAttacked;
-	}
-	
 	/**
 	 * This command sets the position of the Unit to a specified
 	 * tile.
@@ -193,10 +167,29 @@ public class Unit {
 		position = new Position(tile.getXpos(),tile.getYpos(),tile.getTilex(),tile.getTiley());
 	}
 
+	public void setPlayerID(Players Player) 
+	{
+		this.owningPlayer = Player;
+	}
+	public Players getPlayerID()
+	{
+		return this.owningPlayer;
+	}
+	public boolean getHasGotAttacked() {
+		return hasGotAttacked;
+	}
+	public void setHasGotAttacked(boolean hasGotAttacked) {
+		this.hasGotAttacked = hasGotAttacked;
+	}
+	public void setHasAttacked(boolean hasAttacked) {
+		this.hasAttacked = hasAttacked;
+	}
+	public boolean getHasAttacked() {
+		return hasAttacked;
+	}
     public void setFlying(boolean bool) {
 		isFlying = bool;
     }
-
 	public boolean isFlying() {
 		return isFlying;
 	}

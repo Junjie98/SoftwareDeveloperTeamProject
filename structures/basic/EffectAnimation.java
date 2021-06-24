@@ -13,7 +13,6 @@ import java.util.List;
  *
  */
 public class EffectAnimation {
-
 	List<String> animationTextures;
 	ImageCorrection correction;
 	int fps;
@@ -44,6 +43,4 @@ public class EffectAnimation {
 	public void setFps(int fps) {
 		this.fps = fps;
 	}
-	
-	
 }

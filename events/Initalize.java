@@ -7,8 +7,6 @@ import commandbuilders.TileCommandBuilder;
 import commandbuilders.enums.States;
 import structures.Board;
 import structures.GameState;
-import structures.basic.Tile;
-import utils.BasicObjectBuilders;
 
 /**
  * Indicates that both the core game loop in the browser is starting, meaning

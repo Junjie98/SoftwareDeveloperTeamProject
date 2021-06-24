@@ -10,7 +10,6 @@ package structures.basic;
  *
  */
 public class Position {
-
 	int xpos;
 	int ypos;
 	int tilex;
@@ -49,9 +48,4 @@ public class Position {
 	public void setTiley(int tilexy) {
 		this.tiley = tilexy;
 	}
-	
-	
-	
-	
-	
 }

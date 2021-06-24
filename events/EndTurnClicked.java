@@ -6,8 +6,6 @@ import akka.actor.ActorRef;
 import commandbuilders.PlayerNotificationCommandBuilder;
 import structures.GameState;
 import commandbuilders.enums.Players;
-import structures.basic.Tile;
-import structures.basic.Unit;
 
 /**
  * Indicates that the user has clicked an object on the game canvas, in this case

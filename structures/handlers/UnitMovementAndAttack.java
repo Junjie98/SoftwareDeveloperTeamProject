@@ -145,67 +145,55 @@ public class UnitMovementAndAttack {
         return output;
     }
 
-    public boolean checkMoveValidity(int x, int y, Unit unit) {
-        Pair<Integer, Integer> test = new Pair<>(x, y);
-        ArrayList<Pair<Integer, Integer>> activeTiles = null;
-        if (unit.isFlying()) {
-            activeTiles = getAllMoveTiles(activeUnit.getFirst(), activeUnit.getSecond());
-        } else {
-            activeTiles = getFlyMoveTiles();
-        }
-        for (Pair<Integer, Integer> ip: activeTiles) {
-            if(ip.getFirst() == test.getFirst() && ip.getSecond() == test.getSecond()) {
-                //valid move
-                if(Board.getInstance().getTile(x, y).getUnit()!=null) {
-                    //this space is occupied
-                    return false;
-                }
-                return true;
-            }
-        }
-        return false;
-    }
-
     public void highlightedMoveTileClicked(ActorRef out, int x, int y) {
-        Tile previousUnitLocation = Board.getInstance().getTile(activeUnit);
+        Tile activatedTile = Board.getInstance().getTile(activeUnit);
 
-        if (previousUnitLocation.getUnit().getHasAttacked()) {
+        if (activatedTile.getUnit().getHasAttacked()) {
             // Units that has attacked should not be able to move.
+            parent.getHighlighter().clearBoardHighlights(out);
             return;
         }
 
-        if (checkMoveValidity(x, y, previousUnitLocation.getUnit())) {
-            if(!previousUnitLocation.getUnit().getHasMoved()){
-                unitsCanMove = false;   // Prevent other units from moving.
-
-                System.out.println("move valid");
-
-                new UnitCommandBuilder(out)
-                        .setMode(UnitCommandBuilderMode.MOVE)
-                        .setTilePosition(x, y)
-                        .setUnit(previousUnitLocation.getUnit())
-                        .issueCommand();
-
-                ArrayList<Pair<Integer, Integer>> pool = (parent.getTurn() == Players.PLAYER1) ?
-                        parent.player1UnitsPosition : parent.player2UnitsPosition;
-
-                for (Pair<Integer, Integer> position: pool) {
-                    if (position.equals(activeUnit)) {
-                        pool.remove(position);
-                        break;
-                    }
-                }
-
-                pool.add(new Pair<>(x, y));
-                parent.getHighlighter().clearBoardHighlights(out);
-                previousUnitLocation.getUnit().setHasMoved(true);
-                moveAttackAndCounterAttack.add(previousUnitLocation.getUnit());
-                previousUnitLocation.setUnit(null);
-            } else {
-                parent.getHighlighter().clearBoardHighlights(out);
-            }
-        } else {
+        if (activatedTile.getUnit().getHasMoved()) {
+            // Units cannot move twice in the same turn.
             parent.getHighlighter().clearBoardHighlights(out);
+            return;
+        }
+
+        Tile destinationTile = Board.getInstance().getTile(x, y);
+
+        if (destinationTile.getTileState() == States.NORMAL) {
+            parent.getHighlighter().clearBoardHighlights(out);
+        } else if (destinationTile.getTileState() == States.HIGHLIGHTED) {
+            unitsCanMove = false;   // Prevent other units from moving.
+
+            System.out.println("move valid");
+
+            new UnitCommandBuilder(out)
+                    .setMode(UnitCommandBuilderMode.MOVE)
+                    .setTilePosition(x, y)
+                    .setUnit(activatedTile.getUnit())
+                    .issueCommand();
+
+            // Update the units position in the stored position lists.
+            ArrayList<Pair<Integer, Integer>> pool = (parent.getTurn() == Players.PLAYER1) ?
+                    parent.player1UnitsPosition : parent.player2UnitsPosition;
+            for (Pair<Integer, Integer> position: pool) {
+                if (position.equals(activeUnit)) {
+                    pool.remove(position);
+                    break;
+                }
+            }
+            pool.add(new Pair<>(x, y));
+
+            parent.getHighlighter().clearBoardHighlights(out);
+            activatedTile.getUnit().setHasMoved(true);
+            moveAttackAndCounterAttack.add(activatedTile.getUnit());
+            activatedTile.setUnit(null);
+        } else {
+            // RED should be redirected to attack so should be here.
+            parent.getHighlighter().clearBoardHighlights(out);
+            System.err.println("Something went wrong");
         }
     }
 
@@ -224,8 +212,22 @@ public class UnitMovementAndAttack {
 
                 int enemyHealthAfterAttack = attack(out, attackerLocation, enemy, attacker, x, y);
                 if (enemyHealthAfterAttack > 0) {
-                    //Launch Counter Attack
-                    attack(out, enemyLocation, attacker, enemy, attacker.getPosition().getTilex(), attacker.getPosition().getTiley());
+                    // Launch Counter Attack
+                    int counterAttackResult = attack(out, enemyLocation, attacker, enemy, attacker.getPosition().getTilex(), attacker.getPosition().getTiley());
+                    if (counterAttackResult <= 0) {
+                        System.out.println("Hello");
+                        // Handle unit died of counter attack
+                        attackerLocation.setUnit(null);
+                        ArrayList<Pair<Integer, Integer>> pool = (parent.getTurn() == Players.PLAYER1) ?
+                                parent.player1UnitsPosition : parent.player2UnitsPosition;
+                        Pair<Integer, Integer> positionToRemove = new Pair<>(attackerLocation.getTilex(), attackerLocation.getTiley());
+                        for (Pair<Integer, Integer> position: pool) {
+                            if (position.equals(positionToRemove)) {
+                                pool.remove(position);
+                                break;
+                            }
+                        }
+                    }
                 } else {
                     enemyLocation.setUnit(null);
                     ArrayList<Pair<Integer, Integer>> pool = (parent.getTurn() == Players.PLAYER1) ?
@@ -237,8 +239,7 @@ public class UnitMovementAndAttack {
                             break;
                         }
                     }
-                    }
-                parent.getHighlighter().clearBoardHighlights(out);
+                }
             }
         }
     }
@@ -254,7 +255,7 @@ public class UnitMovementAndAttack {
                 .setDistination(Board.getInstance().getTile(x, y))
                 .issueCommand();
 
-        // TODO: Do this when far away only.
+        // TODO: Do this when far away only. Use a normal attack animation if close.
 
         enemyCommandBuilder
                 .setMode(UnitCommandBuilderMode.SET)

@@ -50,7 +50,15 @@ public class CardPlayed {
                         .setEffectAnimation(TileEffectAnimation.MARTYRDOM) //<- Choose your animation here
                         .issueCommand();
             }
+
+            // TODO: May need to decrease Mana here.
         } else {
+            Tile tile = Board.getInstance().getTile(x, y);
+            if (tile.hasUnit()) {
+                // Cannot deal a card to a Tile that has unit.
+                return;
+            }
+
             Unit unit = new UnitFactory().generateUnitByCard(current);
             unit.setFlying(true);
             new UnitCommandBuilder(out)
@@ -65,9 +73,7 @@ public class CardPlayed {
             } else {
                 parent.player2UnitsPosition.add(new Pair<>(x, y));
             }
-
-//            Tile tile = Board.getInstance().getTile(x, y);
-//            tile.setUnit(unit);
+            // TODO: May need to decrease Mana here.
         }
         deleteCardFromHand(out, activeCard.getSecond());
         parent.getHighlighter().clearBoardHighlights(out);

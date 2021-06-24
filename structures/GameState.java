@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import akka.actor.ActorRef;
 import commandbuilders.*;
 import commandbuilders.enums.*;
+import scala.Int;
 import structures.basic.Card;
 import structures.basic.Player;
 import structures.basic.Tile;
@@ -147,10 +148,10 @@ public class GameState {
     public void cardClicked(ActorRef out, int idx) {
         Card current = (turn == PLAYER1) ? player1CardsInHand.get(idx) : player2CardsInHand.get(idx);
         System.out.println("Card Clicked: " + current.getCardname());
+        Pair<Card, Integer> card = cardPlayed.getActiveCard();
 
         highlighter.clearBoardHighlights(out);
-
-        if (cardPlayed.getActiveCard() == null || cardPlayed.getActiveCard().getSecond() != idx) {
+        if (card == null || card.getSecond() != idx) {
             cardPlayed.setActiveCard(current, idx);
             ArrayList<Pair<Integer, Integer>> friendlyUnits =
                     (turn == PLAYER1) ? player1UnitsPosition : player2UnitsPosition;
@@ -188,11 +189,13 @@ public class GameState {
                     } else if (tile.getUnit().getHasAttacked()) {
                         return;
                     }
+                    unitMovementAndAttack.unitClicked(out, x ,y);
                 }
-                unitMovementAndAttack.unitClicked(out, x ,y);
             } else {
                 if (tile != null && tile.hasUnit()) {
                     unitMovementAndAttack.unitClicked(out, x, y);
+                } else if (tile != null && tile.getTileState() == States.NORMAL) {
+                    highlighter.clearBoardHighlights(out);
                 }
             }
         }
@@ -256,30 +259,6 @@ public class GameState {
         output.add(new Pair<>(x+depth, y-diag));
         output.add(new Pair<>(x+diag, y+depth));
         return output;
-    }
-
-    public void TileUnhighlight(ActorRef out, ArrayList<Pair<Integer, Integer>> activeTiles) {
-        for (Pair<Integer, Integer> at : activeTiles) {
-            int x = at.getFirst();
-            int y = at.getSecond();
-
-            Tile tile = Board.getInstance().getTile(x, y);
-
-            if(x < 0 || x > 8) {
-                continue;
-            }
-
-            if(y < 0 || y > 4) {
-                continue;
-            }
-
-            new TileCommandBuilder(out)
-                .setTilePosition(x, y)
-                .setState(States.NORMAL)
-                .issueCommand();
-
-            tile.setTileState(States.NORMAL);
-        }
     }
 
     // ===========================================================================

@@ -145,7 +145,7 @@ public class UnitMovementAndAttack {
         return output;
     }
 
-    public boolean checkMoveValidity(ActorRef out, int x, int y, Unit unit) {
+    public boolean checkMoveValidity(int x, int y, Unit unit) {
         Pair<Integer, Integer> test = new Pair<>(x, y);
         ArrayList<Pair<Integer, Integer>> activeTiles = null;
         if (unit.isFlying()) {
@@ -174,7 +174,7 @@ public class UnitMovementAndAttack {
             return;
         }
 
-        if (checkMoveValidity(out, x, y, previousUnitLocation.getUnit())) {
+        if (checkMoveValidity(x, y, previousUnitLocation.getUnit())) {
             if(!previousUnitLocation.getUnit().getHasMoved()){
                 unitsCanMove = false;   // Prevent other units from moving.
 

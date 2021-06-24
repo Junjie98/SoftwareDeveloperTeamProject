@@ -50,7 +50,7 @@ public class Highlighter {
                         .setTilePosition(x, y)
                         .setState(States.RED)
                         .issueCommand();
-
+                highlightedTiles.add(tile);
                 tile.setTileState(States.RED);
             } else {
                 // Tile has friendly
@@ -58,7 +58,7 @@ public class Highlighter {
                         .setTilePosition(x, y)
                         .setState(States.NORMAL)
                         .issueCommand();
-
+                highlightedTiles.add(tile);
                 tile.setTileState(States.NORMAL);
             }
             return false;

@@ -373,7 +373,8 @@ public class GameState {
             highlightedMoveTileClicked(out, x, y);
             
         }
-        else if (Board.getInstance().getTile(x, y).getUnit() != null && Board.getInstance().getTile(x, y).getUnit().getHasMoved()!=true)
+        else if (Board.getInstance().getTile(x, y).getUnit() != null && Board.getInstance().getTile(x, y).getUnit().getHasMoved()!=true
+        		 && Board.getInstance().getTile(x, y).getUnit().getHasAttacked() != true)
         {
             unitClicked(out, x, y);
         }
@@ -547,7 +548,7 @@ public class GameState {
 	      //update avatar health to UI player health.
 //	      if(enemy.getIdentifer() == 1 && enemy.getPlayerID() == Players.PLAYER1) 
 //	      {
-//	    	  player1.setHealth(enemy.getHealth());
+//	    	  player1.setHealth(100);
 //	    	  
 //	    	  new UnitCommandBuilder(out)
 //	        	.setMode(UnitCommandBuilderMode.SET)
@@ -593,7 +594,7 @@ public class GameState {
 //	        	.setStats(UnitStats.HEALTH, player2.getHealth())
 //	        	.issueCommand();
 //	      }
-	      
+//	      
 	      // Win condition: should be moved to a method where we are checking player's health
 	      if (player1.getHealth() < 1)
 	    	  BasicCommands.addPlayer1Notification(out, "Player1 Won", 4);
@@ -1038,6 +1039,8 @@ public class GameState {
     ////////////////////////////////resetMoveCount////////////////////////////////
     
     //only call this method during *ENDTURN*
+    //bugfix, included resetting unit hasAttacked to false.
+    //else after attacked, next round unit will only able to move but no longer able to attack.
     public void resetMoveCountnAttack() {
     	for(int i = 0; i<unitMoved.size(); i++) {
     		unitMoved.get(i).resetMoveAbility();

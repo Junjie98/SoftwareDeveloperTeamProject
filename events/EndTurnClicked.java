@@ -47,6 +47,7 @@ public class EndTurnClicked implements EventProcessor{
 					.issueCommand();
 			
 			//JJ reset the move count on board.
+			//bugfix included resetting the attackboolean
 			gameState.resetMoveCountnAttack();
 			
 			// Ana: reset mana before incrementing
@@ -68,8 +69,12 @@ public class EndTurnClicked implements EventProcessor{
 					.issueCommand();
 			
 			//mana increment after endturn
-			if(gameState.getRound() > 1) { //Checks if it is round 0. If it is, dont increment the mana of Player2
-
+			if(gameState.getRound() > 1) { //Checks if it is round 1. If it is, dont increment the mana of Player2
+				
+				//JJ reset the move count on board.
+				//bugfix included resetting the attackboolean
+				gameState.resetMoveCountnAttack();
+				
 				// Ana: reset mana before incrementing
 				gameState.resetMana(out);
 				

@@ -30,12 +30,8 @@ public class Unit {
 	int unitHealth = 0;
 	int unitDamage =  0;
 	int unitIdentifier = 0; //0==unit & 1==player avatar
-	
-	//JJ: prevent multiple movement on board. 
-	//this is to work along with the attack logic
-	//(Move --> Attack -->|Restricts further movement on board|) 
-	//will not be > than 1
-	int moveAbility = 0;
+
+	boolean isFlying = false;
 	
 	//Ana: for counter attack
 	boolean hasGotAttacked = false;
@@ -43,8 +39,7 @@ public class Unit {
 	//JJ: for attack logic. If attacked without move, it forfeits the move ability
 	boolean hasMoved = false; //moved this for visibility
 	boolean hasAttacked = false;
-	
-	
+
 	public Unit() {}
 	
 	public Unit(int id, UnitAnimationSet animations, ImageCorrection correction) {
@@ -66,9 +61,7 @@ public class Unit {
 		this.correction = correction;
 		this.animations = animations;
 	}
-	
-	
-	
+
 	public Unit(int id, UnitAnimationType animation, Position position, UnitAnimationSet animations,
 			ImageCorrection correction) {
 		super();
@@ -95,14 +88,14 @@ public class Unit {
 		return this.unitIdentifier;
 	}
 	
-	public void setHealth(int health) 
-	{
+	public void setHealth(int health) {
 		if(health<=0) {
 			unitHealth = 0;
-		}else {
+		} else {
 		unitHealth = health;
 		}
 	}
+
 	public int getHealth()
 	{
 		return unitHealth;
@@ -124,16 +117,8 @@ public class Unit {
 	{
 		hasMoved = false;
 	}
-	public void hasMoved()
-	{
-		hasMoved =true;
-		this.moveAbility++;
-	}
-	public int getMoveAbility() {
-		return this.moveAbility;
-	}
-	public void resetMoveAbility() {
-		this.moveAbility = 0;
+	public void setHasMoved(boolean newValue) {
+		hasMoved = newValue;
 	}
 
 	public int getId() {
@@ -207,6 +192,12 @@ public class Unit {
 	public void setPositionByTile(Tile tile) {
 		position = new Position(tile.getXpos(),tile.getYpos(),tile.getTilex(),tile.getTiley());
 	}
-	
-	
+
+    public void setFlying(boolean bool) {
+		isFlying = bool;
+    }
+
+	public boolean isFlying() {
+		return isFlying;
+	}
 }

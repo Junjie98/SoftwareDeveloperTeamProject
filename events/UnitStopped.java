@@ -23,7 +23,7 @@ public class UnitStopped implements EventProcessor{
 	@Override
 	public void processEvent(ActorRef out, GameState gameState, JsonNode message) {
 		int unitid = message.get("id").asInt();
-		gameState.setUnitsCanMove(true);
+		gameState.getUnitMovementAndAttack().setUnitsCanMove(true);
 	}
 
 }

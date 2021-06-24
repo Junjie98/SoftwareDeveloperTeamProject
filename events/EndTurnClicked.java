@@ -24,7 +24,7 @@ public class EndTurnClicked implements EventProcessor{
 
 	@Override
 	public void processEvent(ActorRef out, GameState gameState, JsonNode message) {
-		gameState.nextTurn(out);
+		gameState.endTurnClicked(out);
 		processChangedTurns(out, gameState);
 	}
 
@@ -35,21 +35,7 @@ public class EndTurnClicked implements EventProcessor{
 					.setDisplaySeconds(2)
 					.setPlayer(Players.PLAYER1)
 					.issueCommand();
-			
-			//JJ reset the move count on board.
-			//bugfix included resetting the attackboolean
-			gameState.resetMoveCountnAttack();
-			
-			// Ana: reset mana before incrementing
-			gameState.resetMana(out);
-			
-			//mana increment after endturn
-			gameState.ManaIncrementPerRound(out);
-			// TODO: Perform things that should be done on Player 1's turn.
-			gameState.drawCard(out, Players.PLAYER1);
-			
 		} else {
-			
 			// Setting Player to PLAYER2 should in theory work.
 			// However, it is not properly supported by the front-end so it is strongly discouraged.
 			new PlayerNotificationCommandBuilder(out)
@@ -57,34 +43,7 @@ public class EndTurnClicked implements EventProcessor{
 					.setDisplaySeconds(2)
 					.setPlayer(Players.PLAYER1)
 					.issueCommand();
-			
-			//mana increment after endturn
-			if(gameState.getRound() > 1) { //Checks if it is round 1. If it is, dont increment the mana of Player2
-				
-				//JJ reset the move count on board.
-				//bugfix included resetting the attackboolean
-				gameState.resetMoveCountnAttack();
-				
-				// Ana: reset mana before incrementing
-				gameState.resetMana(out);
-				
-				gameState.ManaIncrementPerRound(out);
-			}
-
-			// TODO: Perform things that should be done on Player 2's turn.
-			gameState.drawCard(out, Players.PLAYER2);
 		}
-		
-		// Ana: counter attack
-		// Resetting hasGotAttacked of the players after an attack
-		Unit attacker1 = gameState.getPreviousUnitLocation().getUnit();
-		Unit attacker2 = gameState.getCurrentUnitLocation().getUnit();
-		
-		if (attacker1 != null)
-			attacker1.setHasGotAttacked(false);
-		
-		if (attacker2 != null)
-			attacker2.setHasGotAttacked(false);
 	}
 
 }

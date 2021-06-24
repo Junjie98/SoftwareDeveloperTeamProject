@@ -2,6 +2,7 @@ package structures;
 
 import structures.basic.Tile;
 import structures.basic.Unit;
+import structures.handlers.Pair;
 import utils.BasicObjectBuilders;
 
 public class Board {
@@ -21,15 +22,18 @@ public class Board {
     }
 
     public Tile getTile(int x, int y) {
+        if ((x < 0 || y < 0) || (x > 8 || y > 8)) {
+            return null;
+        }
+
         return board[x][y];
     }
 
+    public Tile getTile(Pair<Integer, Integer> position) {
+        return getTile(position.getFirst(), position.getSecond());
+    }
     public void setUnitToTile(Unit unit, int x, int y) {
         board[x][y].setUnit(unit);
-    }
-
-    public void removeUnitFromTile(int x, int y) {
-        board[x][y].setUnit(null);
     }
 
     public static void reloadBoard() {

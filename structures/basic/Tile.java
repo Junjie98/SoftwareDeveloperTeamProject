@@ -8,6 +8,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import commandbuilders.enums.Players;
+import commandbuilders.enums.States;
 
 /**
  * A basic representation of a tile on the game board. Tiles have both a pixel position
@@ -31,7 +32,17 @@ public class Tile {
 	int height;
 	int tilex;
 	int tiley;
-	
+
+	States tileState = States.NORMAL;
+
+	public States getTileState() {
+		return tileState;
+	}
+
+	public void setTileState(States tileState) {
+		this.tileState = tileState;
+	}
+
 	public Tile() {}
 	
 	public Tile(String tileTexture, int xpos, int ypos, int width, int height, int tilex, int tiley) {

@@ -27,7 +27,12 @@ public class CardDrawing {
     public void drawNewCardFor(ActorRef out,Players player) {
         ArrayList<Card> current = (player == Players.PLAYER1) ? parent.player1CardsInHand : parent.player2CardsInHand;
         if (current.isEmpty()) {
-            parent.endGame(out);
+            if (player == Players.PLAYER1 && deck1.isEmpty()) {
+                parent.endGame(out);
+            }
+            if (player == Players.PLAYER2 && deck2.isEmpty()) {
+                parent.endGame(out);
+            }
         }
         if (current.size() < MAX_CARD_COUNT_IN_HAND) {
             Card temp = (player == Players.PLAYER1) ? deck1.nextCard() : deck2.nextCard();

@@ -7,11 +7,13 @@ import java.util.HashMap;
 import akka.actor.ActorRef;
 import commandbuilders.*;
 import commandbuilders.enums.*;
+import commands.BasicCommands;
 import decks.*;
 import structures.basic.Card;
 import structures.basic.Player;
 import structures.basic.Tile;
 import structures.basic.Unit;
+import structures.basic.UnitAnimationType;
 
 /**
  * This class can be used to hold information about the on-going game.
@@ -25,6 +27,7 @@ public class GameState {
     private final int MAX_CARD_COUNT_IN_HAND = 6;
     private final int INITIAL_CARD_COUNT = 3;
     private int roundNumber = 1;
+    private ArrayList<Unit> unitMoved = new ArrayList<Unit>();
     
     private Players turn = Players.PLAYER1;
     // TODO: This should be randomised according to game loop.
@@ -48,8 +51,15 @@ public class GameState {
     private int[][] friendlyUnits = null;
 
     private HashMap<Unit, UnitStatus> units = new HashMap<>();
+    
+    // Ana: counter attack
+    private Tile currentUnitLocation = null;
 
-    //////////////////////////////////////////////////////////////////////////////
+    public Tile getCurrentUnitLocation() {
+		return currentUnitLocation;
+	}
+
+	//////////////////////////////////////////////////////////////////////////////
                 ///Initalisation and functions related to such///
     //////////////////////////////////////////////////////////////////////////////
     //Creates the two players
@@ -73,14 +83,58 @@ public class GameState {
     public void spawnAvatars(ActorRef out)
     {
         Unit human = new UnitFactory().generateUnit(UnitType.HUMAN);
+        human.setIdentifier(1);
+        
         Unit ai = new UnitFactory().generateUnit(UnitType.AI);
+        ai.setIdentifier(1);
 
+        
+//       Unit avatar = new UnitFactory().generateUnit(UnitType.AZURE_HERALD);
+//       new UnitCommandBuilder(out)
+//   					.setMode(UnitCommandBuilderMode.DRAW)
+//   					.setTilePosition(1, 2)
+//   					.setPlayerID(Players.PLAYER1)
+//   					.setUnit(avatar)
+//   					.issueCommand();
+//       
+//       new UnitCommandBuilder(out)
+//			    	.setMode(UnitCommandBuilderMode.SET)
+//			    	.setUnit(avatar) 
+//			    	.setStats(UnitStats.HEALTH, 20)
+//			    	.issueCommand();
+//       
+//       new UnitCommandBuilder(out)
+//				   	.setMode(UnitCommandBuilderMode.SET)
+//				   	.setUnit(avatar) 
+//				   	.setStats(UnitStats.ATTACK, 2)
+//				   	.issueCommand();
+       
+        
+        //Nelson testcase//
+//        Unit humanUnit = new UnitFactory().generateUnit(UnitType.WINDSHRIKE);
+        //TESTCASE//
         new UnitCommandBuilder(out)
                     .setMode(UnitCommandBuilderMode.DRAW)
                     .setTilePosition(1, 2)
                     .setPlayerID(Players.PLAYER1)
                     .setUnit(human)
                     .issueCommand();
+
+        //setting health & attack to board. *They doesnt stack*
+        //Avatar1
+        new UnitCommandBuilder(out)
+        	.setMode(UnitCommandBuilderMode.SET)
+        	.setUnit(human) 
+        	//uses the health that has been initialised earlier with the player constructor
+        	.setStats(UnitStats.HEALTH, player1.getHealth())
+        	.issueCommand();
+        
+        new UnitCommandBuilder(out)
+    	.setMode(UnitCommandBuilderMode.SET)
+    	.setUnit(human)
+    	.setStats(UnitStats.ATTACK, 2)
+    	.issueCommand();
+        ////
 
         new UnitCommandBuilder(out)
                     .setMode(UnitCommandBuilderMode.DRAW)
@@ -89,23 +143,51 @@ public class GameState {
                     .setUnit(ai)
                     .issueCommand();
 
+        //Avatar2
         new UnitCommandBuilder(out)
-                .setMode(UnitCommandBuilderMode.SET)
-                .setUnit(human)
-                .setStats(UnitStats.ATTACK, 10)
-                .issueCommand();
-
-
+        	.setMode(UnitCommandBuilderMode.SET)
+        	.setUnit(ai) 
+        	//uses the health that has been initialised earlier with the player constructor
+        	.setStats(UnitStats.HEALTH, player2.getHealth())
+        	.issueCommand();
+        
+        new UnitCommandBuilder(out)
+    	.setMode(UnitCommandBuilderMode.SET)
+    	.setUnit(ai)
+    	.setStats(UnitStats.ATTACK, 2)
+    	.issueCommand();
+        ////
+   
+        //////////////////////////////////////////////////////////////////////////////////////
+        //TEST **THORFINN OR YS Here's the flyer test set if you're intrested in debugging**
         // Are you peeking here @Nelson :P
         // Nice C++ style btw
-        // Unit flyer = new UnitFactory().generateUnit(UnitType.WINDSHRIKE);
-        // units.put(flyer, UnitStatus.FLYING);
-        // new UnitCommandBuilder(out)
-        //         .setMode(UnitCommandBuilderMode.DRAW)
-        //         .setTilePosition(1, 1)
-        //         .setPlayerID(Players.PLAYER1)
-        //         .setUnit(flyer)
-        //         .issueCommand();
+//         Unit flyer = new UnitFactory().generateUnit(UnitType.WINDSHRIKE);
+//         units.put(flyer, UnitStatus.FLYING);
+//         new UnitCommandBuilder(out)
+//                 .setMode(UnitCommandBuilderMode.DRAW)
+//                 .setTilePosition(1, 1)
+//                 .setPlayerID(Players.PLAYER1)
+//                 .setUnit(flyer)
+//                 .issueCommand();
+         
+         //testUnit
+//         new UnitCommandBuilder(out)
+//         	.setMode(UnitCommandBuilderMode.SET)
+//         	.setUnit(flyer) 
+//         	.setStats(UnitStats.HEALTH, 3)
+//         	.issueCommand();
+//         
+//         new UnitCommandBuilder(out)
+//     	.setMode(UnitCommandBuilderMode.SET)
+//     	.setUnit(flyer)
+//     	.setStats(UnitStats.ATTACK, 1)
+//     	.issueCommand();
+
+         //////////////////////////////////////////////////////////////////////////////////////
+        
+        ////
+
     }
 
 
@@ -132,8 +214,8 @@ public class GameState {
             turn = Players.PLAYER1;
 
             ++roundNumber;//new round when player2 has finished their turn
-            resetUnitMoves();
         }
+        resetUnitMoves();
     }
 
     public void resetUnitMoves()
@@ -285,20 +367,37 @@ public class GameState {
     //////////////////////////////////////////////////////////////////////////////
                 ///Unit selection, unit moving, unit logic///
     //////////////////////////////////////////////////////////////////////////////
+    
     public void tileClicked(ActorRef out, int x, int y)
     {
         if (preMove && Board.getInstance().getTile(x, y).getUnit() == null)
         {
             highlightedMoveTileClicked(out, x, y);
+            
         }
-        else if (Board.getInstance().getTile(x, y).getUnit() != null && Board.getInstance().getTile(x, y).getUnit().getHasMoved()!=true)
+        else if (Board.getInstance().getTile(x, y).getUnit() != null && Board.getInstance().getTile(x, y).getUnit().getHasMoved()!=true
+        		 && Board.getInstance().getTile(x, y).getUnit().getHasAttacked() != true)
         {
             unitClicked(out, x, y);
+        }
+        
+        else if(Board.getInstance().getTile(x, y).getUnit() != null && Board.getInstance().getTile(x, y).getUnit().getHasMoved() == true 
+        		&& Board.getInstance().getTile(x, y).getUnit().getHasAttacked() == false) 
+        {
+        		unitClicked(out, x,y);     
+        }
+        else if(Board.getInstance().getTile(x, y).getUnit() != null && Board.getInstance().getTile(x, y).getUnit().getHasMoved() == false 
+        		&& Board.getInstance().getTile(x, y).getUnit().getHasAttacked() == true)
+        {
+        	clearBoardHighlights(out);
         }
         else
         {
             clearBoardHighlights(out);
         }
+        
+        
+        
     }
 
     public Tile getPreviousUnitLocation() {
@@ -357,6 +456,9 @@ public class GameState {
         System.out.println("move logic");
         if(checkMoveValidity(out, x, y, previousUnitLocation.getUnit()))
         {
+        	if(previousUnitLocation.getUnit().getMoveAbility()<1){
+        		
+        	
             unitsCanMove = false;   // Prevent other units from moving.
         
             System.out.println("move valid");
@@ -368,9 +470,17 @@ public class GameState {
                     .issueCommand();
 
             previousUnitLocation.getUnit().hasMoved();
+            
+            //keeps a record on who has moved. So it works later with the reset.
+            unitMoved.add(previousUnitLocation.getUnit());
+            
             clearBoardHighlights(out);
             previousUnitLocation.setUnit(null);
-
+        	}
+        	else 
+        	{
+        		clearBoardHighlights(out);
+        	}
         }
         else
         {
@@ -380,16 +490,142 @@ public class GameState {
         preMove = false;
         
     }
+    
+    
+    ////NELSON
+    public boolean attackCheck(ActorRef out, int x, int y)
+    {
+    	int[] acPos = {x,y};
+    	int tileActive [][] = getAllMoveTiles(previousUnitLocation.getTilex(), previousUnitLocation.getTiley());
+    	
+    	//Ana: for counter attack
+    	if (Board.getInstance().getTile(x, y).getUnit() != null && Board.getInstance().getTile(x, y).getUnit().getHasGotAttacked())
+    		return false;
+
+    	
+    	for (int[] ip : tileActive)
+        {
+            if(ip[0] == acPos[0] && ip[1] == acPos[1])        
+            {
+                if(Board.getInstance().getTile(x, y).getUnit() != null) //enemy is in this tile
+                {
+                    return true;
+                }
+                return false;
+            }
+            
+        }
+		return false;
+    }
+    
+    ////NELSON
+    
+    
+    // Ana: Counter attack, ranged attack not included
+    public int attack(ActorRef out, Tile attackerLocation, Unit enemy, Unit attacker, int x, int y) {
+			UnitCommandBuilder enemyCommandBuilder = new UnitCommandBuilder(out).setUnit(enemy);
+			int enemyHealth = enemy.getHealth();
+	    	int healthAfterDamage =  enemyHealth - attacker.getDamage();
+	  
+	      new ProjectTileAnimationCommandBuilder(out)
+	              .setSource(attackerLocation)
+	              .setDistination(Board.getInstance().getTile(x, y))
+	              .issueCommand();
+	      
+	
+	      enemyCommandBuilder
+	              .setMode(UnitCommandBuilderMode.SET)
+	              .setStats(UnitStats.HEALTH, healthAfterDamage)
+	              .issueCommand();
+	      
+	      //unhighlight all the tiles
+	      clearBoardHighlights(out);
+          
+	      //restrict human player to attack again
+	      enemy.setHasGotAttacked(true);
+	      
+	      //restrict player to move after attack
+	      attacker.setHasAttacked(true);
+	      
+	      //update avatar health to UI player health.
+	      if(enemy.getIdentifer() == 1 && enemy.getPlayerID() == Players.PLAYER1) 
+	      {
+	    	  player1.setHealth(enemy.getHealth());
+	    	  
+	    	  new PlayerSetCommandsBuilder(out)
+        		.setPlayer(Players.PLAYER1)
+        		.setStats(PlayerStats.HEALTH)
+        		.setInstance(player1)
+        		.issueCommand();
+  
+	      }
+	      
+	      else if(enemy.getIdentifer() == 1 && enemy.getPlayerID()== Players.PLAYER2) 
+	      {
+	    	  player2.setHealth(enemy.getHealth());
+	    	  
+	    	  new PlayerSetCommandsBuilder(out)
+      			.setPlayer(Players.PLAYER2)
+      			.setStats(PlayerStats.HEALTH)
+      			.setInstance(player2)
+      			.issueCommand();
+	      }
+	    	  
+	      else if(attacker.getIdentifer() == 1 && attacker.getPlayerID()== Players.PLAYER1)
+	      {
+	    	  player1.setHealth(attacker.getHealth());
+	    	  
+	    	  new PlayerSetCommandsBuilder(out)
+      			.setPlayer(Players.PLAYER1)
+      			.setStats(PlayerStats.HEALTH)
+      			.setInstance(player1)
+      			.issueCommand();
+	      }
+	      
+	      else if(attacker.getIdentifer() == 1 && attacker.getPlayerID()== Players.PLAYER2)
+	      {
+	    	  player2.setHealth(attacker.getHealth());
+	    	  
+	    	  new PlayerSetCommandsBuilder(out)
+      			.setPlayer(Players.PLAYER2)
+      			.setStats(PlayerStats.HEALTH)
+      			.setInstance(player2)
+      			.issueCommand();
+	      }
+	      
+	      // Win condition: should be moved to a method where we are checking player's health
+	      if (player1.getHealth() < 1)
+	    	  BasicCommands.addPlayer1Notification(out, "Player1 Won", 4);
+	      else if (player2.getHealth() < 1)
+	    	  BasicCommands.addPlayer1Notification(out, "Player2 Won", 4);
+	      
+	      return enemy.getHealth();
+    }
 
     public void unitClicked(ActorRef out,int x, int y)
     {
-        System.out.println(x +"," + y + " Clicked");
-        System.out.println(Board.getInstance().getTile(x, y).getUnit().getId());
-       
+    	currentUnitLocation = Board.getInstance().getTile(x, y);
         if(Board.getInstance().getTile(x, y).getUnit().getPlayerID() != turn) //you dont own this unit!
         {
-            System.err.println("you dont own this unit");
-            return;
+        	try {
+	        	if(attackCheck(out, x,y)) {
+	        		Tile enemyLocation = Board.getInstance().getTile(x, y);
+	        		Unit enemy = enemyLocation.getUnit();
+	        		Unit attacker = previousUnitLocation.getUnit();
+	        		
+	        		// Attack & Checking health before counter attack
+	        		int enemyHealthAfterAttack = attack(out, previousUnitLocation, enemy, attacker, x, y);
+	    
+	        		if (enemyHealthAfterAttack > 0) {
+		        		//Counter Attack
+		        		attack(out, enemyLocation, attacker, enemy, attacker.getPosition().getTilex(), attacker.getPosition().getTiley());
+	        		}
+	        	}
+        	}catch(NullPointerException e) {
+        		System.err.println("Select your avatar/unit before selecting enemy");
+        		
+        	}
+        	return;
         }
 
         //Unhighlight previously selected unit
@@ -422,6 +658,8 @@ public class GameState {
         } else {
             System.err.println("Unit movement locked due to other units moving.");
         }
+        
+        //test attack
     }
 
     public void moveHighlight(ActorRef out, int x, int y)
@@ -745,6 +983,7 @@ public class GameState {
                                ///Mana incrementation///
     //////////////////////////////////////////////////////////////////////////////
     public void ManaIncrementPerRound(ActorRef out) {
+    	
     	if(this.turn==Players.PLAYER1) {
     		int player1Mana = player1.getMana();
     		player1.setMana(player1Mana + roundNumber + 1);
@@ -764,11 +1003,46 @@ public class GameState {
     	}
     }
     
-    public int getRound() { //uses for validation. So round 0 will not increment the mana for player 2 after
+    public void resetMana(ActorRef out) {
+    	
+		// Ana: Reset mana after end turn is clicked
+    	if(this.turn == Players.PLAYER1) {
+    		player1.setMana(0);
+    		new PlayerSetCommandsBuilder(out)
+        		.setPlayer(Players.PLAYER1)
+        		.setStats(PlayerStats.MANA)
+        		.setInstance(player1)
+        		.issueCommand();
+    	}else {
+        	player2.setMana(0);
+        	new PlayerSetCommandsBuilder(out)
+            	.setPlayer(Players.PLAYER2)
+            	.setStats(PlayerStats.MANA)
+            	.setInstance(player2)
+            	.issueCommand();
+    	}
+    }
+    
+    public int getRound() { //uses for validation. So round 1 will not increment the mana for player 2 after
         //player1 ends his turn.
         return this.roundNumber;
 
     }
 
     ////////////////////////////////////end///////////////////////////////////////
+    
+    
+    
+    //////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////resetMoveCount////////////////////////////////
+    
+    //only call this method during *ENDTURN*
+    //bugfix, included resetting unit hasAttacked to false.
+    //else after attacked, next round unit will only able to move but no longer able to attack.
+    public void resetMoveCountnAttack() {
+    	for(int i = 0; i<unitMoved.size(); i++) {
+    		unitMoved.get(i).resetMoveAbility();
+    		unitMoved.get(i).setHasAttacked(false);
+    	}
+    }
 }

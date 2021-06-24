@@ -116,8 +116,10 @@ public class UnitCommandBuilder extends CommandBuilder{
         } else if (mode == UnitCommandBuilderMode.SET) {
             if (stats == UnitStats.ATTACK) {
                 BasicCommands.setUnitAttack(reference, unit, value);
+                unit.setDamage(value);
             } else {
                 BasicCommands.setUnitHealth(reference, unit, value);
+                unit.setHealth(value);
             }
         } else if (mode == UnitCommandBuilderMode.DELETE) {
             BasicCommands.deleteUnit(reference, unit);

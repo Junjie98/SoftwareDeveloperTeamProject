@@ -82,19 +82,16 @@ This builder is to display a ProjectTile animation.
 
 The initialisation step takes the `ActorRef` that is used to send/receive commands in the front-end side.
 
-You will need to call `.setUnit1(Unit, Tile)` and `.setUnit2(Unit, Tile)` before you issue the command.
+You will need to call `.setSource(Tile)` and `.setDestination(Tile)` before you issue the command.
 
 Notice the issueCommand code is now a generalised version of the Demo code. Further testing may reveal some refinements needed.
 
 This code is *expected* to be called like:
 
 ```java
-// definition of unit 1 / tile 1
-// definition of unit 2 / tile 2
-
 new ProjectTileAnimationCommandBuilder(out)
-		.setUnit1(unit1, tile1)
-		.setUnit2(unit2, tile2)
+		.setSource(tile1)
+		.setDestination(tile2)
 		.issueCommand();
 ```
 

@@ -87,6 +87,7 @@ public class GameState {
         
         Unit ai = new UnitFactory().generateUnit(UnitType.AI);
         ai.setIdentifier(1);
+
         
 //       Unit avatar = new UnitFactory().generateUnit(UnitType.AZURE_HERALD);
 //       new UnitCommandBuilder(out)
@@ -546,55 +547,51 @@ public class GameState {
 	      attacker.setHasAttacked(true);
 	      
 	      //update avatar health to UI player health.
-//	      if(enemy.getIdentifer() == 1 && enemy.getPlayerID() == Players.PLAYER1) 
-//	      {
-//	    	  player1.setHealth(100);
-//	    	  
-//	    	  new UnitCommandBuilder(out)
-//	        	.setMode(UnitCommandBuilderMode.SET)
-//	        	.setUnit(enemy) 
-//	        	//uses the health that has been initialised earlier with the player constructor
-//	        	.setStats(UnitStats.HEALTH, player1.getHealth())
-//	        	.issueCommand();
-//	    	  
-//	      }
-//	      
-//	      else if(enemy.getIdentifer() == 1 && enemy.getPlayerID()== Players.PLAYER2) 
-//	      {
-//	    	  player2.setHealth(enemy.getHealth());
-//	    	  
-//	    	  new UnitCommandBuilder(out)
-//	        	.setMode(UnitCommandBuilderMode.SET)
-//	        	.setUnit(enemy) 
-//	        	//uses the health that has been initialised earlier with the player constructor
-//	        	.setStats(UnitStats.HEALTH, player2.getHealth())
-//	        	.issueCommand();
-//	      }
-//	    	  
-//	      else if(attacker.getIdentifer() == 1 && attacker.getPlayerID()== Players.PLAYER1)
-//	      {
-//	    	  player1.setHealth(attacker.getHealth());
-//	    	  
-//	    	  new UnitCommandBuilder(out)
-//	        	.setMode(UnitCommandBuilderMode.SET)
-//	        	.setUnit(attacker) 
-//	        	//uses the health that has been initialised earlier with the player constructor
-//	        	.setStats(UnitStats.HEALTH, player1.getHealth())
-//	        	.issueCommand();
-//	      }
-//	      
-//	      else if(attacker.getIdentifer() == 1 && attacker.getPlayerID()== Players.PLAYER2)
-//	      {
-//	    	  player2.setHealth(attacker.getHealth());
-//	    	  
-//	    	  new UnitCommandBuilder(out)
-//	        	.setMode(UnitCommandBuilderMode.SET)
-//	        	.setUnit(attacker) 
-//	        	//uses the health that has been initialised earlier with the player constructor
-//	        	.setStats(UnitStats.HEALTH, player2.getHealth())
-//	        	.issueCommand();
-//	      }
-//	      
+	      if(enemy.getIdentifer() == 1 && enemy.getPlayerID() == Players.PLAYER1) 
+	      {
+	    	  player1.setHealth(enemy.getHealth());
+	    	  
+	    	  new PlayerSetCommandsBuilder(out)
+        		.setPlayer(Players.PLAYER1)
+        		.setStats(PlayerStats.HEALTH)
+        		.setInstance(player1)
+        		.issueCommand();
+  
+	      }
+	      
+	      else if(enemy.getIdentifer() == 1 && enemy.getPlayerID()== Players.PLAYER2) 
+	      {
+	    	  player2.setHealth(enemy.getHealth());
+	    	  
+	    	  new PlayerSetCommandsBuilder(out)
+      			.setPlayer(Players.PLAYER2)
+      			.setStats(PlayerStats.HEALTH)
+      			.setInstance(player2)
+      			.issueCommand();
+	      }
+	    	  
+	      else if(attacker.getIdentifer() == 1 && attacker.getPlayerID()== Players.PLAYER1)
+	      {
+	    	  player1.setHealth(attacker.getHealth());
+	    	  
+	    	  new PlayerSetCommandsBuilder(out)
+      			.setPlayer(Players.PLAYER1)
+      			.setStats(PlayerStats.HEALTH)
+      			.setInstance(player1)
+      			.issueCommand();
+	      }
+	      
+	      else if(attacker.getIdentifer() == 1 && attacker.getPlayerID()== Players.PLAYER2)
+	      {
+	    	  player2.setHealth(attacker.getHealth());
+	    	  
+	    	  new PlayerSetCommandsBuilder(out)
+      			.setPlayer(Players.PLAYER2)
+      			.setStats(PlayerStats.HEALTH)
+      			.setInstance(player2)
+      			.issueCommand();
+	      }
+	      
 	      // Win condition: should be moved to a method where we are checking player's health
 	      if (player1.getHealth() < 1)
 	    	  BasicCommands.addPlayer1Notification(out, "Player1 Won", 4);

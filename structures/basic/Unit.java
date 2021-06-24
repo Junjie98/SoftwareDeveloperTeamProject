@@ -27,21 +27,23 @@ public class Unit {
 	UnitAnimationSet animations;
 	ImageCorrection correction;
 	Players owningPlayer;
-	boolean hasMoved = false;
 	int unitHealth = 0;
 	int unitDamage =  0;
+	int unitIdentifier = 0; //0==unit & 1==player avatar
+	
+	//JJ: prevent multiple movement on board. 
+	//this is to work along with the attack logic
+	//(Move --> Attack -->|Restricts further movement on board|) 
+	//will not be > than 1
+	int moveAbility = 0;
 	
 	//Ana: for counter attack
 	boolean hasGotAttacked = false;
 	
-	public boolean isHasGotAttacked() {
-		return hasGotAttacked;
-	}
-
-	public void setHasGotAttacked(boolean hasGotAttacked) {
-		this.hasGotAttacked = hasGotAttacked;
-	}
-	//
+	//JJ: for attack logic. If attacked without move, it forfeits the move ability
+	boolean hasMoved = false; //moved this for visibility
+	boolean hasAttacked = false;
+	
 	
 	public Unit() {}
 	
@@ -77,6 +79,22 @@ public class Unit {
 		this.correction = correction;
 	}
 	
+	public void setIdentifier(int num) 
+	{
+		if(num > 1 || num < 0) 
+		{
+			System.err.println("Please insert 1 for avatar. or 0 for unit.");
+			// you dont need to specific 0 for unit as I only need this for avatar to update the UI.
+			}else {
+				this.unitIdentifier = num;
+			}
+	}
+	
+	public int getIdentifer() 
+	{
+		return this.unitIdentifier;
+	}
+	
 	public void setHealth(int health) 
 	{
 		if(health<=0) {
@@ -109,6 +127,13 @@ public class Unit {
 	public void hasMoved()
 	{
 		hasMoved =true;
+		this.moveAbility++;
+	}
+	public int getMoveAbility() {
+		return this.moveAbility;
+	}
+	public void resetMoveAbility() {
+		this.moveAbility = 0;
 	}
 
 	public int getId() {
@@ -156,6 +181,23 @@ public class Unit {
 	{
 		return this.owningPlayer;
 	}
+
+	public boolean getHasGotAttacked() {
+		return hasGotAttacked;
+	}
+
+	public void setHasGotAttacked(boolean hasGotAttacked) {
+		this.hasGotAttacked = hasGotAttacked;
+	}
+
+	public void setHasAttacked(boolean hasAttacked) {
+		this.hasAttacked = hasAttacked;
+	}
+	
+	public boolean getHasAttacked() {
+		return hasAttacked;
+	}
+	
 	/**
 	 * This command sets the position of the Unit to a specified
 	 * tile.

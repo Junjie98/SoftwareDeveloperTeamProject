@@ -46,6 +46,9 @@ public class EndTurnClicked implements EventProcessor{
 					.setPlayer(Players.PLAYER1)
 					.issueCommand();
 			
+			//JJ reset the move count on board.
+			gameState.resetMoveCountnAttack();
+			
 			// Ana: reset mana before incrementing
 			gameState.resetMana(out);
 			

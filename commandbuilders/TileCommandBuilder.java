@@ -34,6 +34,10 @@ public class TileCommandBuilder extends CommandBuilder {
     private int y = 0;
     private TileEffectAnimation effectAnimation;
 
+    // For Interval
+    // Defaults to 30 ms. Change dynamically use setDrawInterval.
+    private int drawInterval = 30;
+
     public TileCommandBuilder(ActorRef out) {
         reference = out;
     }
@@ -59,6 +63,11 @@ public class TileCommandBuilder extends CommandBuilder {
         return this;
     }
 
+    public TileCommandBuilder setDrawInterval(int drawInterval) {
+        this.drawInterval = drawInterval;
+        return this;
+    }
+
     @Override
     public void issueCommand() {
         if (mode == TileCommandBuilderMode.DRAW) {
@@ -75,7 +84,7 @@ public class TileCommandBuilder extends CommandBuilder {
             }
 
             BasicCommands.drawTile(reference, tile, drawMode);
-            try {Thread.sleep(30);} catch (InterruptedException e) {e.printStackTrace();}
+            try {Thread.sleep(drawInterval);} catch (InterruptedException e) {e.printStackTrace();}
         } else if (mode == TileCommandBuilderMode.ANIMATION) {
             Tile tile = BasicObjectBuilders.loadTile(x, y);
             String temp = StaticConfFiles.f1_inmolation;

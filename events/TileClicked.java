@@ -21,10 +21,8 @@ import structures.GameState;
  *
  */
 public class TileClicked implements EventProcessor{
-
 	@Override
 	public void processEvent(ActorRef out, GameState gameState, JsonNode message) {
-
 		int tilex = message.get("tilex").asInt();
 		int tiley = message.get("tiley").asInt();
 		
@@ -32,5 +30,4 @@ public class TileClicked implements EventProcessor{
 		
 		gameState.tileClicked(out, tilex, tiley);
 	}
-
 }

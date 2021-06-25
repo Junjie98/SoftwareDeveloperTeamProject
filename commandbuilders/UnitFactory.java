@@ -118,6 +118,9 @@ public class UnitFactory {
         }else {
             unit = this.generateUnit(UnitType.WINDSHRIKE);
         }
+
+        // TODO: Set the Attack & Health here. It should be stored in Card.BigCard
+
         return unit;
     }
 }

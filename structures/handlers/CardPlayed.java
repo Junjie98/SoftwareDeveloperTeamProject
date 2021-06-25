@@ -30,6 +30,11 @@ public class CardPlayed {
         String cardname = current.getCardname();
         System.out.println(cardname);
 
+        // TODO: Need to check the Mana cost and block move to board if we don't have enough Mana.
+//        if () {
+//            return;
+//        }
+
         if (current.isSpell()) {
             if (cardname.equals("Truestrike") || cardname.equals("Entropic Decay")) {
                 // Set a buff animation and the effects like this.

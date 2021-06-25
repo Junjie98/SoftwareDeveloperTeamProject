@@ -19,7 +19,6 @@ import commandbuilders.enums.Players;
  *
  */
 public class EndTurnClicked implements EventProcessor{
-
 	@Override
 	public void processEvent(ActorRef out, GameState gameState, JsonNode message) {
 		gameState.endTurnClicked(out);
@@ -43,5 +42,4 @@ public class EndTurnClicked implements EventProcessor{
 					.issueCommand();
 		}
 	}
-
 }

@@ -19,11 +19,9 @@ import structures.GameState;
  *
  */
 public class UnitStopped implements EventProcessor{
-
 	@Override
 	public void processEvent(ActorRef out, GameState gameState, JsonNode message) {
 		int unitid = message.get("id").asInt();
 		gameState.getUnitMovementAndAttack().setUnitsCanMove(true);
 	}
-
 }

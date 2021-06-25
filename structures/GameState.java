@@ -21,8 +21,6 @@ import static commandbuilders.enums.Players.*;
  *
  */
 
-// TODO: only move -> attack and attack is allowed. No attack move or move move.
-
 public class GameState {
     private final int INITIAL_CARD_COUNT = 3;
     private int roundNumber = 3;
@@ -65,7 +63,7 @@ public class GameState {
     }
 
     //Spawns Avatars in starting positions at init
-    public void spawnAvatars(ActorRef out)  {
+    public void spawnAvatars(ActorRef out) {
         Unit human = new UnitFactory().generateUnit(UnitType.HUMAN);
         human.setIdentifier(1);
         
@@ -158,6 +156,8 @@ public class GameState {
             for (Pair<Integer, Integer> position: friendlyUnits) {
                 highlighter.cardTileHighlight(out, position.getFirst(), position.getSecond());
             }
+
+            // TODO: Change the highlighted state of the card and redraw the hand.
         }
     }
 

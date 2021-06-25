@@ -182,22 +182,30 @@ public class GameState {
             }
         } else {
             if (unitMovementAndAttack.getActiveUnit() == null) {
-                // Player clicked on a unit
                 if (tile != null && tile.hasUnit()) {
+                    // User clicked on a unit.
                     if (tile.getUnit().getHasAttacked() && tile.getUnit().getHasMoved()) {
+                        // Block hasAttacked -> hasMoved
                         return;
                     } else if (tile.getUnit().getHasAttacked()) {
+                        // Block hasAttacked
                         return;
                     }
                     unitMovementAndAttack.unitClicked(out, x ,y);
                 }
             } else {
                 if (tile != null && tile.hasUnit()) {
+                    // If player clicked on a unit and clicked on another.
                     unitMovementAndAttack.unitClicked(out, x, y);
                 } else if (tile != null && tile.getTileState() == States.NORMAL) {
+                    // Click on another unit or the activated unit will cancel the board highlight.
                     highlighter.clearBoardHighlights(out);
                 }
             }
+        }
+        if (cardPlayed.getActiveCard() != null && tile.hasUnit() == false) {
+            // Cancel the highlights on clicking on a not highlighted cell, excluding the unit.
+            highlighter.clearBoardHighlights(out);
         }
     }
 

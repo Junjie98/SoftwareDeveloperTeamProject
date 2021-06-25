@@ -34,15 +34,18 @@ public class UnitMovementAndAttack {
             return;
         }
         if(activeUnit != null) {
-            //Unhighlight previously selected unit
             Tile previousUnitLocation = Board.getInstance().getTile(activeUnit);
+
+            //Unhighlight previously selected unit
             parent.getHighlighter().clearBoardHighlights(out);
+
             if (previousUnitLocation != tile) {
                 // A new unit is clicked
                 moveHighlight(out, x, y);
                 activeUnit = new Pair<>(x, y);
             }
         } else if (unitsCanMove) {
+            parent.getHighlighter().clearBoardHighlights(out);
             activeUnit = new Pair<>(x, y);
             moveHighlight(out, x, y);
         } else {

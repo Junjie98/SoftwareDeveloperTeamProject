@@ -65,7 +65,11 @@ public class CardPlayed {
             }
 
             Unit unit = new UnitFactory().generateUnitByCard(current);
-            unit.setFlying(true);
+            if(cardname.equals("WindShrike")) {
+                unit.setFlying(true);
+            } else {
+                unit.setFlying(false);
+            }
             new UnitCommandBuilder(out)
                     .setMode(UnitCommandBuilderMode.DRAW)
                     .setTilePosition(x, y)

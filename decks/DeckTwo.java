@@ -38,4 +38,8 @@ public class DeckTwo {
         cards.remove(cards.size() - 1);
         return temp;
     }
+
+    public boolean isEmpty() {
+        return cards.isEmpty();
+    }
 }

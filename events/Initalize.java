@@ -7,8 +7,6 @@ import commandbuilders.TileCommandBuilder;
 import commandbuilders.enums.States;
 import structures.Board;
 import structures.GameState;
-import structures.basic.Tile;
-import utils.BasicObjectBuilders;
 
 /**
  * Indicates that both the core game loop in the browser is starting, meaning
@@ -22,7 +20,6 @@ import utils.BasicObjectBuilders;
  *
  */
 public class Initalize implements EventProcessor{
-
 	@Override
 	public void processEvent(ActorRef out, GameState gameState, JsonNode message) {
 		// CommandDemo.executeDemo(out); // this executes the command demo, comment out this when implementing your solution

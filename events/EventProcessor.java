@@ -12,7 +12,6 @@ import structures.GameState;
  *
  */
 public interface EventProcessor {
-
 	/**
 	 * The processEvent method takes as input the contents of the event in the form of a
 	 * Jackson JsonNode object, which contains a set of key-value pairs (the information
@@ -23,5 +22,4 @@ public interface EventProcessor {
 	 * @return
 	 */
 	public void processEvent(ActorRef out, GameState gameState, JsonNode message);
-	
 }

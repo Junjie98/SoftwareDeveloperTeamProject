@@ -53,10 +53,4 @@ public class BigCard {
 	public void setCardTextures(String[] cardTextures) {
 		this.cardTextures = cardTextures;
 	}
-
-	
-	
-	
-	
-	
 }

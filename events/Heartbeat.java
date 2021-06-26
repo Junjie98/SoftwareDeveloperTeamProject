@@ -19,7 +19,6 @@ import structures.GameState;
  *
  */
 public class Heartbeat implements EventProcessor{
-
 	@Override
 	public void processEvent(ActorRef out, GameState gameState, JsonNode message) {
 

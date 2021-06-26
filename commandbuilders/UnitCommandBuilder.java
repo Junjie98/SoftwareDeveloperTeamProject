@@ -58,6 +58,10 @@ public class UnitCommandBuilder extends CommandBuilder{
     // For Animation
     private UnitAnimationType animationType = UnitAnimationType.attack;
 
+    // For Interval
+    // Defaults to 30 ms. Change dynamically use setDrawInterval.
+    private int drawInterval = 30;
+
     public UnitCommandBuilder(ActorRef out) {
         reference = out;
     }
@@ -90,12 +94,18 @@ public class UnitCommandBuilder extends CommandBuilder{
         return this;
     }
 
-    public void setDirection(MoveDirection direction) {
+    public UnitCommandBuilder setDirection(MoveDirection direction) {
         this.direction = direction;
+        return this;
     }
 
     public UnitCommandBuilder setAnimationType(UnitAnimationType animationType) {
         this.animationType = animationType;
+        return this;
+    }
+
+    public UnitCommandBuilder setDrawInterval(int drawInterval) {
+        this.drawInterval = drawInterval;
         return this;
     }
 
@@ -126,6 +136,6 @@ public class UnitCommandBuilder extends CommandBuilder{
         } else if (mode == UnitCommandBuilderMode.ANIMATION) {
             BasicCommands.playUnitAnimation(reference, unit, animationType);
         }
-        try {Thread.sleep(30);} catch (InterruptedException e) {e.printStackTrace();}
+        try {Thread.sleep(drawInterval);} catch (InterruptedException e) {e.printStackTrace();}
     }
 }

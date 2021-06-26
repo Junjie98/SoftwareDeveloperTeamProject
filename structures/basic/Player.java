@@ -8,7 +8,6 @@ package structures.basic;
  *
  */
 public class Player {
-
 	int health;
 	int mana;
 	
@@ -22,6 +21,7 @@ public class Player {
 		this.health = health;
 		this.mana = mana;
 	}
+
 	public int getHealth() {
 		return health;
 	}
@@ -42,7 +42,4 @@ public class Player {
 		}
 		
 	}
-	
-	
-	
 }

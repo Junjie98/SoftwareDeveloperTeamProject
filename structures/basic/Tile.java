@@ -8,6 +8,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import commandbuilders.enums.Players;
+import commandbuilders.enums.States;
 
 /**
  * A basic representation of a tile on the game board. Tiles have both a pixel position
@@ -31,7 +32,17 @@ public class Tile {
 	int height;
 	int tilex;
 	int tiley;
-	
+
+	States tileState = States.NORMAL;
+
+	public States getTileState() {
+		return tileState;
+	}
+
+	public void setTileState(States tileState) {
+		this.tileState = tileState;
+	}
+
 	public Tile() {}
 	
 	public Tile(String tileTexture, int xpos, int ypos, int width, int height, int tilex, int tiley) {
@@ -56,6 +67,7 @@ public class Tile {
 		this.tilex = tilex;
 		this.tiley = tiley;
 	}
+
 	public List<String> getTileTextures() {
 		return tileTextures;
 	}
@@ -98,31 +110,7 @@ public class Tile {
 	public void setTiley(int tiley) {
 		this.tiley = tiley;
 	}
-	
-	public void setUnit(Unit unit)
-	{
-		this.unit = unit;
-	}
 
-	public boolean hasUnit()
-	{
-		return unit != null;
-	}
-
-
-	public boolean hasFriendlyUnit(Players turn)
-	{
-		if (unit != null && unit.owningPlayer != null) {		//Check if unit is null, and if it has a players unit
-			return unit.owningPlayer == turn ? true : false;
-		} else {
-			return false;
-		}
-	}
-
-	public Unit getUnit()
-	{
-		return this.unit;
-	}
 	/**
 	 * Loads a tile from a configuration file
 	 * parameters.
@@ -130,18 +118,25 @@ public class Tile {
 	 * @return
 	 */
 	public static Tile constructTile(String configFile) {
-		
+
 		try {
 			Tile tile = mapper.readValue(new File(configFile), Tile.class);
 			return tile;
 		} catch (Exception e) {
 			e.printStackTrace();
-			
+
 		}
 		return null;
-		
+
 	}
-	
-	
-	
+
+	public void setUnit(Unit unit) {
+		this.unit = unit;
+	}
+	public boolean hasUnit() {
+		return unit != null;
+	}
+	public Unit getUnit() {
+		return this.unit;
+	}
 }

@@ -9,6 +9,11 @@ public class Pair<T, U> {
         this.second = second;
     }
 
+    public static Pair<Integer, Integer> copy(Pair<Integer, Integer> o) 
+    {
+        return new Pair<>(o.getFirst(), o.getSecond());
+    }
+
     public T getFirst() {
         return first;
     }
@@ -28,6 +33,8 @@ public class Pair<T, U> {
     public boolean equals(Pair<T, U> another) {
         return this.toString().equals(another.toString());
     }
+
+   
 
     @Override
     public String toString() {

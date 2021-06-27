@@ -10,6 +10,7 @@ There are some cases where commit identity does not match exactly with the ident
 | --------------------------------------------- | --------------------------------------------- |
 | Yu-Sung Hsu (2540296h@student.gla.ac.uk)      | Yu-Sung Hsu (2540296h@student.gla.ac.uk)      |
 | Theodoros Vrakas (2593566v@student.gla.ac.uk) | Theodoros Vrakas (2593566v@student.gla.ac.uk) |
+|						| Theodoros Vrakas (te0sx@yahoo.gr)		|
 |                                               | te0sx (te0sx@yahoo.gr)                        |
 | Jun Jie Low (2600104l@student.gla.ac.uk)      | Jun Jie Low (2600104l@student.gla.ac.uk)      |
 |                                               | JunJie (nelsonlow_88@hotmail.com)             |

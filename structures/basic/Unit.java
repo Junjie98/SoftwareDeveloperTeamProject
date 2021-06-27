@@ -29,15 +29,16 @@ public class Unit {
 	Players owningPlayer;
 	int unitHealth = 0;
 	int unitDamage =  0;
-	int unitIdentifier = 0; //0==unit & 1==player avatar
 
-	boolean isFlying = false;
+	// TODO: Would we make a Enum for this? This can be more readable.
+	int unitIdentifier = 0; //0==unit & 1==player avatar
 
 	//Ana: for counter attack
 	boolean hasGotAttacked = false;
 	//JJ: for attack logic. If attacked without move, it forfeits the move ability
 	boolean hasMoved = false; //moved this for visibility
 	boolean hasAttacked = false;
+	boolean isFlying = false;
 
 	public Unit() {}
 	
@@ -91,7 +92,7 @@ public class Unit {
 		if(health<=0) {
 			unitHealth = 0;
 		} else {
-		unitHealth = health;
+			unitHealth = health;
 		}
 	}
 
@@ -192,5 +193,16 @@ public class Unit {
     }
 	public boolean isFlying() {
 		return isFlying;
+	}
+
+	public Unit getCopy() {
+		Unit copy = new Unit(id, animation, position, animations, correction);
+		copy.setPlayerID(owningPlayer);
+		copy.setHasGotAttacked(hasGotAttacked);
+		copy.setHasAttacked(hasAttacked);
+		copy.setFlying(isFlying);
+		copy.setHealth(unitHealth);
+		copy.setDamage(unitDamage);
+		return copy;
 	}
 }

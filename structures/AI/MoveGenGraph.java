@@ -7,7 +7,9 @@ import javax.lang.model.util.ElementScanner14;
 import commandbuilders.enums.ActionEnum;
 import commandbuilders.enums.Players;
 import structures.Board;
+import structures.Card;
 import structures.GameState;
+import structures.basic.Unit;
 import structures.handlers.Pair;
 
 
@@ -15,6 +17,7 @@ public class MoveGenGraph
 {
     ArrayList<Vertex> verts = new ArrayList<>();
 	int iteration;
+    Board lBoard = Board.getInstance();
 
 
 	public Vertex generateActionsPerVert(Vertex v1, int vertDepth)
@@ -49,9 +52,9 @@ public class MoveGenGraph
 
 			GameState cast_state = castSpells(l_state);
 			
-			if(moved_state != null)
+			if(cast_state != null)
 			{
-				Vertex newVert = new Vertex(moved_state, vertDepth+1, v1.label+"m");
+				Vertex newVert = new Vertex(cast_state, vertDepth+1, v1.label+"c");
 				
                 for(int i = 0; i < moveDat.size(); i++)
                 {
@@ -62,7 +65,7 @@ public class MoveGenGraph
 
 				verts.add(newVert);
 				
-				actions.add(new Pair<> (ActionEnum.MOVE, newVert));
+				actions.add(new Pair<> (ActionEnum.CAST, newVert));
 				
 			}
 
@@ -81,15 +84,24 @@ public class MoveGenGraph
 
     public GameState castSpells(GameState gs)
     {
+        //get all the relevent positional information
         ArrayList<ArrayList<Pair<Integer, Integer>>> units = getUnits(gs);
+        
         ArrayList<Pair<Integer, Integer>> enemies = units.get(1);
         Pair<Integer, Integer> enemyTarget = null;
+
         ArrayList<Pair<Integer, Integer>> friendlies = units.get(0);
         Pair<Integer, Integer> friendlyTarget = null;
 
+        boolean killUnit = false;
+
+        ArrayList<Card> hand = gs.getTurn() == Players.PLAYER2 ? gs.player2CardsInHand : gs.player1CardsInHand;
+
         for (Pair<Integer,Integer> pair : enemies) {
-            if(Board.getInstance().getTile(pair).getUnit().getHealth() <= 2)
-            {
+            if(lBoard.getTile(pair).getUnit().getHealth() <= 2)
+            {   //if there is an enemy unit on 2 health 
+                //and we have a 2 damage then cast to them
+                killUnit = true;
                 enemyTarget = pair;
             }
         }
@@ -102,25 +114,35 @@ public class MoveGenGraph
         int lowHealth = 20;
 
         for (Pair<Integer,Integer> pair : friendlies) {
-            if(Board.getInstance().getTile(pair).getUnit().getHealth() < lowHealth)
-            {
-                lowHealth = Board.getInstance().getTile(pair).getUnit().getHealth();
+            if(lBoard.getTile(pair).getUnit().getHealth() < lowHealth)
+            {   //What is the lowest health friendly, for healing
+                lowHealth = lBoard.getTile(pair).getUnit().getHealth();
                 friendlyTarget = pair;
             }
         }
 
         for (int i = 0; i < gs.player2CardsInHand.size(); i++)
         {
+            if(gs.player2CardsInHand.get(i)== null)
+            {
+                continue;
+            }
             int id = gs.player2CardsInHand.get(i).getId();
             //17 18 = sundrop +2 staff + 2
             //19 20 = truestrike -2 decay -2
             if(id == 19 || id == 20)
             {
-                //health +2 spell
+                //attack spell
+                Unit unit = lBoard.getTile(enemyTarget).getUnit();
+                unit.setHealth(unit.getHealth()-2);
+                gs.player2CardsInHand.set(i, null);
             }
             else if(id == 17 || id == 18)
             {
-                //dmg -2 spell
+                //heal spell
+                Unit unit = lBoard.getTile(friendlyTarget).getUnit();
+                unit.setHealth(unit.getHealth()+2);
+                gs.player2CardsInHand.set(i, null);
             }
         }
     }

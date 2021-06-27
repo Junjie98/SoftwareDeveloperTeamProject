@@ -33,7 +33,7 @@ public class CardPlayed {
 
         // Decrease Mana
         int manaCost = current.getManacost();
-        boolean enoughMana = parent.decreaseManaPerAction(out, manaCost);   //if enough mana then true
+        boolean enoughMana = parent.decreaseManaPerCardPlayed(out, manaCost);   //if enough mana then true
 
         // if enough mana,then play the card
         if (enoughMana) {

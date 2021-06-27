@@ -30,6 +30,13 @@ public class Card {
 		this.miniCard = miniCard;
 		this.bigCard = bigCard;
 	}
+
+
+	public Card(Card inCard)
+	{
+		this.id = inCard.id;
+		this.manacost = inCard.manacost;
+	}
 	
 	public int getId() {
 		return id;

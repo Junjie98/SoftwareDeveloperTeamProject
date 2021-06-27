@@ -257,9 +257,10 @@ public class GameState {
         }
     }
 
-    public void decreaseManaPerAction(ActorRef out, int manaCost) {
+    public boolean decreaseManaPerAction(ActorRef out, int manaCost) {
         int previousMana = (turn == PLAYER1) ? player1.getMana() : player2.getMana();
         int currentMana = previousMana - manaCost;
+        if (currentMana < 0) {return false;}
         if(turn == Players.PLAYER1) {
             player1.setMana(currentMana);
             new PlayerSetCommandsBuilder(out)
@@ -275,6 +276,7 @@ public class GameState {
                     .setInstance(player2)
                     .issueCommand();
         }
+        return true;
     }
 
     // ===========================================================================

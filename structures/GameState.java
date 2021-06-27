@@ -257,6 +257,26 @@ public class GameState {
         }
     }
 
+    public void decreaseManaPerAction(ActorRef out, int manaCost) {
+        int previousMana = (turn == PLAYER1) ? player1.getMana() : player2.getMana();
+        int currentMana = previousMana - manaCost;
+        if(turn == Players.PLAYER1) {
+            player1.setMana(currentMana);
+            new PlayerSetCommandsBuilder(out)
+                    .setPlayer(Players.PLAYER1)
+                    .setStats(PlayerStats.MANA)
+                    .setInstance(player1)
+                    .issueCommand();
+        } else {
+            player2.setMana(currentMana);
+            new PlayerSetCommandsBuilder(out)
+                    .setPlayer(Players.PLAYER2)
+                    .setStats(PlayerStats.MANA)
+                    .setInstance(player2)
+                    .issueCommand();
+        }
+    }
+
     // ===========================================================================
     // Shared Highlighting Functions
     // ===========================================================================

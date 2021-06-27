@@ -56,7 +56,6 @@ public class CardPlayed {
                         .issueCommand();
             }
 
-            // TODO: May need to decrease Mana here.
         } else {
             Tile tile = Board.getInstance().getTile(x, y);
             if (tile.hasUnit()) {
@@ -82,8 +81,11 @@ public class CardPlayed {
             } else {
                 parent.player2UnitsPosition.add(new Pair<>(x, y));
             }
-            // TODO: May need to decrease Mana here.
         }
+        // TODO: May need to decrease Mana here. //Done
+        int manaCost = current.getManacost();
+        parent.decreaseManaPerAction(out, manaCost);
+
         deleteCardFromHand(out, activeCard.getSecond());
         parent.getHighlighter().clearBoardHighlights(out);
     }

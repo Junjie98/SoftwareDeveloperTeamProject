@@ -148,16 +148,29 @@ public class GameState {
         System.out.println("Card Clicked: " + current.getCardname());
         Pair<Card, Integer> card = cardPlayed.getActiveCard();
 
-        highlighter.clearBoardHighlights(out);
-        if (card == null || card.getSecond() != idx) {
-            cardPlayed.setActiveCard(current, idx);
-            ArrayList<Pair<Integer, Integer>> friendlyUnits =
-                    (turn == PLAYER1) ? player1UnitsPosition : player2UnitsPosition;
-            for (Pair<Integer, Integer> position: friendlyUnits) {
-                highlighter.cardTileHighlight(out, position.getFirst(), position.getSecond());
-            }
+        // Decrease Mana
+        int manaCost = current.getManacost();
+        boolean enoughMana = decreaseManaPerCardPlayed(out, manaCost);   //if enough mana then true
 
-            // TODO: Change the highlighted state of the card and redraw the hand.
+        // if enough mana,then highlight and play the card
+        if(enoughMana) {
+            highlighter.clearBoardHighlights(out);
+            if (card == null || card.getSecond() != idx) {
+                cardPlayed.setActiveCard(current, idx);
+                ArrayList<Pair<Integer, Integer>> friendlyUnits =
+                        (turn == PLAYER1) ? player1UnitsPosition : player2UnitsPosition;
+                for (Pair<Integer, Integer> position : friendlyUnits) {
+                    highlighter.cardTileHighlight(out, position.getFirst(), position.getSecond());
+                }
+
+                // TODO: Change the highlighted state of the card and redraw the hand.
+            }
+        } else {
+            new PlayerNotificationCommandBuilder(out)
+                    .setMessage("Insufficient Mana")
+                    .setPlayer(getTurn())
+                    .setDisplaySeconds(4)
+                    .issueCommand();
         }
     }
 

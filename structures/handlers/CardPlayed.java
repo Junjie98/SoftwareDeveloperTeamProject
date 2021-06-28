@@ -80,6 +80,7 @@ public class CardPlayed {
         }
 
         deleteCardFromHand(out, activeCard.getSecond());
+        parent.decreaseManaPerCardPlayed(out, current.getManacost());
         parent.getHighlighter().clearBoardHighlights(out);
     }
 

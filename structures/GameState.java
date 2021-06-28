@@ -150,7 +150,9 @@ public class GameState {
 
         // Decrease Mana
         int manaCost = current.getManacost();
-        boolean enoughMana = decreaseManaPerCardPlayed(out, manaCost);   //if enough mana then true
+        int playersMana = (turn == PLAYER1) ? player1.getMana() : player2.getMana();
+
+        boolean enoughMana = (playersMana >= manaCost) ? true : false;   //if enough mana then true
 
         // if enough mana,then highlight and play the card
         if(enoughMana) {
@@ -270,10 +272,9 @@ public class GameState {
         }
     }
 
-    public boolean decreaseManaPerCardPlayed(ActorRef out, int manaCost) {
+    public void decreaseManaPerCardPlayed(ActorRef out, int manaCost) {
         int previousMana = (turn == PLAYER1) ? player1.getMana() : player2.getMana();
-        int currentMana = previousMana - manaCost;
-        if (currentMana < 0) {return false;}    //if not enough mana, return false
+        int currentMana = previousMana - manaCost;      // We check beforehand that currentMana always >=0
         if(turn == Players.PLAYER1) {
             player1.setMana(currentMana);
             new PlayerSetCommandsBuilder(out)
@@ -289,7 +290,6 @@ public class GameState {
                     .setInstance(player2)
                     .issueCommand();
         }
-        return true;
     }
 
     // ===========================================================================

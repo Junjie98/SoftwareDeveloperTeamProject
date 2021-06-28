@@ -29,14 +29,16 @@ public class Unit {
 	Players owningPlayer;
 	int unitHealth = 0;
 	int unitDamage =  0;
+	int unitIdentifier = 0; //0==unit & 1==player avatar
 
 	boolean isFlying = false;
-	boolean isAvatar = false;
+
 	//Ana: for counter attack
 	boolean hasGotAttacked = false;
 	//JJ: for attack logic. If attacked without move, it forfeits the move ability
 	boolean hasMoved = false; //moved this for visibility
 	boolean hasAttacked = false;
+
 	public Unit() {}
 	
 	public Unit(int id, UnitAnimationSet animations, ImageCorrection correction) {
@@ -69,11 +71,27 @@ public class Unit {
 		this.correction = correction;
 	}
 	
+	public void setIdentifier(int num) 
+	{
+		if(num > 1 || num < 0) 
+		{
+			System.err.println("Please insert 1 for avatar. or 0 for unit.");
+			// you dont need to specific 0 for unit as I only need this for avatar to update the UI.
+			}else {
+				this.unitIdentifier = num;
+			}
+	}
+	
+	public int getIdentifer() 
+	{
+		return this.unitIdentifier;
+	}
+	
 	public void setHealth(int health) {
 		if(health<=0) {
 			unitHealth = 0;
 		} else {
-			unitHealth = health;
+		unitHealth = health;
 		}
 	}
 
@@ -174,23 +192,5 @@ public class Unit {
     }
 	public boolean isFlying() {
 		return isFlying;
-	}
-	public boolean isAvatar() {
-		return isAvatar;
-	}
-	public void setAvatar(boolean avatar) {
-		isAvatar = avatar;
-	}
-
-	public Unit getCopy() {
-		Unit copy = new Unit(id, animation, position, animations, correction);
-		copy.setPlayerID(owningPlayer);
-		copy.setHasGotAttacked(hasGotAttacked);
-		copy.setHasAttacked(hasAttacked);
-		copy.setFlying(isFlying);
-		copy.setHealth(unitHealth);
-		copy.setDamage(unitDamage);
-		copy.setAvatar(isAvatar);
-		return copy;
 	}
 }

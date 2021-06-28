@@ -22,12 +22,6 @@ public class Player {
 		this.mana = mana;
 	}
 
-	public Player(Player inPlayer)
-	{
-		this.health = inPlayer.health;
-		this.mana = inPlayer.mana;
-	}
-
 	public int getHealth() {
 		return health;
 	}

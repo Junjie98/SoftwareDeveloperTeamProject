@@ -37,8 +37,6 @@ public class Unit {
 	//JJ: for attack logic. If attacked without move, it forfeits the move ability
 	boolean hasMoved = false; //moved this for visibility
 	boolean hasAttacked = false;
-	boolean isFlying = false;
-
 	public Unit() {}
 	
 	public Unit(int id, UnitAnimationSet animations, ImageCorrection correction) {

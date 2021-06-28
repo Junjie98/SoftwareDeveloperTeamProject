@@ -7,6 +7,7 @@ import commandbuilders.UnitCommandBuilder;
 import commandbuilders.enums.*;
 import structures.Board;
 import structures.GameState;
+import structures.AI.AI;
 import structures.basic.Tile;
 import structures.basic.Unit;
 
@@ -19,6 +20,8 @@ public class UnitMovementAndAttack {
     ArrayList<Unit> moveAttackAndCounterAttack = new ArrayList<>();
 
     boolean unitsCanMove = true;
+    Tile previousUnitLocation;
+    boolean errorBool = false;
 
     public UnitMovementAndAttack(GameState parent) {
         this.parent = parent;
@@ -34,19 +37,24 @@ public class UnitMovementAndAttack {
             return;
         }
         if(activeUnit != null) {
-            Tile previousUnitLocation = Board.getInstance().getTile(activeUnit);
+            previousUnitLocation = Board.getInstance().getTile(activeUnit);
 
             //Unhighlight previously selected unit
             parent.getHighlighter().clearBoardHighlights(out);
+            errorBool = true;
+            System.err.println("OLD UNIT SELECTED!");
 
             if (previousUnitLocation != tile) {
                 // A new unit is clicked
                 moveHighlight(out, x, y);
                 activeUnit = new Pair<>(x, y);
             }
+
+
         } else if (unitsCanMove) {
             parent.getHighlighter().clearBoardHighlights(out);
             activeUnit = new Pair<>(x, y);
+            System.err.println("NEW UNIT SELECTED!");
             moveHighlight(out, x, y);
         } else {
             System.err.println("Unit movement locked due to other units moving.");
@@ -169,6 +177,7 @@ public class UnitMovementAndAttack {
             parent.getHighlighter().clearBoardHighlights(out);
         } else if (destinationTile.getTileState() == States.HIGHLIGHTED) {
             unitsCanMove = false;   // Prevent other units from moving.
+            
 
             System.out.println("move valid");
 
@@ -182,10 +191,16 @@ public class UnitMovementAndAttack {
             ArrayList<Pair<Integer, Integer>> pool = (parent.getTurn() == Players.PLAYER1) ?
                     parent.player1UnitsPosition : parent.player2UnitsPosition;
             for (Pair<Integer, Integer> position: pool) {
-                if (position.equals(activeUnit)) {
-                    pool.remove(position);
-                    break;
-                }
+
+               System.err.println("a unit in the pool" + position);
+                    if (position.equals(activeUnit)) {
+                        System.err.println("REMOVING UNIT!");
+                        pool.remove(position);
+                        break;
+                    }
+               
+                
+ 
             }
             pool.add(new Pair<>(x, y));
 

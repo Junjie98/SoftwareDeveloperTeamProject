@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import akka.actor.ActorRef;
 import commandbuilders.PlayerNotificationCommandBuilder;
 import structures.GameState;
+import structures.AI.AI;
 import commandbuilders.enums.Players;
 
 /**
@@ -19,6 +20,8 @@ import commandbuilders.enums.Players;
  *
  */
 public class EndTurnClicked implements EventProcessor{
+	public AI ai = new AI();
+
 	@Override
 	public void processEvent(ActorRef out, GameState gameState, JsonNode message) {
 		gameState.endTurnClicked(out);
@@ -40,6 +43,8 @@ public class EndTurnClicked implements EventProcessor{
 					.setDisplaySeconds(2)
 					.setPlayer(Players.PLAYER1)
 					.issueCommand();
+			ai.TakeTurn(out, gameState);
 		}
 	}
+
 }

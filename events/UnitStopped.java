@@ -4,7 +4,9 @@ package events;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import akka.actor.ActorRef;
+import commandbuilders.enums.Players;
 import structures.GameState;
+import structures.AI.AI;
 
 /**
  * Indicates that a unit instance has stopped moving. 
@@ -23,5 +25,11 @@ public class UnitStopped implements EventProcessor{
 	public void processEvent(ActorRef out, GameState gameState, JsonNode message) {
 		int unitid = message.get("id").asInt();
 		gameState.getUnitMovementAndAttack().setUnitsCanMove(true);
+		if(gameState.getTurn() == Players.PLAYER2)
+		{
+			//System.err.println("unit stop, call ai move");
+			AI.move(out, gameState);
+
+		}
 	}
 }

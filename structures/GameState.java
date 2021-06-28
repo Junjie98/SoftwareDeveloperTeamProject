@@ -67,8 +67,8 @@ public class GameState {
         Unit human = new UnitFactory().generateUnit(UnitType.HUMAN);
         human.setAvatar(true);
         
-        Unit ai = new UnitFactory().generateUnit(UnitType.AI);
-        ai.setAvatar(true);
+        Unit aiAvatar = new UnitFactory().generateUnit(UnitType.AI);
+        aiAvatar.setAvatar(true);
 
         new UnitCommandBuilder(out)
                     .setMode(UnitCommandBuilderMode.DRAW)
@@ -300,6 +300,21 @@ public class GameState {
         output.add(new Pair<>(x-depth, y+diag));
         output.add(new Pair<>(x+depth, y-diag));
         output.add(new Pair<>(x+diag, y+depth));
+        return output;
+    }
+    public ExtractedGameState extract() {
+        ExtractedGameState output = new ExtractedGameState();
+
+        // TODO: Extract relevant data from GameState.
+        // TODO: Get a copy of the Board for the AI to make sense of the GameState.
+        // This class should always get a copy or a String representation that the AI can recover or make sense from it.
+        // Changing from the ExtractedGameState will not change the GameState.
+
+        // Potential extracted data:
+        // - Copy of the Board Object
+        // - List of all Units on board (two copied arraylists)
+        // - A list of previous actions taken by the players (Object to be created)
+
         return output;
     }
 

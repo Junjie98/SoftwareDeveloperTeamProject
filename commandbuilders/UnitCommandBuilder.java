@@ -94,8 +94,9 @@ public class UnitCommandBuilder extends CommandBuilder{
         return this;
     }
 
-    public void setDirection(MoveDirection direction) {
+    public UnitCommandBuilder setDirection(MoveDirection direction) {
         this.direction = direction;
+        return this;
     }
 
     public UnitCommandBuilder setAnimationType(UnitAnimationType animationType) {
@@ -103,8 +104,9 @@ public class UnitCommandBuilder extends CommandBuilder{
         return this;
     }
 
-    public void setDrawInterval(int drawInterval) {
+    public UnitCommandBuilder setDrawInterval(int drawInterval) {
         this.drawInterval = drawInterval;
+        return this;
     }
 
     @Override

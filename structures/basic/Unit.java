@@ -30,9 +30,8 @@ public class Unit {
 	int unitHealth = 0;
 	int unitDamage =  0;
 
-	// TODO: Would we make a Enum for this? This can be more readable.
-	int unitIdentifier = 0; //0==unit & 1==player avatar
-
+	boolean isFlying = false;
+	boolean isAvatar = false;
 	//Ana: for counter attack
 	boolean hasGotAttacked = false;
 	//JJ: for attack logic. If attacked without move, it forfeits the move ability
@@ -70,22 +69,6 @@ public class Unit {
 		this.position = position;
 		this.animations = animations;
 		this.correction = correction;
-	}
-	
-	public void setIdentifier(int num) 
-	{
-		if(num > 1 || num < 0) 
-		{
-			System.err.println("Please insert 1 for avatar. or 0 for unit.");
-			// you dont need to specific 0 for unit as I only need this for avatar to update the UI.
-			}else {
-				this.unitIdentifier = num;
-			}
-	}
-	
-	public int getIdentifer() 
-	{
-		return this.unitIdentifier;
 	}
 	
 	public void setHealth(int health) {
@@ -194,6 +177,12 @@ public class Unit {
 	public boolean isFlying() {
 		return isFlying;
 	}
+	public boolean isAvatar() {
+		return isAvatar;
+	}
+	public void setAvatar(boolean avatar) {
+		isAvatar = avatar;
+	}
 
 	public Unit getCopy() {
 		Unit copy = new Unit(id, animation, position, animations, correction);
@@ -203,6 +192,7 @@ public class Unit {
 		copy.setFlying(isFlying);
 		copy.setHealth(unitHealth);
 		copy.setDamage(unitDamage);
+		copy.setAvatar(isAvatar);
 		return copy;
 	}
 }

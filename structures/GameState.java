@@ -94,10 +94,10 @@ public class GameState {
     //Spawns Avatars in starting positions at init
     public void spawnAvatars(ActorRef out) {
         Unit human = new UnitFactory().generateUnit(UnitType.HUMAN);
-        human.setIdentifier(1);
+        human.setAvatar(true);
         
         Unit ai = new UnitFactory().generateUnit(UnitType.AI);
-        ai.setIdentifier(1);
+        ai.setAvatar(true);
 
         new UnitCommandBuilder(out)
                     .setMode(UnitCommandBuilderMode.DRAW)
@@ -284,6 +284,28 @@ public class GameState {
                     .setInstance(player2)
                     .issueCommand();
         }
+    }
+
+    public boolean decreaseManaPerCardPlayed(ActorRef out, int manaCost) {
+        int previousMana = (turn == PLAYER1) ? player1.getMana() : player2.getMana();
+        int currentMana = previousMana - manaCost;
+        if (currentMana < 0) {return false;}    //if not enough mana, return false
+        if(turn == Players.PLAYER1) {
+            player1.setMana(currentMana);
+            new PlayerSetCommandsBuilder(out)
+                    .setPlayer(Players.PLAYER1)
+                    .setStats(PlayerStats.MANA)
+                    .setInstance(player1)
+                    .issueCommand();
+        } else {
+            player2.setMana(currentMana);
+            new PlayerSetCommandsBuilder(out)
+                    .setPlayer(Players.PLAYER2)
+                    .setStats(PlayerStats.MANA)
+                    .setInstance(player2)
+                    .issueCommand();
+        }
+        return true;
     }
 
     // ===========================================================================

@@ -65,10 +65,10 @@ public class GameState {
     //Spawns Avatars in starting positions at init
     public void spawnAvatars(ActorRef out) {
         Unit human = new UnitFactory().generateUnit(UnitType.HUMAN);
-        human.setIdentifier(1);
+        human.setAvatar(true);
         
         Unit ai = new UnitFactory().generateUnit(UnitType.AI);
-        ai.setIdentifier(1);
+        ai.setAvatar(true);
 
         new UnitCommandBuilder(out)
                     .setMode(UnitCommandBuilderMode.DRAW)

@@ -5,7 +5,9 @@ import akka.actor.ActorRef;
 
 import commandbuilders.enums.Players;
 import structures.GameState;
+import structures.basic.Player;
 import structures.handlers.Pair;
+import structures.Board;
 
 public class AI 
 {
@@ -51,7 +53,7 @@ public class AI
 
     }
 
-    static public void move(ActorRef out, GameState gs)
+    public void move(ActorRef out, GameState gs)
     {
 
         //Todo Make a response factor so that we can tell what needs to happen next, eg if we move then we wait for move response, if we attack we wait for attack response etc
@@ -79,8 +81,7 @@ public class AI
 
         if(friendlyUnit.getFirst() > enemyXRange + 1)             
         {   //if that friendly is out of attack range then move forwards
-            friendlyTarget= new Pair<>(friendlyUnit.getFirst() - 2, friendlyUnit.getSecond());
-            System.err.println("simple 2 forward");
+            friendlyTarget = simpleMove(friendlyUnit);
         }
         else
         {   //if the friendly is about to or has entered attack range
@@ -105,8 +106,31 @@ public class AI
                 }
                 
             }
-            
-            friendlyTarget= new Pair<>(friendlyUnit.getFirst() + xMove, friendlyUnit.getSecond() + yMove);
+
+            if(Board.getInstance().getTile(friendlyUnit.getFirst() + xMove, friendlyUnit.getSecond() + yMove).getUnit().getPlayerID() != Players.PLAYER2)
+            {
+                friendlyTarget= new Pair<>(friendlyUnit.getFirst() + xMove, friendlyUnit.getSecond() + yMove);
+
+            }
+            else
+            {
+                
+                if(Math.abs(xMove) == 1)
+                {
+                    if(Math.abs(yMove) ==1)
+                    {
+                        xMove = 0;
+
+                    }
+                }
+                else if(Math.abs(yMove) ==1)
+                {
+                    yMove = 0;
+                    
+                }
+                friendlyTarget= new Pair<>(friendlyUnit.getFirst() + xMove, friendlyUnit.getSecond() + yMove);
+
+            }
 
         }
 
@@ -129,6 +153,51 @@ public class AI
         
 
         
+    }
+
+    public Pair<Integer,Integer> simpleMove(Pair<Integer,Integer> friendlyUnit)
+    {
+        Pair<Integer,Integer> friendlyTarget = null;
+        if(Board.getInstance().getTile(friendlyUnit.getFirst() - 2, friendlyUnit.getSecond()).hasUnit())    
+        {   //if that space has a unit
+            if(Board.getInstance().getTile(friendlyUnit.getFirst() - 2, friendlyUnit.getSecond()).getUnit().getPlayerID() != Players.PLAYER2)
+            {   //and its not our unit then move attack
+                friendlyTarget= new Pair<>(friendlyUnit.getFirst() - 2, friendlyUnit.getSecond());
+                System.err.println("simple 2 forward");
+            }
+            else
+            {
+                
+                if(Board.getInstance().getTile(friendlyUnit.getFirst() - 1, friendlyUnit.getSecond()).hasUnit())
+                {
+                    if(Board.getInstance().getTile(friendlyUnit.getFirst() -1, friendlyUnit.getSecond()).getUnit().getPlayerID() != Players.PLAYER2)
+                    {
+                        friendlyTarget= new Pair<>(friendlyUnit.getFirst() - 1, friendlyUnit.getSecond());
+                    }
+                    else
+                    {
+                        if(Board.getInstance().getTile(friendlyUnit.getFirst() - 1, friendlyUnit.getSecond()-1) != null)
+                        {
+                            friendlyTarget= new Pair<>(friendlyUnit.getFirst() - 1, friendlyUnit.getSecond()-1);
+
+                        }
+                        else
+                        {
+                            friendlyTarget= new Pair<>(friendlyUnit.getFirst() - 1, friendlyUnit.getSecond()+1);
+
+                        }
+
+                    }
+                }
+            }
+        }
+        else
+        {
+            friendlyTarget= new Pair<>(friendlyUnit.getFirst() - 2, friendlyUnit.getSecond());
+            System.err.println("simple 2 forward");
+
+        }
+        return friendlyTarget;
     }
     
 }

@@ -13,7 +13,7 @@ public class Pair<T, U> {
     {
         return new Pair<>(o.getFirst(), o.getSecond());
     }
-
+    
     public T getFirst() {
         return first;
     }
@@ -33,8 +33,6 @@ public class Pair<T, U> {
     public boolean equals(Pair<T, U> another) {
         return this.toString().equals(another.toString());
     }
-
-   
 
     @Override
     public String toString() {

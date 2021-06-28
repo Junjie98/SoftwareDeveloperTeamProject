@@ -5,6 +5,7 @@ import akka.actor.ActorRef;
 import commandbuilders.*;
 import commandbuilders.enums.*;
 import scala.Int;
+import structures.AI.AI;
 import structures.basic.Card;
 import structures.basic.Player;
 import structures.basic.Tile;
@@ -39,6 +40,8 @@ public class GameState {
     private CardPlayed cardPlayed = new CardPlayed(this);
     private Highlighter highlighter = new Highlighter(this);
 
+
+    
     // Ana: counter attack
     // private Tile currentUnitLocation = null;
 
@@ -128,7 +131,7 @@ public class GameState {
                     .setMode(UnitCommandBuilderMode.DRAW)
                     .setTilePosition(7, 2)
                     .setPlayerID(Players.PLAYER2)
-                    .setUnit(ai)
+                    .setUnit(aiAvatar)
                     .issueCommand();
 
         player2UnitsPosition.add(new Pair<>(7, 2));
@@ -136,14 +139,14 @@ public class GameState {
         //Avatar2
         new UnitCommandBuilder(out)
         	.setMode(UnitCommandBuilderMode.SET)
-        	.setUnit(ai) 
+        	.setUnit(aiAvatar) 
         	//uses the health that has been initialised earlier with the player constructor
         	.setStats(UnitStats.HEALTH, player2.getHealth())
         	.issueCommand();
         
         new UnitCommandBuilder(out)
     	.setMode(UnitCommandBuilderMode.SET)
-    	.setUnit(ai)
+    	.setUnit(aiAvatar)
     	.setStats(UnitStats.ATTACK, 2)
     	.issueCommand();
     }
@@ -170,6 +173,7 @@ public class GameState {
         }
         cardDrawing.displayCardsOnScreenFor(out, turn);
         ++roundNumber; // Divide this by 2 when we are going to use this.
+
     }
 
     public void cardClicked(ActorRef out, int idx) {
@@ -196,18 +200,26 @@ public class GameState {
             if (cardPlayed.getActiveCard() != null) {
                 // Handle spell
                 cardPlayed.moveCardToBoard(out, x ,y);
+                System.err.println("card moved to board");
+
             }
             if (unitMovementAndAttack.getActiveUnit() != null) {
                 // Handle attack
                 unitMovementAndAttack.launchAttack(out, x, y);
+                System.err.println("attack launched");
+
             }
         } else if (tile.getTileState() == States.HIGHLIGHTED) {
             if (cardPlayed.getActiveCard() != null) {
                 // Card Played or spell played
                 cardPlayed.moveCardToBoard(out, x, y);
+                System.err.println("unit summon or spell");
+
             } else {
                 // Must be a move
                 unitMovementAndAttack.highlightedMoveTileClicked(out, x, y);
+                System.err.println("unit moving");
+
             }
         } else {
             if (unitMovementAndAttack.getActiveUnit() == null) {
@@ -221,11 +233,14 @@ public class GameState {
                         return;
                     }
                     unitMovementAndAttack.unitClicked(out, x ,y);
+                    System.err.println("unit clicked");
                 }
             } else {
                 if (tile != null && tile.hasUnit()) {
                     // If player clicked on a unit and clicked on another.
                     unitMovementAndAttack.unitClicked(out, x, y);
+                    System.err.println("unit clicked");
+
                 } else if (tile != null && tile.getTileState() == States.NORMAL) {
                     // Click on another unit or the activated unit will cancel the board highlight.
                     highlighter.clearBoardHighlights(out);

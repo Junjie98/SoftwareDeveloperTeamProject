@@ -37,7 +37,6 @@ public class Unit {
 	//JJ: for attack logic. If attacked without move, it forfeits the move ability
 	boolean hasMoved = false; //moved this for visibility
 	boolean hasAttacked = false;
-
 	public Unit() {}
 	
 	public Unit(int id, UnitAnimationSet animations, ImageCorrection correction) {
@@ -74,7 +73,7 @@ public class Unit {
 		if(health<=0) {
 			unitHealth = 0;
 		} else {
-		unitHealth = health;
+			unitHealth = health;
 		}
 	}
 
@@ -176,8 +175,22 @@ public class Unit {
 	public boolean isFlying() {
 		return isFlying;
 	}
-	public boolean isAvatar() { return isAvatar; }
+	public boolean isAvatar() {
+		return isAvatar;
+	}
 	public void setAvatar(boolean avatar) {
 		isAvatar = avatar;
+	}
+
+	public Unit getCopy() {
+		Unit copy = new Unit(id, animation, position, animations, correction);
+		copy.setPlayerID(owningPlayer);
+		copy.setHasGotAttacked(hasGotAttacked);
+		copy.setHasAttacked(hasAttacked);
+		copy.setFlying(isFlying);
+		copy.setHealth(unitHealth);
+		copy.setDamage(unitDamage);
+		copy.setAvatar(isAvatar);
+		return copy;
 	}
 }

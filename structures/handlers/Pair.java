@@ -9,7 +9,6 @@ public class Pair<T, U> {
         this.second = second;
     }
 
-    
     public static Pair<Integer, Integer> copy(Pair<Integer, Integer> o) 
     {
         return new Pair<>(o.getFirst(), o.getSecond());

@@ -292,29 +292,28 @@ public class UnitMovementAndAttack {
         moveAttackAndCounterAttack.add(attacker);
 
         //update avatar health to UI player health.
-        if(enemy.getIdentifer() == 1 && enemy.getPlayerID() == Players.PLAYER1) {
+        if(enemy.isAvatar() && enemy.getPlayerID() == Players.PLAYER1) {
             parent.getPlayer1().setHealth(enemy.getHealth());
             new PlayerSetCommandsBuilder(out)
                     .setPlayer(Players.PLAYER1)
                     .setStats(PlayerStats.HEALTH)
                     .setInstance(parent.getPlayer1())
                     .issueCommand();
-        } else if(enemy.getIdentifer() == 1 && enemy.getPlayerID()== Players.PLAYER2) {
+        } else if(enemy.isAvatar() && enemy.getPlayerID()== Players.PLAYER2) {
             parent.getPlayer2().setHealth(enemy.getHealth());
             new PlayerSetCommandsBuilder(out)
                     .setPlayer(Players.PLAYER2)
                     .setStats(PlayerStats.HEALTH)
                     .setInstance(parent.getPlayer2())
                     .issueCommand();
-        } else if(attacker.getIdentifer() == 1 && attacker.getPlayerID()== Players.PLAYER1) {
+        } else if(attacker.isAvatar() && attacker.getPlayerID()== Players.PLAYER1) {
             parent.getPlayer1().setHealth(attacker.getHealth());
-
             new PlayerSetCommandsBuilder(out)
                     .setPlayer(Players.PLAYER1)
                     .setStats(PlayerStats.HEALTH)
                     .setInstance(parent.getPlayer1())
                     .issueCommand();
-        } else if(attacker.getIdentifer() == 1 && attacker.getPlayerID()== Players.PLAYER2) {
+        } else if(attacker.isAvatar() && attacker.getPlayerID()== Players.PLAYER2) {
             parent.getPlayer2().setHealth(attacker.getHealth());
             new PlayerSetCommandsBuilder(out)
                     .setPlayer(Players.PLAYER2)

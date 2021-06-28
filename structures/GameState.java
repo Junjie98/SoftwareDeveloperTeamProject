@@ -45,6 +45,35 @@ public class GameState {
     // Ana: counter attack
     // private Tile currentUnitLocation = null;
 
+
+    // ===========================================================================
+    // Copy constructor
+    // ===========================================================================
+    //Creates a new GameState from an existing one
+    public GameState(GameState inState)
+    {
+        this.turn = inState.turn;
+        this.player1 = new Player(inState.player1);
+        this.player2 = new Player(inState.player2);
+        for (int i = 0 ; i < inState.player1CardsInHand.size(); i++) 
+        {
+            this.player1CardsInHand.set(i, new Card(inState.player1CardsInHand.get(i)));
+        }
+        for (int i = 0 ; i < inState.player2CardsInHand.size(); i++) 
+        {
+            this.player2CardsInHand.set(i, new Card(inState.player2CardsInHand.get(i)));
+        }
+        for (int i = 0 ; i < inState.player1UnitsPosition.size(); i++)
+        {
+            this.player1UnitsPosition.set(i, Pair.copy(inState.player1UnitsPosition.get(i)));
+        }
+        for (int i = 0 ; i < inState.player2UnitsPosition.size(); i++)
+        {
+            this.player2UnitsPosition.set(i, Pair.copy(inState.player2UnitsPosition.get(i)) );
+        }
+        
+    }
+
 	// ===========================================================================
     // Game Initialisation
     // ===========================================================================
@@ -68,10 +97,10 @@ public class GameState {
     //Spawns Avatars in starting positions at init
     public void spawnAvatars(ActorRef out) {
         Unit human = new UnitFactory().generateUnit(UnitType.HUMAN);
-        human.setIdentifier(1);
+        human.setAvatar(true);
         
-        Unit aiAvatar = new UnitFactory().generateUnit(UnitType.AI);
-        aiAvatar.setIdentifier(1);
+        Unit ai = new UnitFactory().generateUnit(UnitType.AI);
+        ai.setAvatar(true);
 
         new UnitCommandBuilder(out)
                     .setMode(UnitCommandBuilderMode.DRAW)

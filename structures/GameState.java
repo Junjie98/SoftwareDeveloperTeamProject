@@ -31,6 +31,12 @@ public class GameState {
     public ArrayList<Pair<Integer, Integer>> player1UnitsPosition = new ArrayList<>();
     public ArrayList<Pair<Integer, Integer>> player2UnitsPosition = new ArrayList<>();
 
+    // This is in preparation to Extracted GameState.
+    // Basically, this will be used within GameState, and when extracted, it will be set to a copy of the GameState.
+    // TODO: Hook every part that calls Board.getInstance() with this.
+    // TODO: Create a getter for the handlers to get access to this.
+    protected Board board = Board.getInstance();
+
     // ===========================================================================
     // Handler Classes
     // ===========================================================================
@@ -358,5 +364,13 @@ public class GameState {
 
     public void setTurn(Players player) {
         turn = player;
+    }
+
+    public Board getBoard() {
+        return board;
+    }
+
+    public void setBoard(Board board) {
+        this.board = board;
     }
 }

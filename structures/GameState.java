@@ -314,6 +314,7 @@ public class GameState {
         // - Copy of the Board Object
         // - List of all Units on board (two copied arraylists)
         // - A list of previous actions taken by the players (Object to be created)
+        //     - User Action type like Attack, Move, Summon and relevant information
 
         return output;
     }

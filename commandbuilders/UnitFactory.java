@@ -1,5 +1,8 @@
 package commandbuilders;
 
+import akka.actor.ActorRef;
+import commandbuilders.enums.UnitCommandBuilderMode;
+import commandbuilders.enums.UnitStats;
 import commandbuilders.enums.UnitType;
 import scala.runtime.Static;
 import structures.basic.Card;
@@ -70,9 +73,10 @@ public class UnitFactory {
         return BasicObjectBuilders.loadUnit(conf, counter++, Unit.class);
     }
 
-    public Unit generateUnitByCard(Card card){
+    public Unit generateUnitByCard(Card card, ActorRef out){
         Unit unit = null;
         String cardname = card.getCardname();
+        Card c = new Card();
         if(cardname.equals("Pureblade Enforcer")) {
             unit = this.generateUnit(UnitType.PUREBLADE_ENFORCER);
         } else if(cardname.equals("Azure Herald")) {
@@ -80,7 +84,7 @@ public class UnitFactory {
         } else if(cardname.equals("Azurite Lion")) {
             unit = this.generateUnit(UnitType.AZURITE_LION);
         } else if(cardname.equals("Comodo Charger")) {
-            unit = this.generateUnit(UnitType.COMODO_CHARGER);
+            unit = this.generateUnit(UnitType.COMODO_CHARGER);           
         } else if(cardname.equals("Fire Spitter")) {
             unit = this.generateUnit(UnitType.FIRE_SPITTER);
         } else if(cardname.equals("Hailstone Golem")) {
@@ -118,8 +122,7 @@ public class UnitFactory {
         }else {
             unit = this.generateUnit(UnitType.WINDSHRIKE);
         }
-
-        // TODO: Set the Attack & Health here. It should be stored in Card.BigCard
+       
 
         return unit;
     }

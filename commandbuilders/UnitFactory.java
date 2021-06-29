@@ -76,7 +76,6 @@ public class UnitFactory {
     public Unit generateUnitByCard(Card card){
         Unit unit = null;
         String cardname = card.getCardname();
-        Card c = new Card();
         if(cardname.equals("Pureblade Enforcer")) {
             unit = this.generateUnit(UnitType.PUREBLADE_ENFORCER);
         } else if(cardname.equals("Azure Herald")) {

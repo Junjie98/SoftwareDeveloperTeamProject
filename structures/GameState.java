@@ -35,6 +35,7 @@ public class GameState {
     // Basically, this will be used within GameState, and when extracted, it will be set to a copy of the GameState.
     // TODO: Hook every part that calls Board.getInstance() with this.
     // TODO: Create a getter for the handlers to get access to this.
+    protected boolean simulation = false;
     protected Board board = Board.getInstance();
 
     // ===========================================================================
@@ -308,8 +309,22 @@ public class GameState {
         output.add(new Pair<>(x+diag, y+depth));
         return output;
     }
+
+    // ===========================================================================
+    // Extractor
+    // ===========================================================================
     public ExtractedGameState extract() {
         ExtractedGameState output = new ExtractedGameState();
+
+        output.simulation = true;       // Simulation will be used to block draw board and prevent changes to affect the main GameState.
+        // TODO: Add a builder level protection to prevent drawing from happening.
+        // Question: Do we need to create new units for simulations? ()
+
+        output.board = Board.getCopy();
+        output.player1CardsInHand = cloneCardList(player1CardsInHand);
+        output.player2CardsInHand = cloneCardList(player2CardsInHand);
+        output.player1UnitsPosition = clonePairList(player1UnitsPosition);
+        output.player2UnitsPosition = clonePairList(player2UnitsPosition);
 
         // TODO: Extract relevant data from GameState.
         // TODO: Get a copy of the Board for the AI to make sense of the GameState.
@@ -322,6 +337,23 @@ public class GameState {
         // - A list of previous actions taken by the players (Object to be created)
         //     - User Action type like Attack, Move, Summon and relevant information
 
+        return output;
+    }
+
+    private ArrayList<Card> cloneCardList(ArrayList<Card> input) {
+        ArrayList<Card> output = new ArrayList<>();
+        for (Card card: input) {
+            // If we will not change the content of the card, we will not need to clone it.
+            output.add(card);
+        }
+        return output;
+    }
+
+    private ArrayList<Pair<Integer, Integer>> clonePairList(ArrayList<Pair<Integer, Integer>> input) {
+        ArrayList<Pair<Integer, Integer>> output = new ArrayList<>();
+        for (Pair<Integer, Integer> pair: input) {
+            output.add(Pair.copy(pair));
+        }
         return output;
     }
 

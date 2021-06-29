@@ -65,12 +65,28 @@ public class CardPlayed {
             } else {
                 unit.setFlying(false);
             }
+            
+            
             new UnitCommandBuilder(out)
                     .setMode(UnitCommandBuilderMode.DRAW)
                     .setTilePosition(x, y)
                     .setPlayerID(parent.getTurn())
                     .setUnit(unit)
                     .issueCommand();
+            
+            //updates the UI from bigCard stats
+            new UnitCommandBuilder(out)
+            .setMode(UnitCommandBuilderMode.SET)
+            .setUnit(unit)
+            .setStats(UnitStats.HEALTH, current.getBigCard().getHealth())
+            .issueCommand();
+            
+            new UnitCommandBuilder(out)
+            .setMode(UnitCommandBuilderMode.SET)
+            .setUnit(unit)
+            .setStats(UnitStats.ATTACK, current.getBigCard().getAttack())
+            .issueCommand();
+            
 
             if (parent.getTurn() == PLAYER1) {
                 parent.player1UnitsPosition.add(new Pair<>(x, y));

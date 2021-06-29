@@ -59,7 +59,7 @@ public class CardPlayed {
                 return;
             }
 
-            Unit unit = new UnitFactory().generateUnitByCard(current,out);
+            Unit unit = new UnitFactory().generateUnitByCard(current);
             if (cardname.equals("WindShrike")) {
                 unit.setFlying(true);
             } else {

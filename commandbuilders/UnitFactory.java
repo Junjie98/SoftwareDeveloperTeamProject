@@ -73,7 +73,7 @@ public class UnitFactory {
         return BasicObjectBuilders.loadUnit(conf, counter++, Unit.class);
     }
 
-    public Unit generateUnitByCard(Card card, ActorRef out){
+    public Unit generateUnitByCard(Card card){
         Unit unit = null;
         String cardname = card.getCardname();
         Card c = new Card();

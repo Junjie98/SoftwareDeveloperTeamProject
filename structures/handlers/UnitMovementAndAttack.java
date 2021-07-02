@@ -218,7 +218,10 @@ public class UnitMovementAndAttack {
                     // Launch Counter Attack
                     int counterAttackResult = attack(out, enemyLocation, attacker, enemy, attacker.getPosition().getTilex(), attacker.getPosition().getTiley());
                     if (counterAttackResult <= 0) {
-                        System.out.println("Hello");
+                        new UnitCommandBuilder(out)
+                                .setMode(UnitCommandBuilderMode.DELETE)
+                                .setUnit(attackerLocation.getUnit())
+                                .issueCommand();
                         // Handle unit died of counter attack
                         attackerLocation.setUnit(null);
                         ArrayList<Pair<Integer, Integer>> pool = (parent.getTurn() == Players.PLAYER1) ?
@@ -232,6 +235,10 @@ public class UnitMovementAndAttack {
                         }
                     }
                 } else {
+                    new UnitCommandBuilder(out)
+                            .setMode(UnitCommandBuilderMode.DELETE)
+                            .setUnit(enemyLocation.getUnit())
+                            .issueCommand();
                     enemyLocation.setUnit(null);
                     ArrayList<Pair<Integer, Integer>> pool = (parent.getTurn() == Players.PLAYER1) ?
                             parent.player2UnitsPosition : parent.player1UnitsPosition;

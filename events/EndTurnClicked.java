@@ -20,7 +20,7 @@ import commandbuilders.enums.Players;
  *
  */
 public class EndTurnClicked implements EventProcessor{
-	public AI ai = new AI();
+	
 
 	@Override
 	public void processEvent(ActorRef out, GameState gameState, JsonNode message) {
@@ -43,7 +43,6 @@ public class EndTurnClicked implements EventProcessor{
 					.setDisplaySeconds(2)
 					.setPlayer(Players.PLAYER1)
 					.issueCommand();
-			ai.TakeTurn(out, gameState);
 		}
 	}
 

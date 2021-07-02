@@ -3,6 +3,7 @@ package events;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
+
 import akka.actor.ActorRef;
 import commandbuilders.enums.Players;
 import structures.GameState;
@@ -25,10 +26,10 @@ public class UnitStopped implements EventProcessor{
 	public void processEvent(ActorRef out, GameState gameState, JsonNode message) {
 		int unitid = message.get("id").asInt();
 		gameState.getUnitMovementAndAttack().setUnitsCanMove(true);
+		gameState.ai.move(out, gameState);
 		if(gameState.getTurn() == Players.PLAYER2)
 		{
 			//System.err.println("unit stop, call ai move");
-			AI.move(out, gameState);
 
 		}
 	}

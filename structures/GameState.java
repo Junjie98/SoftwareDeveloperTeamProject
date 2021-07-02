@@ -32,6 +32,8 @@ public class GameState {
     public ArrayList<Pair<Integer, Integer>> player1UnitsPosition = new ArrayList<>();
     public ArrayList<Pair<Integer, Integer>> player2UnitsPosition = new ArrayList<>();
 
+
+    public AI ai = new AI();
     // ===========================================================================
     // Handler Classes
     // ===========================================================================
@@ -144,7 +146,15 @@ public class GameState {
         }
         cardDrawing.displayCardsOnScreenFor(out, turn);
         ++roundNumber; // Divide this by 2 when we are going to use this.
+        
+        ai.TakeTurn(out, this);
 
+    }
+
+
+    public void AiPulse(ActorRef out, GameState gs)
+    {
+        ai.move(out, gs);
     }
 
     public void cardClicked(ActorRef out, int idx) {

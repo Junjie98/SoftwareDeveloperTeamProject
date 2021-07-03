@@ -1,13 +1,14 @@
 package structures.AI;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
-import javax.lang.model.util.ElementScanner14;
 
 import akka.actor.ActorRef;
 
 import commandbuilders.enums.Players;
 import structures.GameState;
+import structures.basic.Card;
 import structures.basic.Unit;
 import structures.handlers.Pair;
 import structures.Board;
@@ -20,6 +21,7 @@ public class AI
     static int enemyXRange= 0;
     static int moveIndex = 0;
     static boolean attack = false;
+    int mana = 0;
 
     public AI()
     {
@@ -29,8 +31,31 @@ public class AI
     public void TakeTurn(ActorRef out, GameState gs)
     {
         moveInit(out, gs);
+        summonInit(out, gs);
     }
 
+    public void castInit(ActorRef out, GameState gs)
+    {
+        ArrayList<Pair<Integer, Integer>> cardPriority = new ArrayList<>();
+
+        //check mana
+        //check spells
+        //prioritise and cast
+        mana = gs.getPlayer1().getMana();
+        for (int i = 0; i < gs.player2CardsInHand.size(); i++) {
+            if(gs.player2CardsInHand.get(i).getManacost() <= mana){
+                int priority = 1 + gs.player2CardsInHand.get(i).getManacost();
+                if(gs.player2CardsInHand.get(i).isSpell()){
+                    priority = 0;
+                }
+                cardPriority.add(new Pair<Integer, Integer>(i, priority));
+            }
+        }
+
+        for (Pair<Integer,Integer>  : cardPriority) {
+            
+        }
+    }
 
     public Pair<Integer, Integer> findEnemyTarget(ArrayList<Pair<Integer, Integer>> units, GameState gs)
     {
@@ -67,9 +92,26 @@ public class AI
 
     public void move(ActorRef out, GameState gs)
     {
+        if(friendlies == null)
+        {
+            return;
+        }
+
+        if(moveIndex >= friendlies.size())
+        {
+            return;
+        }
+        
+
         Pair<Integer,Integer> unitPos = new Pair<>(friendlies.get(0).getFirst(),friendlies.get(0).getSecond());
 
         Unit temp = Board.getInstance().getTile(unitPos).getUnit();
+
+        if(temp.getHasAttacked() || temp.getHasMoved())
+        {
+            return;
+        }
+
         if(temp.isFlying()){
             //do flying stuff
         }
@@ -161,6 +203,9 @@ public class AI
         }
 
 
+
+      
+
         System.err.println("Tiles selected by ai: ");
         System.err.println(unitPos);
         System.err.println(targPos);
@@ -180,7 +225,14 @@ public class AI
         try {Thread.sleep(1000);} catch (InterruptedException e) {e.printStackTrace();}
        // System.err.println("Number of friendlies: " + friendlies.size());
 
-    
+       moveIndex++;
+
+       if(targPos == enemyTarget)
+       {
+           //we are attacking
+           move(out, gs);
+       }
+
     }
 
     public void dmove(ActorRef out, GameState gs)

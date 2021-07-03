@@ -26,10 +26,10 @@ public class UnitStopped implements EventProcessor{
 	public void processEvent(ActorRef out, GameState gameState, JsonNode message) {
 		int unitid = message.get("id").asInt();
 		gameState.getUnitMovementAndAttack().setUnitsCanMove(true);
-		gameState.ai.move(out, gameState);
 		if(gameState.getTurn() == Players.PLAYER2)
 		{
 			//System.err.println("unit stop, call ai move");
+			gameState.ai.move(out, gameState);
 
 		}
 	}

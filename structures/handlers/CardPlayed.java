@@ -32,7 +32,8 @@ public class CardPlayed {
         System.out.println(cardname);
 
         if (current.isSpell()) {
-            if (cardname.equals("Truestrike") || cardname.equals("Entropic Decay")) {
+            if (cardname.equals("Truestrike")) {
+                // Highlight enemy units
                 // Set a buff animation and the effects like this.
                 new TileCommandBuilder(out)
                         .setMode(TileCommandBuilderMode.ANIMATION)
@@ -41,6 +42,15 @@ public class CardPlayed {
                         .issueCommand();
 
             }
+            if (cardname.equals("Entropic Decay")) {
+                // Highlight enemy units
+                new TileCommandBuilder(out)
+                        .setMode(TileCommandBuilderMode.ANIMATION)
+                        .setTilePosition(x, y)
+                        .setEffectAnimation(TileEffectAnimation.MARTYRDOM) //<- Choose your animation here
+                        .issueCommand();
+            }
+
             if (cardname.equals("Sundrop Elixir") || cardname.equals("Staff of Y'Kir'")) {
                 // Highlight friendly units
                 // After player selected a square to play highlight. // I did the highlight on cardTileHighlight
@@ -48,7 +58,7 @@ public class CardPlayed {
                 new TileCommandBuilder(out)
                         .setMode(TileCommandBuilderMode.ANIMATION)
                         .setTilePosition(x, y)
-                        .setEffectAnimation(TileEffectAnimation.MARTYRDOM) //<- Choose your animation here
+                        .setEffectAnimation(TileEffectAnimation.BUFF) //<- Choose your animation here
                         .issueCommand();
             }
 

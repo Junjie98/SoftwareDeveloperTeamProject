@@ -69,6 +69,13 @@ public class CardPlayed {
                 return;
             }
 
+            //Play summon effect each time a player cast a card
+            new TileCommandBuilder(out)
+                    .setMode(TileCommandBuilderMode.ANIMATION)
+                    .setTilePosition(x, y)
+                    .setEffectAnimation(TileEffectAnimation.SUMMON)
+                    .issueCommand();
+
             Unit unit = new UnitFactory().generateUnitByCard(current);
             if (cardname.equals("WindShrike")) {
                 unit.setFlying(true);

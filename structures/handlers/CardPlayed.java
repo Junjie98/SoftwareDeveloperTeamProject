@@ -1,10 +1,7 @@
 package structures.handlers;
 
 import akka.actor.ActorRef;
-import commandbuilders.PlayerNotificationCommandBuilder;
-import commandbuilders.TileCommandBuilder;
-import commandbuilders.UnitCommandBuilder;
-import commandbuilders.UnitFactory;
+import commandbuilders.*;
 import commandbuilders.enums.*;
 import structures.Board;
 import structures.GameState;
@@ -17,6 +14,7 @@ import java.util.ArrayList;
 import static commandbuilders.enums.Players.PLAYER1;
 
 public class CardPlayed {
+    String cardname;
     private GameState parent;
 
     Pair<Card, Integer> activeCard = null;
@@ -24,15 +22,22 @@ public class CardPlayed {
     public CardPlayed(GameState parent) {
         this.parent = parent;
     }
+    private UnitMovementAndAttack unitMovementAndAttack = new UnitMovementAndAttack(this.parent);
+
 
     public void moveCardToBoard(ActorRef out, int x, int y) {
         Card current = (parent.getTurn() == PLAYER1) ?
                 parent.player1CardsInHand.get(activeCard.getSecond()) : parent.player2CardsInHand.get(activeCard.getSecond());
-        String cardname = current.getCardname();
+        this.cardname = current.getCardname();
         System.out.println(cardname);
 
+        deleteCardFromHand(out, activeCard.getSecond());
+        parent.decreaseManaPerCardPlayed(out, current.getManacost());
+        parent.getHighlighter().clearBoardHighlights(out);
+
         if (current.isSpell()) {
-            if (cardname.equals("Truestrike")) {
+            //Set the effect of the spell and call spellAction
+            if (cardname.equals("Truestrike")) {    // Truestike does -1 damage to any
                 // Highlight enemy units
                 // Set a buff animation and the effects like this.
                 new TileCommandBuilder(out)
@@ -41,27 +46,33 @@ public class CardPlayed {
                         .setEffectAnimation(TileEffectAnimation.INMOLATION)
                         .issueCommand();
 
+                spellAction(out, x, y, -1);
             }
-            if (cardname.equals("Entropic Decay")) {
+
+            if (cardname.equals("Entropic Decay")) {    //Reduces a non-avatar unit to 0 heath, rip
                 // Highlight enemy units
                 new TileCommandBuilder(out)
                         .setMode(TileCommandBuilderMode.ANIMATION)
                         .setTilePosition(x, y)
-                        .setEffectAnimation(TileEffectAnimation.MARTYRDOM) //<- Choose your animation here
+                        .setEffectAnimation(TileEffectAnimation.MARTYRDOM)
                         .issueCommand();
+
+                spellAction(out, x, y, -20);
             }
 
-            if (cardname.equals("Sundrop Elixir") || cardname.equals("Staff of Y'Kir'")) {
-                // Highlight friendly units
-                // After player selected a square to play highlight. // I did the highlight on cardTileHighlight
-                // Set a buff animation and the effects like this.
+            if (cardname.equals("Sundrop Elixir") || cardname.equals("Staff of Y'Kir'")) { //Staff +2 Attack for avatar,
                 new TileCommandBuilder(out)
                         .setMode(TileCommandBuilderMode.ANIMATION)
                         .setTilePosition(x, y)
-                        .setEffectAnimation(TileEffectAnimation.BUFF) //<- Choose your animation here
+                        .setEffectAnimation(TileEffectAnimation.BUFF)
                         .issueCommand();
+                if(cardname.equals("Sundrop Elixir")){
+                    spellAction(out, x, y, 5);
+                } else {
+                    spellAction(out, x, y, 2);
+                }
             }
-
+        // if normal Unit
         } else {
             Tile tile = Board.getInstance().getTile(x, y);
             if (tile.hasUnit()) {
@@ -75,6 +86,8 @@ public class CardPlayed {
                     .setTilePosition(x, y)
                     .setEffectAnimation(TileEffectAnimation.SUMMON)
                     .issueCommand();
+
+            try {Thread.sleep(500);} catch (InterruptedException e) {e.printStackTrace();} // Unit will appear with effect
 
             Unit unit = new UnitFactory().generateUnitByCard(current);
             if (cardname.equals("WindShrike")) {
@@ -110,7 +123,6 @@ public class CardPlayed {
             .setStats(UnitStats.ATTACK, current.getBigCard().getAttack())
             .issueCommand();
             
-
             if (parent.getTurn() == PLAYER1) {
                 parent.player1UnitsPosition.add(new Pair<>(x, y));
             } else {
@@ -118,9 +130,6 @@ public class CardPlayed {
             }
         }
 
-        deleteCardFromHand(out, activeCard.getSecond());
-        parent.decreaseManaPerCardPlayed(out, current.getManacost());
-        parent.getHighlighter().clearBoardHighlights(out);
     }
 
     public void deleteCardFromHand(ActorRef out, int pos) {
@@ -139,5 +148,78 @@ public class CardPlayed {
 
     public void clearActiveCard() {
         this.activeCard = null;
+    }
+
+    public void spellAction(ActorRef out, int x, int y, int strengthOfSpell) {
+        Tile enemyLocation = Board.getInstance().getTile(x, y);
+        Unit enemy = enemyLocation.getUnit();
+        UnitCommandBuilder enemyCommandBuilder = new UnitCommandBuilder(out).setUnit(enemy);
+
+        if(cardname.equals("Sundrop Elixir") || cardname.equals("Entropic Decay") || cardname.equals("Truestrike")) {
+            int enemyHealth = enemy.getHealth();
+            int healthAfterDamage = enemyHealth + strengthOfSpell;  //strengthOfSpell is negative if unit lose health
+            if (healthAfterDamage < 0) { healthAfterDamage = 0; }
+
+            enemyCommandBuilder
+                    .setMode(UnitCommandBuilderMode.SET)
+                    .setStats(UnitStats.HEALTH, healthAfterDamage)
+                    .issueCommand();
+
+            // delete unit if health <=0
+            if (healthAfterDamage == 0) {
+                deleteUnit(out, x, y, enemyLocation);
+            }
+        }else if (cardname.equals("Staff of Y'Kir'")){      //Avatar gains +2 Attack
+            int enemyAvatarAttack = enemy.getDamage();
+            System.out.println(enemyAvatarAttack);
+            int attackAfterSpell = enemyAvatarAttack + strengthOfSpell;
+
+            enemyCommandBuilder
+                    .setMode(UnitCommandBuilderMode.SET)
+                    .setStats(UnitStats.ATTACK, attackAfterSpell)
+                    .issueCommand();
+        }
+
+
+        // update avatar health to UI player health.
+        if(enemy.isAvatar() && enemy.getPlayerID() == Players.PLAYER1) {
+            parent.getPlayer1().setHealth(enemy.getHealth());
+            new PlayerSetCommandsBuilder(out)
+                    .setPlayer(Players.PLAYER1)
+                    .setStats(PlayerStats.HEALTH)
+                    .setInstance(parent.getPlayer1())
+                    .issueCommand();
+        } else if(enemy.isAvatar() && enemy.getPlayerID()== Players.PLAYER2) {
+            parent.getPlayer2().setHealth(enemy.getHealth());
+            new PlayerSetCommandsBuilder(out)
+                    .setPlayer(Players.PLAYER2)
+                    .setStats(PlayerStats.HEALTH)
+                    .setInstance(parent.getPlayer2())
+                    .issueCommand();
+        }
+
+        // Win condition: should be moved to a method where we are checking player's health
+        if (parent.getPlayer1().getHealth() < 1 || parent.getPlayer2().getHealth() < 1) {
+            parent.endGame(out);
+        }
+    }
+
+    public void deleteUnit(ActorRef out, int x, int y, Tile enemyLocation) {
+        //Delete the enemy unit if dies
+        try {Thread.sleep(1000);} catch (InterruptedException e) {e.printStackTrace();} // Unit will disappear with effect
+        new UnitCommandBuilder(out)
+                .setMode(UnitCommandBuilderMode.DELETE)
+                .setUnit(enemyLocation.getUnit())
+                .issueCommand();
+        enemyLocation.setUnit(null);
+        ArrayList<Pair<Integer, Integer>> pool = (parent.getTurn() == Players.PLAYER1) ?
+                parent.player2UnitsPosition : parent.player1UnitsPosition;
+        Pair<Integer, Integer> positionToRemove = new Pair<>(x, y);
+        for (Pair<Integer, Integer> position: pool) {
+            if (position.equals(positionToRemove)) {
+                pool.remove(position);
+                break;
+            }
+        }
     }
 }

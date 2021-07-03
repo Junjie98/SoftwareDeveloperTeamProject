@@ -1,7 +1,6 @@
 package commandbuilders;
 
 import commandbuilders.enums.UnitType;
-import scala.runtime.Static;
 import structures.basic.Card;
 import structures.basic.Unit;
 import utils.BasicObjectBuilders;
@@ -80,7 +79,7 @@ public class UnitFactory {
         } else if(cardname.equals("Azurite Lion")) {
             unit = this.generateUnit(UnitType.AZURITE_LION);
         } else if(cardname.equals("Comodo Charger")) {
-            unit = this.generateUnit(UnitType.COMODO_CHARGER);
+            unit = this.generateUnit(UnitType.COMODO_CHARGER);           
         } else if(cardname.equals("Fire Spitter")) {
             unit = this.generateUnit(UnitType.FIRE_SPITTER);
         } else if(cardname.equals("Hailstone Golem")) {
@@ -118,8 +117,7 @@ public class UnitFactory {
         }else {
             unit = this.generateUnit(UnitType.WINDSHRIKE);
         }
-
-        // TODO: Set the Attack & Health here. It should be stored in Card.BigCard
+       
 
         return unit;
     }

@@ -31,70 +31,96 @@ public class CardPlayed {
         String cardname = current.getCardname();
         System.out.println(cardname);
 
-        // Decrease Mana
-        int manaCost = current.getManacost();
-        boolean enoughMana = parent.decreaseManaPerCardPlayed(out, manaCost);   //if enough mana then true
-
-        // if enough mana,then play the card
-        if (enoughMana) {
-            if (current.isSpell()) {
-                if (cardname.equals("Truestrike") || cardname.equals("Entropic Decay")) {
-                    // Set a buff animation and the effects like this.
-                    new TileCommandBuilder(out)
-                            .setMode(TileCommandBuilderMode.ANIMATION)
-                            .setTilePosition(x, y)
-                            .setEffectAnimation(TileEffectAnimation.INMOLATION)
-                            .issueCommand();
-
-                }
-                if (cardname.equals("Sundrop Elixir") || cardname.equals("Staff of Y'Kir'")) {
-                    // Highlight friendly units
-                    // After player selected a square to play highlight. // I did the highlight on cardTileHighlight
-                    // Set a buff animation and the effects like this.
-                    new TileCommandBuilder(out)
-                            .setMode(TileCommandBuilderMode.ANIMATION)
-                            .setTilePosition(x, y)
-                            .setEffectAnimation(TileEffectAnimation.MARTYRDOM) //<- Choose your animation here
-                            .issueCommand();
-                }
-
-            } else {
-                Tile tile = Board.getInstance().getTile(x, y);
-                if (tile.hasUnit()) {
-                    // Cannot deal a card to a Tile that has unit.
-                    return;
-                }
-
-                Unit unit = new UnitFactory().generateUnitByCard(current);
-                if(cardname.equals("WindShrike")) {
-                    unit.setFlying(true);
-                } else {
-                    unit.setFlying(false);
-                }
-                new UnitCommandBuilder(out)
-                        .setMode(UnitCommandBuilderMode.DRAW)
+        if (current.isSpell()) {
+            if (cardname.equals("Truestrike")) {
+                // Highlight enemy units
+                // Set a buff animation and the effects like this.
+                new TileCommandBuilder(out)
+                        .setMode(TileCommandBuilderMode.ANIMATION)
                         .setTilePosition(x, y)
-                        .setPlayerID(parent.getTurn())
-                        .setUnit(unit)
+                        .setEffectAnimation(TileEffectAnimation.INMOLATION)
                         .issueCommand();
 
-                if (parent.getTurn() == PLAYER1) {
-                    parent.player1UnitsPosition.add(new Pair<>(x, y));
-                } else {
-                    parent.player2UnitsPosition.add(new Pair<>(x, y));
-                }
+            }
+            if (cardname.equals("Entropic Decay")) {
+                // Highlight enemy units
+                new TileCommandBuilder(out)
+                        .setMode(TileCommandBuilderMode.ANIMATION)
+                        .setTilePosition(x, y)
+                        .setEffectAnimation(TileEffectAnimation.MARTYRDOM) //<- Choose your animation here
+                        .issueCommand();
             }
 
-            deleteCardFromHand(out, activeCard.getSecond());
-            parent.getHighlighter().clearBoardHighlights(out);
+            if (cardname.equals("Sundrop Elixir") || cardname.equals("Staff of Y'Kir'")) {
+                // Highlight friendly units
+                // After player selected a square to play highlight. // I did the highlight on cardTileHighlight
+                // Set a buff animation and the effects like this.
+                new TileCommandBuilder(out)
+                        .setMode(TileCommandBuilderMode.ANIMATION)
+                        .setTilePosition(x, y)
+                        .setEffectAnimation(TileEffectAnimation.BUFF) //<- Choose your animation here
+                        .issueCommand();
+            }
+
         } else {
-            new PlayerNotificationCommandBuilder(out)
-                    .setMessage("Insufficient Mana")
-                    .setPlayer(parent.getTurn())
-                    .setDisplaySeconds(4)
+            Tile tile = Board.getInstance().getTile(x, y);
+            if (tile.hasUnit()) {
+                // Cannot deal a card to a Tile that has unit.
+                return;
+            }
+
+            //Play summon effect each time a player cast a card
+            new TileCommandBuilder(out)
+                    .setMode(TileCommandBuilderMode.ANIMATION)
+                    .setTilePosition(x, y)
+                    .setEffectAnimation(TileEffectAnimation.SUMMON)
                     .issueCommand();
+
+            Unit unit = new UnitFactory().generateUnitByCard(current);
+            if (cardname.equals("WindShrike")) {
+                unit.setFlying(true);
+            } else {
+                unit.setFlying(false);
+            }
+            
+            // Ana: Ranged Attack
+            if(cardname.equals("Pyromancer") || cardname.equals("Fire Spitter")) {
+                unit.setRanged(true);
+            } else {
+                unit.setRanged(false);
+            }
+            
+            new UnitCommandBuilder(out)
+                    .setMode(UnitCommandBuilderMode.DRAW)
+                    .setTilePosition(x, y)
+                    .setPlayerID(parent.getTurn())
+                    .setUnit(unit)
+                    .issueCommand();
+            
+            //updates the UI from bigCard stats
+            new UnitCommandBuilder(out)
+            .setMode(UnitCommandBuilderMode.SET)
+            .setUnit(unit)
+            .setStats(UnitStats.HEALTH, current.getBigCard().getHealth())
+            .issueCommand();
+            
+            new UnitCommandBuilder(out)
+            .setMode(UnitCommandBuilderMode.SET)
+            .setUnit(unit)
+            .setStats(UnitStats.ATTACK, current.getBigCard().getAttack())
+            .issueCommand();
+            
+
+            if (parent.getTurn() == PLAYER1) {
+                parent.player1UnitsPosition.add(new Pair<>(x, y));
+            } else {
+                parent.player2UnitsPosition.add(new Pair<>(x, y));
+            }
         }
 
+        deleteCardFromHand(out, activeCard.getSecond());
+        parent.decreaseManaPerCardPlayed(out, current.getManacost());
+        parent.getHighlighter().clearBoardHighlights(out);
     }
 
     public void deleteCardFromHand(ActorRef out, int pos) {

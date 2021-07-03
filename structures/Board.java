@@ -39,7 +39,7 @@ public class Board {
     }
 
     public static void reloadBoard() {
-        instance = new Board(false, null);
+        instance = new Board(false);
     }
 
     public static Board getCopy() {

@@ -13,6 +13,7 @@ import structures.basic.Unit;
 import structures.basic.UnitAnimationType;
 import java.util.HashSet;
 import java.util.ArrayList;
+import java.util.HashSet;
 
 public class UnitMovementAndAttack {
     Pair<Integer, Integer> activeUnit = null;
@@ -272,7 +273,10 @@ public class UnitMovementAndAttack {
     public int attack(ActorRef out, Tile attackerLocation, Unit enemy, Unit attacker, int x, int y, boolean isRanged) {
         UnitCommandBuilder enemyCommandBuilder = new UnitCommandBuilder(out).setUnit(enemy);
         int enemyHealth = enemy.getHealth();
-        int healthAfterDamage =  enemyHealth - attacker.getDamage();
+        int healthAfterDamage = enemyHealth - attacker.getDamage();
+
+        if (healthAfterDamage < 0)
+            healthAfterDamage = 0;
 
         if (healthAfterDamage < 0)
             healthAfterDamage = 0;
@@ -292,6 +296,8 @@ public class UnitMovementAndAttack {
         
 //        BasicCommands.playUnitAnimation(out, attacker, UnitAnimationType.attack);
 //		try {Thread.sleep(2000);} catch (InterruptedException e) {e.printStackTrace();}
+
+
 
         enemyCommandBuilder
             .setMode(UnitCommandBuilderMode.SET)

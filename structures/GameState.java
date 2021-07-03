@@ -134,7 +134,7 @@ public class GameState {
     public void endTurnClicked(ActorRef out) {
         highlighter.clearBoardHighlights(out);
         turn = (turn == Players.PLAYER1) ? PLAYER2 : PLAYER1;
-        unitMovementAndAttack.resetMoveAttackAndCounterAttack();
+        unitMovementAndAttack.resetMoveAttackAndCounterAttack(out);
         setManaByRound(out);
         if (roundNumber > 3) {
             cardDrawing.drawNewCardFor(out, turn);

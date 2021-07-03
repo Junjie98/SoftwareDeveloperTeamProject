@@ -9,8 +9,10 @@ import structures.Board;
 import structures.GameState;
 import structures.basic.Tile;
 import structures.basic.Unit;
+import structures.basic.UnitAnimationType;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 
 public class UnitMovementAndAttack {
     Pair<Integer, Integer> activeUnit = null;
@@ -218,7 +220,10 @@ public class UnitMovementAndAttack {
                     // Launch Counter Attack
                     int counterAttackResult = attack(out, enemyLocation, attacker, enemy, attacker.getPosition().getTilex(), attacker.getPosition().getTiley());
                     if (counterAttackResult <= 0) {
-                        System.out.println("Hello");
+                        new UnitCommandBuilder(out)
+                                .setMode(UnitCommandBuilderMode.DELETE)
+                                .setUnit(attackerLocation.getUnit())
+                                .issueCommand();
                         // Handle unit died of counter attack
                         attackerLocation.setUnit(null);
                         ArrayList<Pair<Integer, Integer>> pool = (parent.getTurn() == Players.PLAYER1) ?
@@ -232,6 +237,10 @@ public class UnitMovementAndAttack {
                         }
                     }
                 } else {
+                    new UnitCommandBuilder(out)
+                            .setMode(UnitCommandBuilderMode.DELETE)
+                            .setUnit(enemyLocation.getUnit())
+                            .issueCommand();
                     enemyLocation.setUnit(null);
                     ArrayList<Pair<Integer, Integer>> pool = (parent.getTurn() == Players.PLAYER1) ?
                             parent.player2UnitsPosition : parent.player1UnitsPosition;
@@ -251,7 +260,10 @@ public class UnitMovementAndAttack {
     public int attack(ActorRef out, Tile attackerLocation, Unit enemy, Unit attacker, int x, int y) {
         UnitCommandBuilder enemyCommandBuilder = new UnitCommandBuilder(out).setUnit(enemy);
         int enemyHealth = enemy.getHealth();
-        int healthAfterDamage =  enemyHealth - attacker.getDamage();
+        int healthAfterDamage = enemyHealth - attacker.getDamage();
+
+        if (healthAfterDamage < 0)
+            healthAfterDamage = 0;
 
         new ProjectTileAnimationCommandBuilder(out)
                 .setSource(attackerLocation)
@@ -259,6 +271,8 @@ public class UnitMovementAndAttack {
                 .issueCommand();
 
         // TODO: Do this when far away only. Use a normal attack animation if close.
+
+
 
         enemyCommandBuilder
                 .setMode(UnitCommandBuilderMode.SET)
@@ -341,11 +355,17 @@ public class UnitMovementAndAttack {
     // ===========================================================================
     // Setters, getters, and resetters
     // ===========================================================================
-    public void resetMoveAttackAndCounterAttack() {
+    public void resetMoveAttackAndCounterAttack(ActorRef out) {
         for (Unit unit: moveAttackAndCounterAttack) {
             unit.setHasMoved(false);
             unit.setHasAttacked(false);
             unit.setHasGotAttacked(false);
+
+            new UnitCommandBuilder(out)
+                    .setUnit(unit)
+                    .setMode(UnitCommandBuilderMode.ANIMATION)
+                    .setAnimationType(UnitAnimationType.idle)
+                    .issueCommand();
         }
         moveAttackAndCounterAttack.clear();
     }

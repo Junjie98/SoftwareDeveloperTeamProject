@@ -83,6 +83,12 @@ public class CardPlayed {
                 unit.setFlying(false);
             }
             
+            // Ana: Ranged Attack
+            if(cardname.equals("Pyromancer") || cardname.equals("Fire Spitter")) {
+                unit.setRanged(true);
+            } else {
+                unit.setRanged(false);
+            }
             
             new UnitCommandBuilder(out)
                     .setMode(UnitCommandBuilderMode.DRAW)

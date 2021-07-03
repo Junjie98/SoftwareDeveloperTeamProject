@@ -153,7 +153,7 @@ public class GameState {
         int playersMana = (turn == PLAYER1) ? player1.getMana() : player2.getMana();
         boolean enoughMana = (playersMana >= manaCost) ? true : false;   //if enough mana then true
 
-        // if enough mana,then highlight and play the card, else drop a notifcation
+        // if enough mana, then highlight and play the card, else drop a notification
         if(enoughMana) {
             highlighter.clearBoardHighlights(out);
             if (card == null || card.getSecond() != idx) {

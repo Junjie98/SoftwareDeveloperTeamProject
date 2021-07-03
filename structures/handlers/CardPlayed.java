@@ -1,10 +1,7 @@
 package structures.handlers;
 
 import akka.actor.ActorRef;
-import commandbuilders.PlayerNotificationCommandBuilder;
-import commandbuilders.TileCommandBuilder;
-import commandbuilders.UnitCommandBuilder;
-import commandbuilders.UnitFactory;
+import commandbuilders.*;
 import commandbuilders.enums.*;
 import structures.Board;
 import structures.GameState;
@@ -24,6 +21,8 @@ public class CardPlayed {
     public CardPlayed(GameState parent) {
         this.parent = parent;
     }
+    private UnitMovementAndAttack unitMovementAndAttack = new UnitMovementAndAttack(this.parent);
+
 
     public void moveCardToBoard(ActorRef out, int x, int y) {
         Card current = (parent.getTurn() == PLAYER1) ?
@@ -41,6 +40,8 @@ public class CardPlayed {
                         .setEffectAnimation(TileEffectAnimation.INMOLATION)
                         .issueCommand();
 
+                spellAttack(out, x, y, -1);
+
             }
             if (cardname.equals("Entropic Decay")) {
                 // Highlight enemy units
@@ -49,6 +50,8 @@ public class CardPlayed {
                         .setTilePosition(x, y)
                         .setEffectAnimation(TileEffectAnimation.MARTYRDOM) //<- Choose your animation here
                         .issueCommand();
+                spellAttack(out, x, y, -20);
+
             }
 
             if (cardname.equals("Sundrop Elixir") || cardname.equals("Staff of Y'Kir'")) {
@@ -60,6 +63,9 @@ public class CardPlayed {
                         .setTilePosition(x, y)
                         .setEffectAnimation(TileEffectAnimation.BUFF) //<- Choose your animation here
                         .issueCommand();
+
+                spellAttack(out, x, y, 2);
+
             }
 
         } else {
@@ -133,5 +139,84 @@ public class CardPlayed {
 
     public void clearActiveCard() {
         this.activeCard = null;
+    }
+
+    public int spellAttack(ActorRef out, int x, int y, int strengthOfSpell) {
+        Tile enemyLocation = Board.getInstance().getTile(x, y);
+        Unit enemy = enemyLocation.getUnit();
+        UnitCommandBuilder enemyCommandBuilder = new UnitCommandBuilder(out).setUnit(enemy);
+        int enemyHealth = enemy.getHealth();
+        int healthAfterDamage = enemyHealth + strengthOfSpell;  //strengthOfSpell is negative if unit lose health
+
+        if (healthAfterDamage < 0)
+            healthAfterDamage = 0;
+
+        // TODO: Do this when far away only. Use a normal attack animation if close.
+
+
+
+        enemyCommandBuilder
+                .setMode(UnitCommandBuilderMode.SET)
+                .setStats(UnitStats.HEALTH, healthAfterDamage)
+                .issueCommand();
+
+
+        //update avatar health to UI player health.
+        if(enemy.isAvatar() && enemy.getPlayerID() == Players.PLAYER1) {
+            parent.getPlayer1().setHealth(enemy.getHealth());
+            new PlayerSetCommandsBuilder(out)
+                    .setPlayer(Players.PLAYER1)
+                    .setStats(PlayerStats.HEALTH)
+                    .setInstance(parent.getPlayer1())
+                    .issueCommand();
+        } else if(enemy.isAvatar() && enemy.getPlayerID()== Players.PLAYER2) {
+            parent.getPlayer2().setHealth(enemy.getHealth());
+            new PlayerSetCommandsBuilder(out)
+                    .setPlayer(Players.PLAYER2)
+                    .setStats(PlayerStats.HEALTH)
+                    .setInstance(parent.getPlayer2())
+                    .issueCommand();
+        }
+
+        //update avatar health to UI player health.
+        if(enemy.isAvatar() && enemy.getPlayerID() == Players.PLAYER1) {
+            parent.getPlayer1().setHealth(enemy.getHealth());
+            new PlayerSetCommandsBuilder(out)
+                    .setPlayer(Players.PLAYER1)
+                    .setStats(PlayerStats.HEALTH)
+                    .setInstance(parent.getPlayer1())
+                    .issueCommand();
+        } else if(enemy.isAvatar() && enemy.getPlayerID()== Players.PLAYER2) {
+            parent.getPlayer2().setHealth(enemy.getHealth());
+            new PlayerSetCommandsBuilder(out)
+                    .setPlayer(Players.PLAYER2)
+                    .setStats(PlayerStats.HEALTH)
+                    .setInstance(parent.getPlayer2())
+                    .issueCommand();
+        }
+
+        // Win condition: should be moved to a method where we are checking player's health
+        if (parent.getPlayer1().getHealth() < 1 || parent.getPlayer2().getHealth() < 1) {
+            parent.endGame(out);
+        }
+
+        if(healthAfterDamage == 0) {
+            new UnitCommandBuilder(out)
+                    .setMode(UnitCommandBuilderMode.DELETE)
+                    .setUnit(enemyLocation.getUnit())
+                    .issueCommand();
+            enemyLocation.setUnit(null);
+            ArrayList<Pair<Integer, Integer>> pool = (parent.getTurn() == Players.PLAYER1) ?
+                    parent.player2UnitsPosition : parent.player1UnitsPosition;
+            Pair<Integer, Integer> positionToRemove = new Pair<>(x, y);
+            for (Pair<Integer, Integer> position: pool) {
+                if (position.equals(positionToRemove)) {
+                    pool.remove(position);
+                    break;
+                }
+            }
+        }
+
+        return enemy.getHealth();
     }
 }

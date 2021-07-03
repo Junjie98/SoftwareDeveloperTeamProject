@@ -31,6 +31,10 @@ public class CardPlayed {
         this.cardname = current.getCardname();
         System.out.println(cardname);
 
+        deleteCardFromHand(out, activeCard.getSecond());
+        parent.decreaseManaPerCardPlayed(out, current.getManacost());
+        parent.getHighlighter().clearBoardHighlights(out);
+
         if (current.isSpell()) {
             //Set the effect of the spell and call spellAction
             if (cardname.equals("Truestrike")) {    // Truestike does -1 damage to any
@@ -83,6 +87,8 @@ public class CardPlayed {
                     .setEffectAnimation(TileEffectAnimation.SUMMON)
                     .issueCommand();
 
+            try {Thread.sleep(500);} catch (InterruptedException e) {e.printStackTrace();} // Unit will appear with effect
+
             Unit unit = new UnitFactory().generateUnitByCard(current);
             if (cardname.equals("WindShrike")) {
                 unit.setFlying(true);
@@ -110,7 +116,6 @@ public class CardPlayed {
             .setStats(UnitStats.ATTACK, current.getBigCard().getAttack())
             .issueCommand();
             
-
             if (parent.getTurn() == PLAYER1) {
                 parent.player1UnitsPosition.add(new Pair<>(x, y));
             } else {
@@ -118,9 +123,6 @@ public class CardPlayed {
             }
         }
 
-        deleteCardFromHand(out, activeCard.getSecond());
-        parent.decreaseManaPerCardPlayed(out, current.getManacost());
-        parent.getHighlighter().clearBoardHighlights(out);
     }
 
     public void deleteCardFromHand(ActorRef out, int pos) {
@@ -197,6 +199,7 @@ public class CardPlayed {
 
     public void deleteUnit(ActorRef out, int x, int y, Tile enemyLocation) {
         //Delete the enemy unit if dies
+        try {Thread.sleep(1000);} catch (InterruptedException e) {e.printStackTrace();} // Unit will disappear with effect
         new UnitCommandBuilder(out)
                 .setMode(UnitCommandBuilderMode.DELETE)
                 .setUnit(enemyLocation.getUnit())
@@ -209,7 +212,6 @@ public class CardPlayed {
             if (position.equals(positionToRemove)) {
                 pool.remove(position);
                 break;
-
             }
         }
     }

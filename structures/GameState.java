@@ -117,6 +117,11 @@ public class GameState {
     	.setUnit(ai)
     	.setStats(UnitStats.ATTACK, 2)
     	.issueCommand();
+
+        //Save the original health state to a hashmap. Used for calculations.
+        cardPlayed.setUnitsOriginalHealth(human.getId(),player1.getHealth());
+        cardPlayed.setUnitsOriginalHealth(human.getId(),player2.getHealth());
+
     }
 
     // This method add 3 cards to both Players as part of initialisation.

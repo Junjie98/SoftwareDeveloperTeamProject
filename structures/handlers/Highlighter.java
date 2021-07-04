@@ -68,6 +68,7 @@ public class Highlighter {
         }
     }
     public void cardTileHighlight(ActorRef out, int x, int y) {
+        // if spell card
         if (parent.getCardPlayed().getActiveCard().getFirst().getCardname().equals("Truestrike") || parent.getCardPlayed().getActiveCard().getFirst().getCardname().equals("Entropic Decay")) {
             ArrayList<Pair<Integer, Integer>> enemyUnits = (parent.getTurn() == PLAYER1) ?
                     parent.player2UnitsPosition : parent.player1UnitsPosition;
@@ -122,6 +123,7 @@ public class Highlighter {
                     highlightedTiles.add(tile);
                 }
             }
+        //if normal non-spell card
 		} else {
             ArrayList<Pair<Integer, Integer>> initDir = parent.getMoveTiles(x, y, 1, 0);
             ArrayList<Pair<Integer, Integer>> interDir = parent.getMoveTiles(x, y, 1, 1);

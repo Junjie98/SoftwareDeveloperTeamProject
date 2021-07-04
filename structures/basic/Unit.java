@@ -39,6 +39,10 @@ public class Unit {
 	//JJ: for attack logic. If attacked without move, it forfeits the move ability
 	boolean hasMoved = false; //moved this for visibility
 	boolean hasAttacked = false;
+	
+	//JJ: for provoke
+	boolean provoked = false;
+	boolean provoker =false;
 
 	public Unit() {}
 	
@@ -103,6 +107,22 @@ public class Unit {
 	}
 	public void setHasMoved(boolean newValue) {
 		hasMoved = newValue;
+	}
+	
+	public void setProvoker(boolean value){
+		this.provoker = value;
+	}
+	public boolean getProvoker(){
+		return this.provoker;
+	}
+	public void setProvoked(boolean value) {
+		this.provoked = value;
+	}
+	public boolean getProvoked() {
+		return this.provoked;
+	}
+	public void setProvokedMove(boolean value){
+		hasMoved = value;
 	}
 
 	public int getId() {

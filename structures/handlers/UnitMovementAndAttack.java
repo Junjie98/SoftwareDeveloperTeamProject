@@ -36,6 +36,7 @@ public class UnitMovementAndAttack {
             // This is not your unit.
             return;
         }
+
         if(activeUnit != null) {
             Tile previousUnitLocation = Board.getInstance().getTile(activeUnit);
 
@@ -93,6 +94,59 @@ public class UnitMovementAndAttack {
         if(initDirB[2] == true || initDirB[3] == true) {
             parent.getHighlighter().checkTileHighlight(out, interDir.get(3));
         }
+
+
+        //Set provoke
+        
+        //ArrayList<Tile> previousRedTileUnit = new ArrayList<>();
+        if(Board.getInstance().getTile(x,y).getUnit().getProvoker()){
+            for(Tile t : parent.getHighlighter().getRedTile()){
+                t.getUnit().setProvoked(true);
+                //setProvokedMove is a reuse code, just for better illustration on what's going on.
+                t.getUnit().setProvokedMove(true); //blocks it from moving. It can only attack.
+               // previousRedTileUnit.add(t);
+                System.out.println(t.getUnit().getProvoked() );//debug purpose
+            }
+
+        }
+        //doesnt matter i figured. Since every unit click it will reset. So yeah imma ditch this.
+       // if(Board.getInstance().getTile(x,y).getUnit().getProvoker() && parent.getHighlighter().getRedTile().size()==0){ 
+            //if provoker moves away reset previous provoked unit
+        //    System.out.println("I AM INGAGA" );
+        //    for(Tile tp : previousRedTileUnit){
+         //       tp.getUnit().setProvoked(false);
+         //       System.out.println(tp.getUnit().getProvoked());//debug purpose
+         //   }
+        //    previousRedTileUnit.clear();
+      //  }
+
+        if(!Board.getInstance().getTile(x,y).getUnit().getProvoker()){
+            System.out.println("Not provoker unit");
+            for(int i = 0; i<parent.getHighlighter().getRedTile().size(); i++){
+                if(parent.getHighlighter().getRedTile().get(i).getUnit().getProvoker()){
+                    Board.getInstance().getTile(x,y).getUnit().setProvoked(true);
+                    Board.getInstance().getTile(x,y).getUnit().setProvokedMove(true); //blocks it from moving. It can only attack.
+                    System.out.println(Board.getInstance().getTile(x,y).getUnit().getProvoked());//debug purpose
+                }
+            }
+            if(parent.getHighlighter().getRedTile().size()==0){ //if my unit tile is all empty, no longer provoked. (Reset)
+                Board.getInstance().getTile(x,y).getUnit().setProvoked(false);
+                Board.getInstance().getTile(x,y).getUnit().setProvokedMove(false);
+                System.out.println(Board.getInstance().getTile(x,y).getUnit().getProvoked());//debug purpose
+            } 
+
+            
+            // for(Tile t : parent.getHighlighter().getRedTile()){
+            //     if(t.getUnit().getProvoker()){ //Within range of a provoker.
+            //         Board.getInstance().getTile(x,y).getUnit().setProvoked(true);
+            //         System.out.println(Board.getInstance().getTile(x,y).getUnit().getProvoked());//debug purpose
+            //     }else{
+            //         System.out.println("I am in");
+            //         Board.getInstance().getTile(x,y).getUnit().setProvoked(false); //reset it
+            //         System.out.println(Board.getInstance().getTile(x,y).getUnit().getProvoked());//debug purpose
+            //     }
+            // }
+        }
     }
 
     public void moveHighlight(ActorRef out, int x, int y) {
@@ -103,6 +157,18 @@ public class UnitMovementAndAttack {
                 flyingOrRangedMoveHighlight(out);
             } else {
                 basicMoveHighlight(out, x, y);
+                //because all provoke units are not flying nor range
+                // if(Board.getInstance().getTile(x,y).getUnit().getProvoker()){
+                //     for(Tile t : parent.getHighlighter().getRedTile()){
+                //         t.getUnit().setProvoked(true);
+                //         System.out.println(t.getUnit().getProvoked());
+                //     }
+
+                    // for(int i=0; i<parent.getHighlighter().getRedTile().size(); i++){
+                    //     System.out.println(parent.getHighlighter().getRedTile().size());
+                    // }
+               // }
+                
             }
         }
     }
@@ -129,6 +195,8 @@ public class UnitMovementAndAttack {
         output.addAll(parent.getMoveTiles(x, y, 1, 1));
         return output;
     }
+
+
 
     public ArrayList<Pair<Integer, Integer>> getFlyMoveTiles() {
         int[][] maxContainer = new int[45][2];
@@ -215,7 +283,8 @@ public class UnitMovementAndAttack {
             Tile attackerLocation =  Board.getInstance().getTile(activeUnit);
             Unit enemy = enemyLocation.getUnit();
             Unit attacker = attackerLocation.getUnit();
-            
+
+
             if(attackCheck(x, y) || attacker.isRanged()) {
                 boolean isRanged = attacker.isRanged();
                 int enemyHealthAfterAttack = attack(out, attackerLocation, enemy, attacker, x, y, isRanged);
@@ -380,6 +449,22 @@ public class UnitMovementAndAttack {
         return false;
     }
 
+    //======================================
+    //Provoke method
+    //======================================
+     public boolean provokeCheck(Unit unit) {
+     	if(unit.getProvoker()==false) {
+             return false;
+     	}
+         return true;
+     }
+    
+    
+    
+    
+    //==================ENDs===================
+    
+    
     // ===========================================================================
     // Setters, getters, and resetters
     // ===========================================================================

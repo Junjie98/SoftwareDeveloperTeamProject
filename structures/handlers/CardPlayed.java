@@ -101,6 +101,12 @@ public class CardPlayed {
                 unit.setRanged(true);
             } else {
                 unit.setRanged(false);
+            }//Junjie: I suggest the else can be removed for code cleanup? Since setRange was false by default.
+            //and only cards matched the if statement will be set to true? 
+
+            //Junjie: Provoker
+            if(cardname.equals("Silverguard Knight") || cardname.equals("Ironcliff Guardian") || cardname.equals("Rock Pulveriser")){
+                unit.setProvoker(true);
             }
             
             new UnitCommandBuilder(out)

@@ -14,6 +14,7 @@ import static commandbuilders.enums.Players.PLAYER1;
 public class Highlighter {
     private ArrayList<Tile> highlightedTiles = new ArrayList<>();
     private GameState parent;
+    private ArrayList<Tile> highlightedRedTiles = new ArrayList<>();
 
     public Highlighter(GameState parent) {
         this.parent = parent;
@@ -33,6 +34,7 @@ public class Highlighter {
 
         Tile tile = Board.getInstance().getTile(x, y);
 
+
         if(!tile.hasUnit()) {
             // empty so highlight
             new TileCommandBuilder(out)
@@ -51,7 +53,11 @@ public class Highlighter {
                         .setState(States.RED)
                         .issueCommand();
                 highlightedTiles.add(tile);
+                highlightedRedTiles.add(tile);
                 tile.setTileState(States.RED);
+
+
+
             } else {
                 // Tile has friendly
                 new TileCommandBuilder(out)
@@ -60,6 +66,7 @@ public class Highlighter {
                         .issueCommand();
                 highlightedTiles.add(tile);
                 tile.setTileState(States.NORMAL);
+                System.out.println("YOGOOD");
             }
             return false;
 
@@ -128,6 +135,11 @@ public class Highlighter {
             tile.setTileState(States.NORMAL);
         }
         highlightedTiles.clear();
+        highlightedRedTiles.clear();
 
+    }
+
+    public ArrayList<Tile> getRedTile(){
+        return highlightedRedTiles;
     }
 }

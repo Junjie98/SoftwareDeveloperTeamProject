@@ -1,15 +1,17 @@
 package structures.memento;
 
+import structures.basic.Card;
 import structures.basic.Unit;
 import structures.handlers.Pair;
 
-public class SummonInformation implements RelevantInformation {
+public class SpellInformation implements RelevantInformation {
     private Pair<Integer, Integer> source, target;
     private Unit summonedUnit;
-    public SummonInformation(Pair<Integer, Integer> target, Unit summonedUnit) {
+    private Card spellCard;
+    public SpellInformation(Pair<Integer, Integer> target, Card spellCard) {
         this.source = target;
         this.target = target;
-        this.summonedUnit = summonedUnit;
+        this.spellCard = spellCard;
     }
     @Override
     public Pair<Integer, Integer> getSource() {
@@ -21,5 +23,8 @@ public class SummonInformation implements RelevantInformation {
     }
     public Unit getSummonedUnit() {
         return summonedUnit;
+    }
+    public Card getSpellCard() {
+        return spellCard;
     }
 }

@@ -1,3 +1,3 @@
 package structures.memento;
 
-public enum ActionType { ATTACK, MOVE, SUMMON }
+public enum ActionType { ATTACK, MOVE, SUMMON, SPELL }

@@ -10,6 +10,7 @@ import structures.basic.Player;
 import structures.basic.Tile;
 import structures.basic.Unit;
 import structures.handlers.*;
+import structures.memento.GameMemento;
 
 import static commandbuilders.enums.Players.*;
 
@@ -30,6 +31,7 @@ public class GameState {
     public ArrayList<Card> player2CardsInHand = new ArrayList<>();
     public ArrayList<Pair<Integer, Integer>> player1UnitsPosition = new ArrayList<>();
     public ArrayList<Pair<Integer, Integer>> player2UnitsPosition = new ArrayList<>();
+    public ArrayList<GameMemento> memento = new ArrayList<>();
 
     // This is in preparation to Extracted GameState.
     // Basically, this will be used within GameState, and when extracted, it will be set to a copy of the GameState.
@@ -106,7 +108,7 @@ public class GameState {
                     .setMode(UnitCommandBuilderMode.DRAW)
                     .setTilePosition(7, 2)
                     .setPlayerID(Players.PLAYER2)
-                    .setUnit(ai)
+                    .setUnit(aiAvatar)
                     .issueCommand();
 
         player2UnitsPosition.add(new Pair<>(7, 2));
@@ -114,14 +116,14 @@ public class GameState {
         //Avatar2
         new UnitCommandBuilder(out)
         	.setMode(UnitCommandBuilderMode.SET)
-        	.setUnit(ai) 
+        	.setUnit(aiAvatar)
         	//uses the health that has been initialised earlier with the player constructor
         	.setStats(UnitStats.HEALTH, player2.getHealth())
         	.issueCommand();
         
         new UnitCommandBuilder(out)
     	.setMode(UnitCommandBuilderMode.SET)
-    	.setUnit(ai)
+    	.setUnit(aiAvatar)
     	.setStats(UnitStats.ATTACK, 2)
     	.issueCommand();
     }

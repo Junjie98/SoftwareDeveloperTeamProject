@@ -8,6 +8,10 @@ import structures.GameState;
 import structures.basic.Card;
 import structures.basic.Tile;
 import structures.basic.Unit;
+import structures.memento.ActionType;
+import structures.memento.GameMemento;
+import structures.memento.SpellInformation;
+import structures.memento.SummonInformation;
 
 import java.util.ArrayList;
 
@@ -66,12 +70,16 @@ public class CardPlayed {
                         .setTilePosition(x, y)
                         .setEffectAnimation(TileEffectAnimation.BUFF)
                         .issueCommand();
+
                 if(cardname.equals("Sundrop Elixir")){
                     spellAction(out, x, y, 5);
                 } else {
                     spellAction(out, x, y, 2);
                 }
             }
+
+            // Track this action in the memento.
+            parent.memento.add(new GameMemento(parent.getTurn(), ActionType.SPELL, new SpellInformation(new Pair<>(x, y), current)));
         // if normal Unit
         } else {
             Tile tile = Board.getInstance().getTile(x, y);
@@ -90,19 +98,10 @@ public class CardPlayed {
             try {Thread.sleep(500);} catch (InterruptedException e) {e.printStackTrace();} // Unit will appear with effect
 
             Unit unit = new UnitFactory().generateUnitByCard(current);
-            if (cardname.equals("WindShrike")) {
-                unit.setFlying(true);
-            } else {
-                unit.setFlying(false);
-            }
-            
+            unit.setFlying(cardname.equals("WindShrike"));
             // Ana: Ranged Attack
-            if(cardname.equals("Pyromancer") || cardname.equals("Fire Spitter")) {
-                unit.setRanged(true);
-            } else {
-                unit.setRanged(false);
-            }
-            
+            unit.setRanged(cardname.equals("Pyromancer") || cardname.equals("Fire Spitter"));
+
             new UnitCommandBuilder(out)
                     .setMode(UnitCommandBuilderMode.DRAW)
                     .setTilePosition(x, y)
@@ -128,6 +127,8 @@ public class CardPlayed {
             } else {
                 parent.player2UnitsPosition.add(new Pair<>(x, y));
             }
+
+            parent.memento.add(new GameMemento(parent.getTurn(), ActionType.SUMMON, new SummonInformation(new Pair<>(x, y), unit.getCopy())));
         }
 
     }

@@ -32,6 +32,8 @@ public class GameState {
     public ArrayList<Pair<Integer, Integer>> player1UnitsPosition = new ArrayList<>();
     public ArrayList<Pair<Integer, Integer>> player2UnitsPosition = new ArrayList<>();
     public ArrayList<GameMemento> memento = new ArrayList<>();
+    // TODO: Hook Attack to the memento
+    // TODO: Hook Movement to the memento
 
     // This is in preparation to Extracted GameState.
     // Basically, this will be used within GameState, and when extracted, it will be set to a copy of the GameState.
@@ -317,21 +319,15 @@ public class GameState {
     // ===========================================================================
     public ExtractedGameState extract() {
         ExtractedGameState output = new ExtractedGameState();
-
         output.simulation = true;       // Simulation will be used to block draw board and prevent changes to affect the main GameState.
         // TODO: Add a builder level protection to prevent drawing from happening.
-        // Question: Do we need to create new units for simulations? ()
 
         output.board = Board.getCopy();
         output.player1CardsInHand = cloneCardList(player1CardsInHand);
         output.player2CardsInHand = cloneCardList(player2CardsInHand);
         output.player1UnitsPosition = clonePairList(player1UnitsPosition);
         output.player2UnitsPosition = clonePairList(player2UnitsPosition);
-
-        // Potential extracted data:
-        // - A list of previous actions taken by the players (Object to be created)
-        //     - User Action type like Attack, Move, Summon and relevant information
-
+        output.memento = cloneMementoList(memento);
         return output;
     }
 
@@ -347,8 +343,15 @@ public class GameState {
     private ArrayList<Pair<Integer, Integer>> clonePairList(ArrayList<Pair<Integer, Integer>> input) {
         ArrayList<Pair<Integer, Integer>> output = new ArrayList<>();
         for (Pair<Integer, Integer> pair: input) {
-            // TODO: May need to be changed when merging.
             output.add(Pair.copyIntegerPair(pair));
+        }
+        return output;
+    }
+
+    private ArrayList<GameMemento> cloneMementoList(ArrayList<GameMemento> mementos) {
+        ArrayList<GameMemento> output = new ArrayList<>();
+        for (GameMemento memento: mementos) {
+            output.add(memento);
         }
         return output;
     }

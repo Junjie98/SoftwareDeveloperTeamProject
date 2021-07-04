@@ -326,14 +326,7 @@ public class GameState {
         output.player1UnitsPosition = clonePairList(player1UnitsPosition);
         output.player2UnitsPosition = clonePairList(player2UnitsPosition);
 
-        // TODO: Extract relevant data from GameState.
-        // TODO: Get a copy of the Board for the AI to make sense of the GameState.
-        // This class should always get a copy or a String representation that the AI can recover or make sense from it.
-        // Changing from the ExtractedGameState will not change the GameState.
-
         // Potential extracted data:
-        // - Copy of the Board Object
-        // - List of all Units on board (two copied arraylists)
         // - A list of previous actions taken by the players (Object to be created)
         //     - User Action type like Attack, Move, Summon and relevant information
 
@@ -352,7 +345,8 @@ public class GameState {
     private ArrayList<Pair<Integer, Integer>> clonePairList(ArrayList<Pair<Integer, Integer>> input) {
         ArrayList<Pair<Integer, Integer>> output = new ArrayList<>();
         for (Pair<Integer, Integer> pair: input) {
-            output.add(Pair.copy(pair));
+            // TODO: May need to be changed when merging.
+            output.add(Pair.copyIntegerPair(pair));
         }
         return output;
     }

@@ -29,6 +29,10 @@ public class Pair<T, U> {
         return this.toString().equals(another.toString());
     }
 
+    public static Pair<Integer, Integer> copyIntegerPair(Pair<Integer, Integer> source) {
+        return new Pair<>(source.getFirst(), source.getSecond());
+    }
+
     @Override
     public String toString() {
         return "Pair{" +

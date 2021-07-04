@@ -31,7 +31,7 @@ public class AI
     public void TakeTurn(ActorRef out, GameState gs)
     {
         moveInit(out, gs);
-        summonInit(out, gs);
+        castInit(out, gs);
     }
 
     public void castInit(ActorRef out, GameState gs)
@@ -52,8 +52,17 @@ public class AI
             }
         }
 
-        for (Pair<Integer,Integer>  : cardPriority) {
+        for (Pair<Integer,Integer> cardInfo : cardPriority) {
             
+        }
+    }
+
+    public void moveCheck(ActorRef out, GameState gs)
+    {
+        System.err.println("recieve pulse");
+        if(friendlies != null && moveIndex < friendlies.size())
+        {
+            move(out, gs);
         }
     }
 

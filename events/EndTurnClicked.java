@@ -24,8 +24,8 @@ public class EndTurnClicked implements EventProcessor{
 
 	@Override
 	public void processEvent(ActorRef out, GameState gameState, JsonNode message) {
-		gameState.endTurnClicked(out);
 		processChangedTurns(out, gameState);
+		gameState.endTurnClicked(out);
 	}
 
 	private void processChangedTurns(ActorRef out, GameState gameState) {

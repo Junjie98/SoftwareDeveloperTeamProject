@@ -3,6 +3,7 @@ package events;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import akka.actor.ActorRef;
+import commandbuilders.enums.Players;
 import structures.GameState;
 
 /**
@@ -21,6 +22,10 @@ import structures.GameState;
 public class Heartbeat implements EventProcessor{
 	@Override
 	public void processEvent(ActorRef out, GameState gameState, JsonNode message) {
-
+		if(gameState.getTurn() != Players.PLAYER2)
+        {
+            gameState.ai.moveCheck(out, gameState);;
+        }
+		
 	}
 }

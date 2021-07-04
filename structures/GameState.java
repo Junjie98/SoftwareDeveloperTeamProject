@@ -147,7 +147,10 @@ public class GameState {
         cardDrawing.displayCardsOnScreenFor(out, turn);
         ++roundNumber; // Divide this by 2 when we are going to use this.
         
-        ai.TakeTurn(out, this);
+        if(turn==PLAYER2)
+        {
+            ai.TakeTurn(out, this);
+        }
 
     }
 

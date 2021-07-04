@@ -121,11 +121,15 @@ public class UnitMovementAndAttack {
       //  }
 
         if(!Board.getInstance().getTile(x,y).getUnit().getProvoker()){
+            Unit nonProvokerUnit = Board.getInstance().getTile(x,y).getUnit();
             System.out.println("Not provoker unit");
             for(int i = 0; i<parent.getHighlighter().getRedTile().size(); i++){
-                if(parent.getHighlighter().getRedTile().get(i).getUnit().getProvoker()){
-                    Board.getInstance().getTile(x,y).getUnit().setProvoked(true);
-                    Board.getInstance().getTile(x,y).getUnit().setProvokedMove(true); //blocks it from moving. It can only attack.
+                boolean provokerExist = parent.getHighlighter().getRedTile().get(i).getUnit().getProvoker();
+                Unit provokerUnit = parent.getHighlighter().getRedTile().get(i).getUnit();
+                if(provokerExist){
+                    nonProvokerUnit.setProvoked(true);
+                    nonProvokerUnit.setProvokedMove(true); //blocks it from moving. It can only attack.
+                    nonProvokerUnit.setUnitProvoked(provokerUnit);
                     System.out.println(Board.getInstance().getTile(x,y).getUnit().getProvoked());//debug purpose
                 }
             }
@@ -284,9 +288,74 @@ public class UnitMovementAndAttack {
             Unit enemy = enemyLocation.getUnit();
             Unit attacker = attackerLocation.getUnit();
 
+            // if(provokeCheck(x,y) && attacker.getProvoked()){
+            //     System.out.println("SMACKING THAT BITCH");
+            //     boolean isRanged = attacker.isRanged();
+            //     if(enemy.getProvoker()){
+            //     int enemyHealthAfterAttack = attack(out, attackerLocation, enemy, attacker, x, y, isRanged);
+            //     System.out.println("Smack provoking bitch");
+                
+            //     }
 
-            if(attackCheck(x, y) || attacker.isRanged()) {
+            // }
+
+             if(attackCheck(x, y) || attacker.isRanged()) {
                 boolean isRanged = attacker.isRanged();
+                if(enemy.getProvoker()&&attacker.getProvoked()){
+                    int enemyHealthAfterAttack = attack(out, attackerLocation, enemy, attacker, x, y, isRanged);
+                    System.out.println("Smack provoking bitch");
+
+                    if (enemyHealthAfterAttack > 0) {
+                        // Launch Counter Attack
+                        int counterAttackResult = attack(out, enemyLocation, attacker, enemy, attacker.getPosition().getTilex(), attacker.getPosition().getTiley(), isRanged);
+                        
+                        if (counterAttackResult <= 0) {
+                            // Handle unit died of counter attack
+                            BasicCommands.playUnitAnimation(out, attacker, UnitAnimationType.death);
+                            try {Thread.sleep(3000);} catch (InterruptedException e) {e.printStackTrace();}
+                            
+                            new UnitCommandBuilder(out)
+                                .setMode(UnitCommandBuilderMode.DELETE)
+                                .setUnit(attackerLocation.getUnit())
+                                .issueCommand();
+    
+                            attackerLocation.setUnit(null);
+                            ArrayList<Pair<Integer, Integer>> pool = (parent.getTurn() == Players.PLAYER1) ?
+                                    parent.player1UnitsPosition : parent.player2UnitsPosition;
+                            Pair<Integer, Integer> positionToRemove = new Pair<>(attackerLocation.getTilex(), attackerLocation.getTiley());
+                            for (Pair<Integer, Integer> position: pool) {
+                                if (position.equals(positionToRemove)) {
+                                    pool.remove(position);
+                                    break;
+                                }
+                            }
+                        }
+                    } else {
+                        BasicCommands.playUnitAnimation(out, enemy, UnitAnimationType.death);
+                        try {Thread.sleep(3000);} catch (InterruptedException e) {e.printStackTrace();}
+                        
+                        new UnitCommandBuilder(out)
+                            .setMode(UnitCommandBuilderMode.DELETE)
+                            .setUnit(enemyLocation.getUnit())
+                            .issueCommand();
+    
+                        enemyLocation.setUnit(null);
+                        ArrayList<Pair<Integer, Integer>> pool = (parent.getTurn() == Players.PLAYER1) ?
+                                parent.player2UnitsPosition : parent.player1UnitsPosition;
+                        Pair<Integer, Integer> positionToRemove = new Pair<>(x, y);
+                        for (Pair<Integer, Integer> position: pool) {
+                            if (position.equals(positionToRemove)) {
+                                pool.remove(position);
+                                break;
+                            }
+                        }
+                    }
+                    
+                    }else{
+                        System.out.println("Attack Provoker only!");
+
+                        
+                if(!attacker.getProvoked()){
                 int enemyHealthAfterAttack = attack(out, attackerLocation, enemy, attacker, x, y, isRanged);
                 
                 if (enemyHealthAfterAttack > 0) {
@@ -335,7 +404,9 @@ public class UnitMovementAndAttack {
                     }
                 }
             }
+            }
         }
+    }
     }
 
     // Ana: Counter attack, including ranged attack
@@ -439,6 +510,9 @@ public class UnitMovementAndAttack {
         for (Pair<Integer, Integer> ip: tileActive) {
             if(ip.getFirst()== acPos[0] && ip.getSecond() == acPos[1]) {
                 if(Board.getInstance().getTile(x, y).getUnit() != null) {
+                    if(Board.getInstance().getTile(x, y).getUnit().getProvoker()){
+                    return true;
+                    }else
                     //enemy is in this tile
                     return true;
                 }
@@ -452,11 +526,28 @@ public class UnitMovementAndAttack {
     //======================================
     //Provoke method
     //======================================
-     public boolean provokeCheck(Unit unit) {
-     	if(unit.getProvoker()==false) {
-             return false;
-     	}
-         return true;
+     public boolean provokeCheck(int x, int y) {
+
+        if (activeUnit == null) { return false; }
+
+        int[] acPos = {x, y};
+        ArrayList<Pair<Integer, Integer>> tileActive = getAllMoveTiles(activeUnit.getFirst(), activeUnit.getSecond());
+
+        //Ana: for counter attack
+        if (Board.getInstance().getTile(x, y).getUnit() != null && Board.getInstance().getTile(x, y).getUnit().getHasGotAttacked())
+            return false;
+
+        for (Pair<Integer, Integer> ip: tileActive) {
+            if(ip.getFirst()== acPos[0] && ip.getSecond() == acPos[1]) {
+                if(Board.getInstance().getTile(x, y).getUnit().getProvoker()) {
+                    //enemy is in this tile
+                    return true;
+                }
+                return false;
+            }
+        }
+
+        return false;
      }
     
     

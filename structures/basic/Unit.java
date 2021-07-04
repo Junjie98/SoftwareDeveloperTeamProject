@@ -1,5 +1,6 @@
 package structures.basic;
 import commandbuilders.enums.Players;
+import java.util.ArrayList;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -43,6 +44,7 @@ public class Unit {
 	//JJ: for provoke
 	boolean provoked = false;
 	boolean provoker =false;
+	ArrayList<Unit> unitProvoked = new ArrayList<>();
 
 	public Unit() {}
 	
@@ -123,6 +125,12 @@ public class Unit {
 	}
 	public void setProvokedMove(boolean value){
 		hasMoved = value;
+	}
+	public void setUnitProvoked(Unit value){
+		unitProvoked.add(value);
+	}
+	public ArrayList<Unit> getUnitProvoked(){
+		return unitProvoked;
 	}
 
 	public int getId() {

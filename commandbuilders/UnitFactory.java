@@ -1,10 +1,6 @@
 package commandbuilders;
 
-import akka.actor.ActorRef;
-import commandbuilders.enums.UnitCommandBuilderMode;
-import commandbuilders.enums.UnitStats;
 import commandbuilders.enums.UnitType;
-import scala.runtime.Static;
 import structures.basic.Card;
 import structures.basic.Unit;
 import utils.BasicObjectBuilders;

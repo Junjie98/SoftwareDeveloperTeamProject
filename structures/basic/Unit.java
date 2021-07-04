@@ -34,6 +34,8 @@ public class Unit {
 	boolean isAvatar = false;
 	//Ana: for counter attack
 	boolean hasGotAttacked = false;
+	//Ana : For ranged
+	boolean isRanged = false;
 	//JJ: for attack logic. If attacked without move, it forfeits the move ability
 	boolean hasMoved = false; //moved this for visibility
 	boolean hasAttacked = false;
@@ -181,7 +183,12 @@ public class Unit {
 	public void setAvatar(boolean avatar) {
 		isAvatar = avatar;
 	}
-
+	public void setRanged(boolean bool) {
+ 		this.isRanged = bool;
+    }
+	public boolean isRanged() {
+		return isRanged;
+	}
 	public Unit getCopy() {
 		Unit copy = new Unit(id, animation, position, animations, correction);
 		copy.setPlayerID(owningPlayer);

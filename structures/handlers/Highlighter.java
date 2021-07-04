@@ -90,7 +90,7 @@ public class Highlighter {
                 tile.setTileState(States.HIGHLIGHTED);
                 highlightedTiles.add(tile);
             }
-        } else {
+		} else {
             ArrayList<Pair<Integer, Integer>> initDir = parent.getMoveTiles(x, y, 1, 0);
             ArrayList<Pair<Integer, Integer>> interDir = parent.getMoveTiles(x, y, 1, 1);
             boolean[] initDirB = {true, true, true, true};

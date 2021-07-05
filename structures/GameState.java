@@ -176,7 +176,7 @@ public class GameState {
         } else {
             new PlayerNotificationCommandBuilder(out)
                     .setMessage("Insufficient Mana")
-                    .setPlayer(getTurn())
+                    .setPlayer(PLAYER1)
                     .setDisplaySeconds(2)
                     .issueCommand();
         }

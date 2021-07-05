@@ -31,8 +31,7 @@ public class GameState {
     public ArrayList<Pair<Integer, Integer>> player1UnitsPosition = new ArrayList<>();
     public ArrayList<Pair<Integer, Integer>> player2UnitsPosition = new ArrayList<>();
     public ArrayList<GameMemento> memento = new ArrayList<>();
-    // TODO: Hook Attack to the memento
-
+    
     // This is in preparation to Extracted GameState.
     // Basically, this will be used within GameState, and when extracted, it will be set to a copy of the GameState.
     // TODO: Hook every part that calls Board.getInstance() with this.

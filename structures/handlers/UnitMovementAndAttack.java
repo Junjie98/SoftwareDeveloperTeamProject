@@ -12,6 +12,7 @@ import structures.basic.Tile;
 import structures.basic.Unit;
 import structures.basic.UnitAnimationType;
 import structures.memento.ActionType;
+import structures.memento.AttackInformation;
 import structures.memento.GameMemento;
 import structures.memento.MovementInformation;
 
@@ -225,7 +226,7 @@ public class UnitMovementAndAttack {
             if(attackCheck(x, y) || attacker.isRanged()) {
                 boolean isRanged = attacker.isRanged();
                 int enemyHealthAfterAttack = attack(out, attackerLocation, enemy, attacker, x, y, isRanged);
-                
+                parent.memento.add(new GameMemento(parent.getTurn(), ActionType.ATTACK, new AttackInformation(activeUnit, new Pair<>(x, y), attacker, enemy)));
                 if (enemyHealthAfterAttack > 0) {
                     // Launch Counter Attack
                     int counterAttackResult = attack(out, enemyLocation, attacker, enemy, attacker.getPosition().getTilex(), attacker.getPosition().getTiley(), isRanged);

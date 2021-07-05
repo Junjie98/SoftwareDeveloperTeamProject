@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import akka.actor.ActorRef;
 import commandbuilders.*;
 import commandbuilders.enums.*;
-import scala.Int;
 import structures.basic.Card;
 import structures.basic.Player;
 import structures.basic.Tile;
@@ -33,7 +32,6 @@ public class GameState {
     public ArrayList<Pair<Integer, Integer>> player2UnitsPosition = new ArrayList<>();
     public ArrayList<GameMemento> memento = new ArrayList<>();
     // TODO: Hook Attack to the memento
-    // TODO: Hook Movement to the memento
 
     // This is in preparation to Extracted GameState.
     // Basically, this will be used within GameState, and when extracted, it will be set to a copy of the GameState.

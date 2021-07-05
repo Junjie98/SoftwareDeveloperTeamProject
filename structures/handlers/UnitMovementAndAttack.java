@@ -11,6 +11,10 @@ import structures.GameState;
 import structures.basic.Tile;
 import structures.basic.Unit;
 import structures.basic.UnitAnimationType;
+import structures.memento.ActionType;
+import structures.memento.GameMemento;
+import structures.memento.MovementInformation;
+
 import java.util.HashSet;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -191,6 +195,8 @@ public class UnitMovementAndAttack {
                 }
             }
             pool.add(new Pair<>(x, y));
+
+            parent.memento.add(new GameMemento(parent.getTurn(), ActionType.MOVE, new MovementInformation(activeUnit, new Pair<>(x, y))));
 
             parent.getHighlighter().clearBoardHighlights(out);
             activatedTile.getUnit().setHasMoved(true);

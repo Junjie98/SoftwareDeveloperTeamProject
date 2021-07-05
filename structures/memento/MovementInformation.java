@@ -1,10 +1,12 @@
 package structures.memento;
 
+import structures.basic.Unit;
 import structures.handlers.Pair;
 
 public class MovementInformation implements RelevantInformation {
     private Pair<Integer, Integer> source, target;
-    public MovementInformation(Pair<Integer, Integer> source, Pair<Integer, Integer> target) {
+    private Unit unit;
+    public MovementInformation(Unit unit, Pair<Integer, Integer> source, Pair<Integer, Integer> target) {
         this.source = source;
         this.target = target;
     }
@@ -15,5 +17,14 @@ public class MovementInformation implements RelevantInformation {
     @Override
     public Pair<Integer, Integer> getTarget() {
         return target;
+    }
+
+    public Unit getUnit() {
+        return unit;
+    }
+
+    @Override
+    public String toString() {
+        return "Unit moved from " + source + " to " + target;
     }
 }

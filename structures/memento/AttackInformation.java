@@ -26,4 +26,9 @@ public class AttackInformation implements RelevantInformation {
     public Unit getTargetUnit() {
         return targetUnit;
     }
+
+    @Override
+    public String toString() {
+        return "Unit" + source + " attacked Unit" + target;
+    }
 }

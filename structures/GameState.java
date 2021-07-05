@@ -31,7 +31,7 @@ public class GameState {
     public ArrayList<Pair<Integer, Integer>> player1UnitsPosition = new ArrayList<>();
     public ArrayList<Pair<Integer, Integer>> player2UnitsPosition = new ArrayList<>();
     public ArrayList<GameMemento> memento = new ArrayList<>();
-    
+
     // This is in preparation to Extracted GameState.
     // Basically, this will be used within GameState, and when extracted, it will be set to a copy of the GameState.
     // TODO: Hook every part that calls Board.getInstance() with this.
@@ -146,6 +146,11 @@ public class GameState {
     // ===========================================================================
     public void endTurnClicked(ActorRef out) {
         highlighter.clearBoardHighlights(out);
+
+        for (GameMemento mem: memento) {
+            System.out.println(mem);
+        }
+
         turn = (turn == Players.PLAYER1) ? PLAYER2 : PLAYER1;
         unitMovementAndAttack.resetMoveAttackAndCounterAttack(out);
         setManaByRound(out);

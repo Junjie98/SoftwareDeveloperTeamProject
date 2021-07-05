@@ -23,4 +23,11 @@ public class GameMemento {
     public RelevantInformation getInformation() {
         return information;
     }
+
+    @Override
+    public String toString() {
+        return "GameMemento(" +
+                "(" + player +
+                "): " + information;
+    }
 }

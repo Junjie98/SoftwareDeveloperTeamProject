@@ -197,7 +197,7 @@ public class UnitMovementAndAttack {
             }
             pool.add(new Pair<>(x, y));
 
-            parent.memento.add(new GameMemento(parent.getTurn(), ActionType.MOVE, new MovementInformation(activeUnit, new Pair<>(x, y))));
+            parent.memento.add(new GameMemento(parent.getTurn(), ActionType.MOVE, new MovementInformation(activatedTile.getUnit(), activeUnit, new Pair<>(x, y))));
 
             parent.getHighlighter().clearBoardHighlights(out);
             activatedTile.getUnit().setHasMoved(true);

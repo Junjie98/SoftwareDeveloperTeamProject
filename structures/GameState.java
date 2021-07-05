@@ -337,7 +337,7 @@ public class GameState {
         output.simulation = true;       // Simulation will be used to block draw board and prevent changes to affect the main GameState.
         // TODO: Add a builder level protection to prevent drawing from happening.
 
-//        output.board = Board.getCopy();
+        output.board = Board.getCopy();
         output.player1CardsInHand = cloneCardList(player1CardsInHand);
         output.player2CardsInHand = cloneCardList(player2CardsInHand);
         output.player1UnitsPosition = clonePairList(player1UnitsPosition);

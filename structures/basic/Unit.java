@@ -1,4 +1,5 @@
 package structures.basic;
+import commandbuilders.UnitFactory;
 import commandbuilders.enums.Players;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -29,6 +30,9 @@ public class Unit {
 	Players owningPlayer;
 	int unitHealth = 0;
 	int unitDamage =  0;
+
+	String configFile = ""; // For copies
+	String name = ""; // For memento
 
 	boolean isFlying = false;
 	boolean isAvatar = false;
@@ -149,6 +153,19 @@ public class Unit {
 	@JsonIgnore
 	public void setPositionByTile(Tile tile) {
 		position = new Position(tile.getXpos(),tile.getYpos(),tile.getTilex(),tile.getTiley());
+	}
+
+	public void setConfigFile(String configFile) {
+		this.configFile = configFile;
+	}
+	public String getConfigFile() {
+		return configFile;
+	}
+	public void setName(String name) {
+		this.name = name;
+	}
+	public String getName() {
+		return name;
 	}
 
 	public void setPlayerID(Players Player) 

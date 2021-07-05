@@ -69,6 +69,12 @@ public class UnitFactory {
         return BasicObjectBuilders.loadUnit(conf, counter++, Unit.class);
     }
 
+    public Unit generateUnitByUnitConfig(Unit oldUnit) {
+        Unit unit = BasicObjectBuilders.loadUnit(oldUnit.getConfigFile(), -1, Unit.class);
+        unit.setName(oldUnit.getName());
+        return unit;
+    }
+
     public Unit generateUnitByCard(Card card){
         Unit unit = null;
         String cardname = card.getCardname();
@@ -117,8 +123,7 @@ public class UnitFactory {
         }else {
             unit = this.generateUnit(UnitType.WINDSHRIKE);
         }
-       
-
+        unit.setName(cardname);
         return unit;
     }
 }

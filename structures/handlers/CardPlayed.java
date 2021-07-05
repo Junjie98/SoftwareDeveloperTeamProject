@@ -106,25 +106,26 @@ public class CardPlayed {
             // Ana: Ranged Attack
             unit.setRanged(cardname.equals("Pyromancer") || cardname.equals("Fire Spitter"));
 
-            new UnitCommandBuilder(out)
-                    .setMode(UnitCommandBuilderMode.DRAW)
+            UnitCommandBuilder builder = new UnitCommandBuilder(out)
+                    .setUnit(unit);
+
+            builder.setMode(UnitCommandBuilderMode.DRAW)
                     .setTilePosition(x, y)
                     .setPlayerID(parent.getTurn())
-                    .setUnit(unit)
                     .issueCommand();
-            
-            //updates the UI from bigCard stats
-            new UnitCommandBuilder(out)
-            .setMode(UnitCommandBuilderMode.SET)
-            .setUnit(unit)
-            .setStats(UnitStats.HEALTH, current.getBigCard().getHealth())
-            .issueCommand();
 
-            new UnitCommandBuilder(out)
-            .setMode(UnitCommandBuilderMode.SET)
-            .setUnit(unit)
-            .setStats(UnitStats.ATTACK, current.getBigCard().getAttack())
-            .issueCommand();
+            try {Thread.sleep(30);} catch (InterruptedException e) {e.printStackTrace();}
+
+            //updates the UI from bigCard stats
+            builder.setMode(UnitCommandBuilderMode.SET)
+                    .setStats(UnitStats.HEALTH, current.getBigCard().getHealth())
+                    .issueCommand();
+
+            try {Thread.sleep(30);} catch (InterruptedException e) {e.printStackTrace();}
+
+            builder.setMode(UnitCommandBuilderMode.SET)
+                    .setStats(UnitStats.ATTACK, current.getBigCard().getAttack())
+                    .issueCommand();
 
             unitsOriginalHealth.put(unit.getId(),current.getBigCard().getHealth());
 //            System.out.println("the health of "+ unit +" is " + unitsOriginalHealth.get(unit.getId()));

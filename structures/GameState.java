@@ -72,64 +72,72 @@ public class GameState {
 
     //Spawns Avatars in starting positions at init
     public void spawnAvatars(ActorRef out) {
+        //Avatar1
         Unit human = new UnitFactory().generateUnit(UnitType.HUMAN);
         human.setAvatar(true);
-        
-        Unit aiAvatar = new UnitFactory().generateUnit(UnitType.AI);
-        aiAvatar.setAvatar(true);
+        human.setName("Human Avatar");
 
-        new UnitCommandBuilder(out)
-                    .setMode(UnitCommandBuilderMode.DRAW)
-                    .setTilePosition(1, 2)
-                    .setPlayerID(Players.PLAYER1)
-                    .setUnit(human)
-                    .issueCommand();
+        UnitCommandBuilder humanCommands = new UnitCommandBuilder(out)
+                .setUnit(human);
+
+        humanCommands.setMode(UnitCommandBuilderMode.DRAW)
+                .setTilePosition(1, 2)
+                .setPlayerID(Players.PLAYER1)
+                .issueCommand();
+
+        // setting health & attack to board. *They doesn't stack*
+        // uses the health that has been initialised earlier with the player constructor
+
+        try {Thread.sleep(30);} catch (InterruptedException e) {e.printStackTrace();}
+
+        humanCommands.setMode(UnitCommandBuilderMode.SET)
+                .setStats(UnitStats.HEALTH, player1.getHealth())
+                .issueCommand();
+
+        try {Thread.sleep(30);} catch (InterruptedException e) {e.printStackTrace();}
+
+        humanCommands.setMode(UnitCommandBuilderMode.SET)
+                .setStats(UnitStats.ATTACK, 2)
+                .issueCommand();
 
         player1UnitsPosition.add(new Pair<>(1, 2));
 
-        //setting health & attack to board. *They doesn't stack*
-
-        //Avatar1
-        new UnitCommandBuilder(out)
-        	.setMode(UnitCommandBuilderMode.SET)
-        	.setUnit(human) 
-        	//uses the health that has been initialised earlier with the player constructor
-        	.setStats(UnitStats.HEALTH, player1.getHealth())
-        	.issueCommand();
-        
-        new UnitCommandBuilder(out)
-    	.setMode(UnitCommandBuilderMode.SET)
-    	.setUnit(human)
-    	.setStats(UnitStats.ATTACK, 2)
-    	.issueCommand();
-
-        new UnitCommandBuilder(out)
-                    .setMode(UnitCommandBuilderMode.DRAW)
-                    .setTilePosition(7, 2)
-                    .setPlayerID(Players.PLAYER2)
-                    .setUnit(aiAvatar)
-                    .issueCommand();
-
-        player2UnitsPosition.add(new Pair<>(7, 2));
+        try {Thread.sleep(30);} catch (InterruptedException e) {e.printStackTrace();}
 
         //Avatar2
-        new UnitCommandBuilder(out)
-        	.setMode(UnitCommandBuilderMode.SET)
-        	.setUnit(aiAvatar)
-        	//uses the health that has been initialised earlier with the player constructor
-        	.setStats(UnitStats.HEALTH, player2.getHealth())
-        	.issueCommand();
-        
-        new UnitCommandBuilder(out)
-    	.setMode(UnitCommandBuilderMode.SET)
-    	.setUnit(aiAvatar)
-    	.setStats(UnitStats.ATTACK, 2)
-    	.issueCommand();
+        Unit aiAvatar = new UnitFactory().generateUnit(UnitType.AI);
+        aiAvatar.setAvatar(true);
+        aiAvatar.setName("AI Avatar");
+
+        UnitCommandBuilder aiCommands = new UnitCommandBuilder(out)
+                .setUnit(aiAvatar);
+
+        aiCommands.setMode(UnitCommandBuilderMode.DRAW)
+                .setTilePosition(7, 2)
+                .setPlayerID(Players.PLAYER2)
+                .issueCommand();
+
+        try {Thread.sleep(30);} catch (InterruptedException e) {e.printStackTrace();}
+
+        //uses the health that has been initialised earlier with the player constructor
+
+        aiCommands.setMode(UnitCommandBuilderMode.SET)
+                .setStats(UnitStats.HEALTH, player2.getHealth())
+                .issueCommand();
+
+        try {Thread.sleep(30);} catch (InterruptedException e) {e.printStackTrace();}
+
+        aiCommands.setMode(UnitCommandBuilderMode.SET)
+                .setStats(UnitStats.ATTACK, 2)
+                .issueCommand();
+
+        try {Thread.sleep(30);} catch (InterruptedException e) {e.printStackTrace();}
+
+        player2UnitsPosition.add(new Pair<>(7, 2));
 
         //Save the original health state to a hashmap. Used for calculations.
         cardPlayed.setUnitsOriginalHealth(human.getId(),player1.getHealth());
         cardPlayed.setUnitsOriginalHealth(human.getId(),player2.getHealth());
-
     }
 
     // This method add 3 cards to both Players as part of initialisation.

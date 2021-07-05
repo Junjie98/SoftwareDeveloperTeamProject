@@ -135,7 +135,7 @@ public class CardPlayed {
                 parent.player2UnitsPosition.add(new Pair<>(x, y));
             }
 
-            parent.memento.add(new GameMemento(parent.getTurn(), ActionType.SUMMON, new SummonInformation(new Pair<>(x, y), unit.getCopy())));
+            parent.memento.add(new GameMemento(parent.getTurn(), ActionType.SUMMON, new SummonInformation(new Pair<>(x, y), unit)));
         }
         deleteCardFromHand(out, tempCardToDelete);      //these two have to take place at the end to avoid a bug.
         parent.decreaseManaPerCardPlayed(out, current.getManacost());

@@ -140,30 +140,4 @@ public class Tile {
 		return this.unit;
 	}
 
-	public Tile getCopy() {
-		Tile copy = new Tile();
-		ArrayList<String> tileTextures = new ArrayList<>();
-
-		for (String item: this.tileTextures) {
-			tileTextures.add(item);
-		}
-
-		copy.tileTextures = tileTextures;
-		copy.xpos = xpos;
-		copy.ypos = ypos;
-		copy.width = width;
-		copy.height = height;
-		copy.tilex = tilex;
-		copy.tiley = tiley;
-
-		Unit unitCopy = null;
-		if (unit != null) {
-			unitCopy = unit.getCopy();
-		}
-
-		copy.setUnit(unitCopy);
-		copy.setTileState(tileState);
-
-		return copy;
-	}
 }

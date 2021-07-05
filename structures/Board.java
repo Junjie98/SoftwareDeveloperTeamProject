@@ -7,17 +7,17 @@ import utils.BasicObjectBuilders;
 
 public class Board {
     private Tile[][] board = new Tile[9][5];
-    private static Board instance = new Board(false);
+    private static Board instance = new Board();
 
-    private Board(boolean copy) {
-        if (copy == false) {
-            for (int x = 0; x < 9; x++) {
-                for (int y = 0; y < 5; y++) {
-                    board[x][y] = BasicObjectBuilders.loadTile(x, y);
-                }
+    private Board() {
+        for (int x = 0; x < 9; x++) {
+            for (int y = 0; y < 5; y++) {
+                board[x][y] = BasicObjectBuilders.loadTile(x, y);
             }
         }
     }
+
+    private Board(boolean copy) { }
 
     public static Board getInstance() {
         return instance;
@@ -39,16 +39,6 @@ public class Board {
     }
 
     public static void reloadBoard() {
-        instance = new Board(false);
-    }
-
-    public static Board getCopy() {
-        Board copy = new Board(true);
-        for (int x = 0; x < 9; x++) {
-            for (int y = 0; y < 5; y++) {
-                copy.board[x][y] = instance.board[x][y].getCopy();
-            }
-        }
-        return copy;
+        instance = new Board();
     }
 }

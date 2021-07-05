@@ -26,7 +26,7 @@ public class GameMemento {
 
     @Override
     public String toString() {
-        return "GameMemento(" +
+        return "GameMemento" +
                 "(" + player +
                 "): " + information;
     }

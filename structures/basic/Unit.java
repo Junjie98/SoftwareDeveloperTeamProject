@@ -189,15 +189,4 @@ public class Unit {
 	public boolean isRanged() {
 		return isRanged;
 	}
-	public Unit getCopy() {
-		Unit copy = new Unit(id, animation, position, animations, correction);
-		copy.setPlayerID(owningPlayer);
-		copy.setHasGotAttacked(hasGotAttacked);
-		copy.setHasAttacked(hasAttacked);
-		copy.setFlying(isFlying);
-		copy.setHealth(unitHealth);
-		copy.setDamage(unitDamage);
-		copy.setAvatar(isAvatar);
-		return copy;
-	}
 }

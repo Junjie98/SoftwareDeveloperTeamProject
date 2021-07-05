@@ -29,6 +29,7 @@ public class GameState {
     private int roundNumber = 3;
     private Players turn = Players.PLAYER1;
     private Player player1, player2;
+    private Card currentHighlightedCard;
     public ArrayList<Card> player1CardsInHand = new ArrayList<>();
     public ArrayList<Card> player2CardsInHand = new ArrayList<>();
     public ArrayList<Pair<Integer, Integer>> player1UnitsPosition = new ArrayList<>();
@@ -181,7 +182,10 @@ public class GameState {
         }
         
         // Highlight clicked card
-        highlightCard(out, current, idx);
+        if (currentHighlightedCard == null || currentHighlightedCard != current)
+        	highlightCard(out, current, idx);
+        else
+        	currentHighlightedCard = null;
     }
 
     public void tileClicked(ActorRef out, int x, int y) {
@@ -321,6 +325,8 @@ public class GameState {
 	        .setPosition(idx)
 	        .setState(States.HIGHLIGHTED)
 	        .issueCommand();
+        
+        currentHighlightedCard = current;
     }
 
     // ===========================================================================

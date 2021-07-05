@@ -24,6 +24,6 @@ public class SummonInformation implements RelevantInformation {
 
     @Override
     public String toString() {
-        return "Unit is summoned on Tile" + target;
+        return "Unit "+ summonedUnit.getName() +" is summoned on Tile" + target;
     }
 }

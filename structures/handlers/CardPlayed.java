@@ -40,6 +40,7 @@ public class CardPlayed {
 
         if (current.isSpell()) {
             //Set the effect of the spell and call spellAction
+            Unit targetUnit = Board.getInstance().getTile(x, y).getUnit();
             if (cardname.equals("Truestrike")) {    // Truestike does -2 damage to any
                 // Highlight enemy units
                 // Set a buff animation and the effects like this.
@@ -83,7 +84,7 @@ public class CardPlayed {
             }
 
             // Track this action in the memento.
-            parent.memento.add(new GameMemento(parent.getTurn(), ActionType.SPELL, new SpellInformation(new Pair<>(x, y), current)));
+            parent.memento.add(new GameMemento(parent.getTurn(), ActionType.SPELL, new SpellInformation(targetUnit, new Pair<>(x, y), current)));
         // if normal Unit
         } else {
             Tile tile = Board.getInstance().getTile(x, y);

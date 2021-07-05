@@ -186,6 +186,8 @@ public class UnitMovementAndAttack {
                     .setUnit(activatedTile.getUnit())
                     .issueCommand();
 
+            parent.memento.add(new GameMemento(parent.getTurn(), ActionType.MOVE, new MovementInformation(activatedTile.getUnit(), activeUnit, new Pair<>(x, y))));
+
             // Update the units position in the stored position lists.
             ArrayList<Pair<Integer, Integer>> pool = (parent.getTurn() == Players.PLAYER1) ?
                     parent.player1UnitsPosition : parent.player2UnitsPosition;
@@ -196,8 +198,6 @@ public class UnitMovementAndAttack {
                 }
             }
             pool.add(new Pair<>(x, y));
-
-            parent.memento.add(new GameMemento(parent.getTurn(), ActionType.MOVE, new MovementInformation(activatedTile.getUnit(), activeUnit, new Pair<>(x, y))));
 
             parent.getHighlighter().clearBoardHighlights(out);
             activatedTile.getUnit().setHasMoved(true);
@@ -225,8 +225,8 @@ public class UnitMovementAndAttack {
             
             if(attackCheck(x, y) || attacker.isRanged()) {
                 boolean isRanged = attacker.isRanged();
-                int enemyHealthAfterAttack = attack(out, attackerLocation, enemy, attacker, x, y, isRanged);
                 parent.memento.add(new GameMemento(parent.getTurn(), ActionType.ATTACK, new AttackInformation(activeUnit, new Pair<>(x, y), attacker, enemy)));
+                int enemyHealthAfterAttack = attack(out, attackerLocation, enemy, attacker, x, y, isRanged);
                 if (enemyHealthAfterAttack > 0) {
                     // Launch Counter Attack
                     int counterAttackResult = attack(out, enemyLocation, attacker, enemy, attacker.getPosition().getTilex(), attacker.getPosition().getTiley(), isRanged);
@@ -303,8 +303,6 @@ public class UnitMovementAndAttack {
         
 //        BasicCommands.playUnitAnimation(out, attacker, UnitAnimationType.attack);
 //		try {Thread.sleep(2000);} catch (InterruptedException e) {e.printStackTrace();}
-
-
 
         enemyCommandBuilder
             .setMode(UnitCommandBuilderMode.SET)

@@ -9,6 +9,7 @@ public class MovementInformation implements RelevantInformation {
     public MovementInformation(Unit unit, Pair<Integer, Integer> source, Pair<Integer, Integer> target) {
         this.source = source;
         this.target = target;
+        this.unit = unit;
     }
     @Override
     public Pair<Integer, Integer> getSource() {
@@ -25,6 +26,6 @@ public class MovementInformation implements RelevantInformation {
 
     @Override
     public String toString() {
-        return "Unit moved from " + source + " to " + target;
+        return "Unit " + unit.getName() + " moved from " + source + " to " + target;
     }
 }

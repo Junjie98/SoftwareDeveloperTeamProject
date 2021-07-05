@@ -155,9 +155,11 @@ public class GameState {
     public void endTurnClicked(ActorRef out) {
         highlighter.clearBoardHighlights(out);
 
+        System.out.println("----- Game Memento -----");
         for (GameMemento mem: memento) {
             System.out.println(mem);
         }
+        System.out.println("-----------------------");
 
         turn = (turn == Players.PLAYER1) ? PLAYER2 : PLAYER1;
         unitMovementAndAttack.resetMoveAttackAndCounterAttack(out);

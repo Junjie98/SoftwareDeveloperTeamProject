@@ -8,7 +8,6 @@ import structures.GameState;
 import structures.basic.Card;
 import structures.basic.Tile;
 import structures.basic.Unit;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -18,29 +17,25 @@ public class CardPlayed {
     String cardname;
     private GameState parent;
     private HashMap<Integer, Integer> unitsOriginalHealth = new HashMap<Integer, Integer>();
-    public void setUnitsOriginalHealth(int id, int health) { unitsOriginalHealth.put(id,health);}
-
     Pair<Card, Integer> activeCard = null;
-
-    public CardPlayed(GameState parent) {
-        this.parent = parent;
-    }
+    public CardPlayed(GameState parent) { this.parent = parent; }
     private UnitMovementAndAttack unitMovementAndAttack = new UnitMovementAndAttack(this.parent);
 
 
+    // ===========================================================================
+    // Move card to the Board and logic behind it.
+    // ===========================================================================
     public void moveCardToBoard(ActorRef out, int x, int y) {
         Card current = (parent.getTurn() == PLAYER1) ?
                 parent.player1CardsInHand.get(activeCard.getSecond()) : parent.player2CardsInHand.get(activeCard.getSecond());
         this.cardname = current.getCardname();
         System.out.println(cardname);
-
-        deleteCardFromHand(out, activeCard.getSecond());
-        parent.decreaseManaPerCardPlayed(out, current.getManacost());
-        parent.getHighlighter().clearBoardHighlights(out);
+        int tempCardToDelete = activeCard.getSecond();      //Need that if we want to have beautiful effects, and not a bug
+        parent.getHighlighter().clearBoardHighlights(out);  // which decrease mana and deletes a card even when clicked at red tile
 
         if (current.isSpell()) {
             //Set the effect of the spell and call spellAction
-            if (cardname.equals("Truestrike")) {    // Truestike does -1 damage to any
+            if (cardname.equals("Truestrike")) {    // Truestike does -2 damage to any
                 // Highlight enemy units
                 // Set a buff animation and the effects like this.
                 new TileCommandBuilder(out)
@@ -53,7 +48,6 @@ public class CardPlayed {
             }
 
             if (cardname.equals("Entropic Decay")) {    //Reduces a non-avatar unit to 0 heath, rip
-                // Highlight enemy units
                 new TileCommandBuilder(out)
                         .setMode(TileCommandBuilderMode.ANIMATION)
                         .setTilePosition(x, y)
@@ -142,27 +136,11 @@ public class CardPlayed {
                 parent.player2UnitsPosition.add(new Pair<>(x, y));
             }
         }
+        deleteCardFromHand(out, tempCardToDelete);      //these two have to take place at the end to avoid a bug.
+        parent.decreaseManaPerCardPlayed(out, current.getManacost());
 
     }
-
-    public void deleteCardFromHand(ActorRef out, int pos) {
-        ArrayList<Card> current = (parent.getTurn() == PLAYER1) ? parent.player1CardsInHand : parent.player2CardsInHand;
-        current.remove(pos);
-        parent.getCardDrawing().displayCardsOnScreenFor(out, parent.getTurn());
-    }
-
-    public Pair<Card, Integer> getActiveCard() {
-        return activeCard;
-    }
-
-    public void setActiveCard(Card activeCard, int idx) {
-        this.activeCard = new Pair<>(activeCard, idx);
-    }
-
-    public void clearActiveCard() {
-        this.activeCard = null;
-    }
-
+    
     public void spellAction(ActorRef out, int x, int y, int strengthOfSpell) {
         Tile targetLocation = Board.getInstance().getTile(x, y);
         Unit target = targetLocation.getUnit();
@@ -216,6 +194,15 @@ public class CardPlayed {
         }
     }
 
+    // ===========================================================================
+    // Delete Cards and Units
+    // ===========================================================================
+    public void deleteCardFromHand(ActorRef out, int pos) {
+        ArrayList<Card> current = (parent.getTurn() == PLAYER1) ? parent.player1CardsInHand : parent.player2CardsInHand;
+        current.remove(pos);
+        parent.getCardDrawing().displayCardsOnScreenFor(out, parent.getTurn());
+    }
+
     public void deleteUnit(ActorRef out, int x, int y, Tile enemyLocation) {
         //Delete the enemy unit if dies
         try {Thread.sleep(1000);} catch (InterruptedException e) {e.printStackTrace();} // Unit will disappear with effect
@@ -233,5 +220,25 @@ public class CardPlayed {
                 break;
             }
         }
+    }
+
+    // ===========================================================================
+    // Setters, getters, and resetters
+    // ===========================================================================
+
+    public Pair<Card, Integer> getActiveCard() {
+        return activeCard;
+    }
+
+    public void setActiveCard(Card activeCard, int idx) {
+        this.activeCard = new Pair<>(activeCard, idx);
+    }
+
+    public void setUnitsOriginalHealth(int id, int health) {
+        unitsOriginalHealth.put(id,health);
+    }
+
+    public void clearActiveCard() {
+        this.activeCard = null;
     }
 }

@@ -181,7 +181,7 @@ public class GameState {
                     .issueCommand();
         }
         
-        // Highlight clicked card
+        // Highlight clicked card and unhighlight when clicked again
         if (currentHighlightedCard == null || currentHighlightedCard != current)
         	highlightCard(out, current, idx);
         else

@@ -35,7 +35,7 @@ public class CardPlayed {
 
         if (current.isSpell()) {
             //Set the effect of the spell and call spellAction
-            if (cardname.equals("Truestrike")) {    // Truestike does -2 damage to any
+            if (cardname.equals("Truestrike")) {    // Truestrike does -2 damage to any
                 // Highlight enemy units
                 // Set a buff animation and the effects like this.
                 new TileCommandBuilder(out)

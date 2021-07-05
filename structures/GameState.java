@@ -4,12 +4,15 @@ import java.util.ArrayList;
 import akka.actor.ActorRef;
 import commandbuilders.*;
 import commandbuilders.enums.*;
+import commands.BasicCommands;
 import scala.Int;
 import structures.basic.Card;
 import structures.basic.Player;
 import structures.basic.Tile;
 import structures.basic.Unit;
 import structures.handlers.*;
+import utils.BasicObjectBuilders;
+import utils.StaticConfFiles;
 
 import static commandbuilders.enums.Players.*;
 
@@ -38,9 +41,6 @@ public class GameState {
     private CardDrawing cardDrawing = new CardDrawing(this);
     private CardPlayed cardPlayed = new CardPlayed(this);
     private Highlighter highlighter = new Highlighter(this);
-
-    // Ana: counter attack
-    // private Tile currentUnitLocation = null;
 
 	// ===========================================================================
     // Game Initialisation
@@ -158,6 +158,9 @@ public class GameState {
         int playersMana = (turn == PLAYER1) ? player1.getMana() : player2.getMana();
         boolean enoughMana = (playersMana >= manaCost) ? true : false;   //if enough mana then true
 
+        // Redraw cards at hand at every card click
+        cardDrawing.displayCardsOnScreenFor(out, turn);
+        
         // if enough mana, then highlight and play the card, else drop a notification
         if(enoughMana) {
             highlighter.clearBoardHighlights(out);
@@ -168,16 +171,17 @@ public class GameState {
                 for (Pair<Integer, Integer> position : friendlyUnits) {
                     highlighter.cardTileHighlight(out, position.getFirst(), position.getSecond());
                 }
-
-                // TODO: Change the highlighted state of the card and redraw the hand.
             }
         } else {
             new PlayerNotificationCommandBuilder(out)
                     .setMessage("Insufficient Mana")
                     .setPlayer(getTurn())
-                    .setDisplaySeconds(4)
+                    .setDisplaySeconds(2)
                     .issueCommand();
         }
+        
+        // Highlight clicked card
+        highlightCard(out, current, idx);
     }
 
     public void tileClicked(ActorRef out, int x, int y) {
@@ -249,10 +253,10 @@ public class GameState {
                 message = "Player 2 won!";
             }
             new PlayerNotificationCommandBuilder(out)
-                    .setMessage(message)
-                    .setPlayer(PLAYER1)
-                    .setDisplaySeconds(4)
-                    .issueCommand();
+                .setMessage(message)
+                .setPlayer(PLAYER1)
+                .setDisplaySeconds(4)
+                .issueCommand();
         }
     }
 
@@ -306,6 +310,17 @@ public class GameState {
         output.add(new Pair<>(x+depth, y-diag));
         output.add(new Pair<>(x+diag, y+depth));
         return output;
+    }
+    
+    // Highlighting the clicked card at hand
+    public void highlightCard(ActorRef out, Card current, int idx) {
+    	// Highlight clicked card
+        new CardInHandCommandBuilder(out)
+	        .setCommandMode(CardInHandCommandMode.DRAW)
+	        .setCard(current)
+	        .setPosition(idx)
+	        .setState(States.HIGHLIGHTED)
+	        .issueCommand();
     }
 
     // ===========================================================================

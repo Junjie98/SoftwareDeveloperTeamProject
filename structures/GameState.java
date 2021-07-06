@@ -350,7 +350,7 @@ public class GameState {
     // Highlighting the clicked card at hand
     public void highlightCard(ActorRef out, Card current, int idx) {
     	// Highlight clicked card
-        new CardInHandCommandBuilder(out)
+        new CardInHandCommandBuilder(out, isSimulation())
 	        .setCommandMode(CardInHandCommandMode.DRAW)
 	        .setCard(current)
 	        .setPosition(idx)

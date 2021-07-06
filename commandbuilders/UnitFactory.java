@@ -66,7 +66,10 @@ public class UnitFactory {
                 conf = StaticConfFiles.u_silverguard_knight;
                 break;
         }
-        return BasicObjectBuilders.loadUnit(conf, counter++, Unit.class);
+        Unit loadedUnit =  BasicObjectBuilders.loadUnit(conf, counter++, Unit.class);
+        loadedUnit.setType(type);
+        
+        return loadedUnit;
     }
 
     public Unit generateUnitByCard(Card card){

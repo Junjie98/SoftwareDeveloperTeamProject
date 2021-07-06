@@ -1,6 +1,7 @@
 package structures.handlers;
 
 import akka.actor.ActorRef;
+
 import commandbuilders.*;
 import commandbuilders.enums.*;
 import structures.Board;
@@ -34,6 +35,36 @@ public class CardPlayed {
         parent.getHighlighter().clearBoardHighlights(out);  // which decrease mana and deletes a card even when clicked at red tile
 
         if (current.isSpell()) {
+        	
+        	// Checking if enemy casted a spell for Pureblade Enforcer
+        	ArrayList<Pair<Integer, Integer>> enemyUnits = (parent.getTurn() == PLAYER1) ?
+                    parent.player2UnitsPosition : parent.player1UnitsPosition;
+			for (Pair<Integer, Integer> position : enemyUnits) {
+                Tile enemyLocation = Board.getInstance().getTile(position);
+              
+                if(enemyLocation.getUnit().getType() == UnitType.PUREBLADE_ENFORCER) {
+                	System.out.println("bleh");
+                	int newHealth = enemyLocation.getUnit().getHealth() + 1;
+                	int newDamage = enemyLocation.getUnit().getDamage() + 1;
+                	enemyLocation.getUnit().setHealth(enemyLocation.getUnit().getHealth() + 1);
+                	enemyLocation.getUnit().setDamage(enemyLocation.getUnit().getDamage() + 1);
+                	
+                	new UnitCommandBuilder(out)
+                    .setMode(UnitCommandBuilderMode.SET)
+                    .setUnit(enemyLocation.getUnit())
+                    .setStats(UnitStats.HEALTH, newHealth)
+                    .issueCommand();
+
+                    new UnitCommandBuilder(out)
+                    .setMode(UnitCommandBuilderMode.SET)
+                    .setUnit(enemyLocation.getUnit())
+                    .setStats(UnitStats.ATTACK, newDamage)
+                    .issueCommand();
+
+                }
+            }
+        	
+        	
             //Set the effect of the spell and call spellAction
             if (cardname.equals("Truestrike")) {    // Truestrike does -2 damage to any
                 // Highlight enemy units
@@ -228,6 +259,19 @@ public class CardPlayed {
 	                    .setInstance(parent.getPlayer2())
 	                    .issueCommand();
                 }
+    			
+//    		case "Pureblade Enforcer":
+//    			ArrayList<Pair<Integer, Integer>> enemyUnits = (parent.getTurn() == PLAYER1) ?
+//                        parent.player2UnitsPosition : parent.player1UnitsPosition;
+//    			for (Pair<Integer, Integer> position : enemyUnits) {
+//                    Tile enemyLocation = Board.getInstance().getTile(position);
+//                  
+//                    if(enemyLocation.getUnit().getType() == UnitType.PUREBLADE_ENFORCER) {
+//                    	System.out.println("bleh");
+//                    	enemyLocation.getUnit().setHealth(enemyLocation.getUnit().getHealth() + 1);
+//                    	enemyLocation.getUnit().setDamage(enemyLocation.getUnit().getDamage() + 1);
+//                    }
+//                }
     	}
     }
 

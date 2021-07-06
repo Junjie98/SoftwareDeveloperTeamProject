@@ -8,6 +8,8 @@ import structures.basic.Card;
 import structures.basic.Player;
 import structures.basic.Tile;
 import structures.basic.Unit;
+import structures.extractor.ExtractedGameState;
+import structures.extractor.GameStateExtractor;
 import structures.handlers.*;
 import structures.memento.GameMemento;
 
@@ -34,10 +36,9 @@ public class GameState {
 
     // This is in preparation to Extracted GameState.
     // Basically, this will be used within GameState, and when extracted, it will be set to a copy of the GameState.
-    // TODO: Hook every part that calls Board.getInstance() with this.
-    // TODO: Create a getter for the handlers to get access to this.
     protected boolean simulation = false;
     protected Board board = Board.getInstance();
+    private GameStateExtractor extractor = new GameStateExtractor(this);
 
     // ===========================================================================
     // Handler Classes
@@ -204,7 +205,7 @@ public class GameState {
     }
 
     public void tileClicked(ActorRef out, int x, int y) {
-        Tile tile = Board.getInstance().getTile(x, y);
+        Tile tile = board.getTile(x, y);
         if (tile.getTileState() == States.RED) {
             if (cardPlayed.getActiveCard() != null) {
                 // Handle spell
@@ -333,48 +334,6 @@ public class GameState {
         output.add(new Pair<>(x-depth, y+diag));
         output.add(new Pair<>(x+depth, y-diag));
         output.add(new Pair<>(x+diag, y+depth));
-        return output;
-    }
-
-    // ===========================================================================
-    // Extractor
-    // ===========================================================================
-    public ExtractedGameState extract() {
-        ExtractedGameState output = new ExtractedGameState();
-        output.simulation = true;       // Simulation will be used to block draw board and prevent changes to affect the main GameState.
-        // TODO: Add a builder level protection to prevent drawing from happening.
-
-        output.board = Board.getCopy();
-        output.player1CardsInHand = cloneCardList(player1CardsInHand);
-        output.player2CardsInHand = cloneCardList(player2CardsInHand);
-        output.player1UnitsPosition = clonePairList(player1UnitsPosition);
-        output.player2UnitsPosition = clonePairList(player2UnitsPosition);
-        output.memento = cloneMementoList(memento);
-        return output;
-    }
-
-    private ArrayList<Card> cloneCardList(ArrayList<Card> input) {
-        ArrayList<Card> output = new ArrayList<>();
-        for (Card card: input) {
-            // If we will not change the content of the card, we will not need to clone it.
-            output.add(card);
-        }
-        return output;
-    }
-
-    private ArrayList<Pair<Integer, Integer>> clonePairList(ArrayList<Pair<Integer, Integer>> input) {
-        ArrayList<Pair<Integer, Integer>> output = new ArrayList<>();
-        for (Pair<Integer, Integer> pair: input) {
-            output.add(Pair.copyIntegerPair(pair));
-        }
-        return output;
-    }
-
-    private ArrayList<GameMemento> cloneMementoList(ArrayList<GameMemento> mementos) {
-        ArrayList<GameMemento> output = new ArrayList<>();
-        for (GameMemento memento: mementos) {
-            output.add(memento);
-        }
         return output;
     }
 

@@ -33,7 +33,7 @@ public class Highlighter {
             return false;
         }
 
-        Tile tile = Board.getInstance().getTile(x, y);
+        Tile tile = parent.getBoard().getTile(x, y);
 
         if(!tile.hasUnit()) {
             // empty so highlight
@@ -46,7 +46,7 @@ public class Highlighter {
             tile.setTileState(States.HIGHLIGHTED);
             return true;
         } else {
-            if(Board.getInstance().getTile(pos.getFirst(), pos.getSecond()).getUnit().getPlayerID() != parent.getTurn()) {
+            if(parent.getBoard().getTile(pos.getFirst(), pos.getSecond()).getUnit().getPlayerID() != parent.getTurn()) {
                 // Tile has enemy
                 new TileCommandBuilder(out, parent.isSimulation())
                         .setTilePosition(x, y)
@@ -74,13 +74,13 @@ public class Highlighter {
                     parent.player2UnitsPosition : parent.player1UnitsPosition;
             if(parent.getCardPlayed().getActiveCard().getFirst().getCardname().equals("Entropic Decay")) {
                 for (Pair<Integer, Integer> position : enemyUnits) {
-                    Tile enemyLocation = Board.getInstance().getTile(position);
+                    Tile enemyLocation = parent.getBoard().getTile(position);
                     if (!enemyLocation.getUnit().isAvatar()) {
                         new TileCommandBuilder(out, parent.isSimulation())
                                 .setTilePosition(position.getFirst(), position.getSecond())
                                 .setState(States.RED)
                                 .issueCommand();
-                        Tile tile = Board.getInstance().getTile(position);
+                        Tile tile = parent.getBoard().getTile(position);
                         tile.setTileState(States.RED);
                         highlightedTiles.add(tile);
                     }
@@ -91,7 +91,7 @@ public class Highlighter {
                             .setTilePosition(position.getFirst(), position.getSecond())
                             .setState(States.RED)
                             .issueCommand();
-                    Tile tile = Board.getInstance().getTile(position);
+                    Tile tile = parent.getBoard().getTile(position);
                     tile.setTileState(States.RED);
                     highlightedTiles.add(tile);
                 }
@@ -101,13 +101,13 @@ public class Highlighter {
                     parent.player1UnitsPosition : parent.player2UnitsPosition;
             if (parent.getCardPlayed().getActiveCard().getFirst().getCardname().equals("Staff of Y'Kir'")) {
                 for (Pair<Integer, Integer> position : friendlyUnits) {
-                    Tile friendlyLocation = Board.getInstance().getTile(position);
+                    Tile friendlyLocation = parent.getBoard().getTile(position);
                     if (friendlyLocation.getUnit().isAvatar()) {
                         new TileCommandBuilder(out, parent.isSimulation())
                                 .setTilePosition(position.getFirst(), position.getSecond())
                                 .setState(States.HIGHLIGHTED)
                                 .issueCommand();
-                        Tile tile = Board.getInstance().getTile(position);
+                        Tile tile = parent.getBoard().getTile(position);
                         tile.setTileState(States.HIGHLIGHTED);
                         highlightedTiles.add(tile);
                     }
@@ -118,7 +118,7 @@ public class Highlighter {
                             .setTilePosition(position.getFirst(), position.getSecond())
                             .setState(States.HIGHLIGHTED)
                             .issueCommand();
-                    Tile tile = Board.getInstance().getTile(position);
+                    Tile tile = parent.getBoard().getTile(position);
                     tile.setTileState(States.HIGHLIGHTED);
                     highlightedTiles.add(tile);
                 }

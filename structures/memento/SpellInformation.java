@@ -12,9 +12,6 @@ public class SpellInformation implements RelevantInformation {
         this.spellTarget = spellTarget;
         this.target = target;
         this.spellCard = spellCard;
-        System.out.println(spellTarget);
-        System.out.println(spellCard);
-        System.out.println(target);
     }
     @Override
     public Pair<Integer, Integer> getSource() {

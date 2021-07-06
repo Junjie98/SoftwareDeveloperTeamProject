@@ -36,13 +36,13 @@ public class UnitMovementAndAttack {
     // Highlight Logic
     // ===========================================================================
     public void unitClicked(ActorRef out, int x, int y) {
-        Tile tile = Board.getInstance().getTile(x, y);
+        Tile tile = parent.getBoard().getTile(x, y);
         if (tile.getUnit().getPlayerID() != parent.getTurn()) {
             // This is not your unit.
             return;
         }
         if(activeUnit != null) {
-            Tile previousUnitLocation = Board.getInstance().getTile(activeUnit);
+            Tile previousUnitLocation = parent.getBoard().getTile(activeUnit);
 
             //Unhighlight previously selected unit
             parent.getHighlighter().clearBoardHighlights(out);
@@ -101,8 +101,8 @@ public class UnitMovementAndAttack {
     }
 
     public void moveHighlight(ActorRef out, int x, int y) {
-        if (Board.getInstance().getTile(x, y) != null) {
-            Unit temp = Board.getInstance().getTile(x, y).getUnit();
+        if (parent.getBoard().getTile(x, y) != null) {
+            Unit temp = parent.getBoard().getTile(x, y).getUnit();
             if(temp.isFlying() || temp.isRanged()) {
                 System.err.println("flyhighlight");
                 flyingOrRangedMoveHighlight(out);
@@ -141,7 +141,7 @@ public class UnitMovementAndAttack {
 
         for(int x = 0; x < 9; x++ ) {
             for(int y = 0; y < 5; y ++) {
-                if(!Board.getInstance().getTile(x, y).hasUnit()) {
+                if(!parent.getBoard().getTile(x, y).hasUnit()) {
                     int[] temp = {x, y};
                     System.err.println("tile: " + x + "," + y);
                     maxContainer[count++] = temp;
@@ -157,7 +157,7 @@ public class UnitMovementAndAttack {
     }
 
     public void highlightedMoveTileClicked(ActorRef out, int x, int y) {
-        Tile activatedTile = Board.getInstance().getTile(activeUnit);
+        Tile activatedTile = parent.getBoard().getTile(activeUnit);
 
         if (activatedTile.getUnit().getHasAttacked()) {
             // Units that has attacked should not be able to move.
@@ -171,7 +171,7 @@ public class UnitMovementAndAttack {
             return;
         }
 
-        Tile destinationTile = Board.getInstance().getTile(x, y);
+        Tile destinationTile = parent.getBoard().getTile(x, y);
 
         if (destinationTile.getTileState() == States.NORMAL) {
             parent.getHighlighter().clearBoardHighlights(out);
@@ -216,10 +216,10 @@ public class UnitMovementAndAttack {
     // ===========================================================================
     public void launchAttack(ActorRef out, int x, int y) {
         if (activeUnit == null) { return; }
-        if (Board.getInstance().getTile(x, y).getUnit().getPlayerID() != parent.getTurn()) {
+        if (parent.getBoard().getTile(x, y).getUnit().getPlayerID() != parent.getTurn()) {
         
-            Tile enemyLocation = Board.getInstance().getTile(x, y);
-            Tile attackerLocation =  Board.getInstance().getTile(activeUnit);
+            Tile enemyLocation = parent.getBoard().getTile(x, y);
+            Tile attackerLocation =  parent.getBoard().getTile(activeUnit);
             Unit enemy = enemyLocation.getUnit();
             Unit attacker = attackerLocation.getUnit();
             
@@ -298,7 +298,7 @@ public class UnitMovementAndAttack {
         
 		new ProjectTileAnimationCommandBuilder(out, parent.isSimulation())
 			.setSource(attackerLocation)
-			.setDistination(Board.getInstance().getTile(x, y))
+			.setDistination(parent.getBoard().getTile(x, y))
 			.issueCommand();
         
 //        BasicCommands.playUnitAnimation(out, attacker, UnitAnimationType.attack);
@@ -369,12 +369,12 @@ public class UnitMovementAndAttack {
         ArrayList<Pair<Integer, Integer>> tileActive = getAllMoveTiles(activeUnit.getFirst(), activeUnit.getSecond());
 
         //Ana: for counter attack
-        if (Board.getInstance().getTile(x, y).getUnit() != null && Board.getInstance().getTile(x, y).getUnit().getHasGotAttacked())
+        if (parent.getBoard().getTile(x, y).getUnit() != null && parent.getBoard().getTile(x, y).getUnit().getHasGotAttacked())
             return false;
 
         for (Pair<Integer, Integer> ip: tileActive) {
             if(ip.getFirst()== acPos[0] && ip.getSecond() == acPos[1]) {
-                if(Board.getInstance().getTile(x, y).getUnit() != null) {
+                if(parent.getBoard().getTile(x, y).getUnit() != null) {
                     //enemy is in this tile
                     return true;
                 }

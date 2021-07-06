@@ -40,7 +40,7 @@ public class CardPlayed {
 
         if (current.isSpell()) {
             //Set the effect of the spell and call spellAction
-            Unit targetUnit = Board.getInstance().getTile(x, y).getUnit();
+            Unit targetUnit = parent.getBoard().getTile(x, y).getUnit();
             if (cardname.equals("Truestrike")) {    // Truestike does -2 damage to any
                 // Highlight enemy units
                 // Set a buff animation and the effects like this.
@@ -72,7 +72,7 @@ public class CardPlayed {
 
                 if(cardname.equals("Sundrop Elixir")){
                     //Calculate how much health the spell will recover based on the original health
-                    Unit unit = Board.getInstance().getTile(x,y).getUnit();
+                    Unit unit = parent.getBoard().getTile(x,y).getUnit();
                     int currentHealth = unit.getHealth();
                     int originalHealth = unitsOriginalHealth.get(unit.getId());
                     int gap = originalHealth - currentHealth;
@@ -87,7 +87,7 @@ public class CardPlayed {
             parent.memento.add(new GameMemento(parent.getTurn(), ActionType.SPELL, new SpellInformation(targetUnit, new Pair<>(x, y), current)));
         // if normal Unit
         } else {
-            Tile tile = Board.getInstance().getTile(x, y);
+            Tile tile = parent.getBoard() .getTile(x, y);
             if (tile.hasUnit()) {
                 // Cannot deal a card to a Tile that has unit.
                 return;
@@ -145,7 +145,7 @@ public class CardPlayed {
     }
     
     public void spellAction(ActorRef out, int x, int y, int strengthOfSpell) {
-        Tile targetLocation = Board.getInstance().getTile(x, y);
+        Tile targetLocation = parent.getBoard().getTile(x, y);
         Unit target = targetLocation.getUnit();
         UnitCommandBuilder targetCommandBuilder = new UnitCommandBuilder(out, parent.isSimulation()).setUnit(target);
 

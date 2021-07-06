@@ -180,7 +180,7 @@ public class UnitMovementAndAttack {
 
             System.out.println("move valid");
 
-            new UnitCommandBuilder(out)
+            new UnitCommandBuilder(out, parent.isSimulation())
                     .setMode(UnitCommandBuilderMode.MOVE)
                     .setTilePosition(x, y)
                     .setUnit(activatedTile.getUnit())
@@ -236,7 +236,7 @@ public class UnitMovementAndAttack {
                     	BasicCommands.playUnitAnimation(out, attacker, UnitAnimationType.death);
             			try {Thread.sleep(3000);} catch (InterruptedException e) {e.printStackTrace();}
                     	
-                    	new UnitCommandBuilder(out)
+                    	new UnitCommandBuilder(out, parent.isSimulation())
 	                        .setMode(UnitCommandBuilderMode.DELETE)
 	                        .setUnit(attackerLocation.getUnit())
 	                        .issueCommand();
@@ -256,7 +256,7 @@ public class UnitMovementAndAttack {
                 	BasicCommands.playUnitAnimation(out, enemy, UnitAnimationType.death);
         			try {Thread.sleep(3000);} catch (InterruptedException e) {e.printStackTrace();}
                 	
-                	new UnitCommandBuilder(out)
+                	new UnitCommandBuilder(out, parent.isSimulation())
 	                    .setMode(UnitCommandBuilderMode.DELETE)
 	                    .setUnit(enemyLocation.getUnit())
 	                    .issueCommand();
@@ -278,7 +278,7 @@ public class UnitMovementAndAttack {
 
     // Ana: Counter attack, including ranged attack
     public int attack(ActorRef out, Tile attackerLocation, Unit enemy, Unit attacker, int x, int y, boolean isRanged) {
-        UnitCommandBuilder enemyCommandBuilder = new UnitCommandBuilder(out).setUnit(enemy);
+        UnitCommandBuilder enemyCommandBuilder = new UnitCommandBuilder(out, parent.isSimulation()).setUnit(enemy);
         int enemyHealth = enemy.getHealth();
         int healthAfterDamage = enemyHealth - attacker.getDamage();
 
@@ -296,7 +296,7 @@ public class UnitMovementAndAttack {
 //			.issueCommand();
 //		}
         
-		new ProjectTileAnimationCommandBuilder(out)
+		new ProjectTileAnimationCommandBuilder(out, parent.isSimulation())
 			.setSource(attackerLocation)
 			.setDistination(Board.getInstance().getTile(x, y))
 			.issueCommand();
@@ -326,28 +326,28 @@ public class UnitMovementAndAttack {
         //update avatar health to UI player health.
         if(enemy.isAvatar() && enemy.getPlayerID() == Players.PLAYER1) {
             parent.getPlayer1().setHealth(enemy.getHealth());
-            new PlayerSetCommandsBuilder(out)
+            new PlayerSetCommandsBuilder(out, parent.isSimulation())
                     .setPlayer(Players.PLAYER1)
                     .setStats(PlayerStats.HEALTH)
                     .setInstance(parent.getPlayer1())
                     .issueCommand();
         } else if(enemy.isAvatar() && enemy.getPlayerID()== Players.PLAYER2) {
             parent.getPlayer2().setHealth(enemy.getHealth());
-            new PlayerSetCommandsBuilder(out)
+            new PlayerSetCommandsBuilder(out, parent.isSimulation())
                     .setPlayer(Players.PLAYER2)
                     .setStats(PlayerStats.HEALTH)
                     .setInstance(parent.getPlayer2())
                     .issueCommand();
         } else if(attacker.isAvatar() && attacker.getPlayerID()== Players.PLAYER1) {
             parent.getPlayer1().setHealth(attacker.getHealth());
-            new PlayerSetCommandsBuilder(out)
+            new PlayerSetCommandsBuilder(out, parent.isSimulation())
                     .setPlayer(Players.PLAYER1)
                     .setStats(PlayerStats.HEALTH)
                     .setInstance(parent.getPlayer1())
                     .issueCommand();
         } else if(attacker.isAvatar() && attacker.getPlayerID()== Players.PLAYER2) {
             parent.getPlayer2().setHealth(attacker.getHealth());
-            new PlayerSetCommandsBuilder(out)
+            new PlayerSetCommandsBuilder(out, parent.isSimulation())
                     .setPlayer(Players.PLAYER2)
                     .setStats(PlayerStats.HEALTH)
                     .setInstance(parent.getPlayer2())
@@ -394,7 +394,7 @@ public class UnitMovementAndAttack {
             unit.setHasAttacked(false);
             unit.setHasGotAttacked(false);
             
-            new UnitCommandBuilder(out)
+            new UnitCommandBuilder(out, parent.isSimulation())
 	            .setUnit(unit)
 	            .setMode(UnitCommandBuilderMode.ANIMATION)
 	            .setAnimationType(UnitAnimationType.idle)

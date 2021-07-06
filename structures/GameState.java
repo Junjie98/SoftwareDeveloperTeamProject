@@ -58,12 +58,12 @@ public class GameState {
     	player1 = new Player(20,2); //set players health and mana to 20
         player2 = new Player(20,2); //player start with 2 mana in round 1.
 
-        new PlayerSetCommandsBuilder(out)
+        new PlayerSetCommandsBuilder(out, isSimulation())
                 .setPlayer(Players.PLAYER1)
                 .setStats(PlayerStats.ALL)
                 .setInstance(player1)
                 .issueCommand();
-        new PlayerSetCommandsBuilder(out)
+        new PlayerSetCommandsBuilder(out, isSimulation())
                 .setPlayer(Players.PLAYER2)
                 .setStats(PlayerStats.ALL)
                 .setInstance(player2)
@@ -77,7 +77,7 @@ public class GameState {
         human.setAvatar(true);
         human.setName("Human Avatar");
 
-        UnitCommandBuilder humanCommands = new UnitCommandBuilder(out)
+        UnitCommandBuilder humanCommands = new UnitCommandBuilder(out, isSimulation())
                 .setUnit(human);
 
         humanCommands.setMode(UnitCommandBuilderMode.DRAW)
@@ -109,7 +109,7 @@ public class GameState {
         aiAvatar.setAvatar(true);
         aiAvatar.setName("AI Avatar");
 
-        UnitCommandBuilder aiCommands = new UnitCommandBuilder(out)
+        UnitCommandBuilder aiCommands = new UnitCommandBuilder(out, isSimulation())
                 .setUnit(aiAvatar);
 
         aiCommands.setMode(UnitCommandBuilderMode.DRAW)
@@ -195,7 +195,7 @@ public class GameState {
                 // TODO: Change the highlighted state of the card and redraw the hand.
             }
         } else {
-            new PlayerNotificationCommandBuilder(out)
+            new PlayerNotificationCommandBuilder(out, isSimulation())
                     .setMessage("Insufficient Mana")
                     .setPlayer(getTurn())
                     .setDisplaySeconds(4)
@@ -271,7 +271,7 @@ public class GameState {
             } else {
                 message = "Player 2 won!";
             }
-            new PlayerNotificationCommandBuilder(out)
+            new PlayerNotificationCommandBuilder(out, isSimulation())
                     .setMessage(message)
                     .setPlayer(PLAYER1)
                     .setDisplaySeconds(4)
@@ -279,19 +279,24 @@ public class GameState {
         }
     }
 
+    private int getCurrentRoundMana() {
+        // This is separated for the potential use in simulation.
+        return (getRound() + 1 > 9) ? 9 : getRound() + 1;
+    }
+
     private void setManaByRound(ActorRef out) {
-        int mana = (getRound() + 1 > 9) ? 9 : getRound() + 1;
+        int mana = getCurrentRoundMana();
 
         if(turn == Players.PLAYER1) {
             player1.setMana(mana);
-            new PlayerSetCommandsBuilder(out)
+            new PlayerSetCommandsBuilder(out, isSimulation())
                     .setPlayer(Players.PLAYER1)
                     .setStats(PlayerStats.MANA)
                     .setInstance(player1)
                     .issueCommand();
         } else {
             player2.setMana(mana);
-            new PlayerSetCommandsBuilder(out)
+            new PlayerSetCommandsBuilder(out, isSimulation())
                     .setPlayer(Players.PLAYER2)
                     .setStats(PlayerStats.MANA)
                     .setInstance(player2)
@@ -304,14 +309,14 @@ public class GameState {
         int currentMana = previousMana - manaCost;      // We check beforehand that currentMana always >=0
         if(turn == Players.PLAYER1) {
             player1.setMana(currentMana);
-            new PlayerSetCommandsBuilder(out)
+            new PlayerSetCommandsBuilder(out, isSimulation())
                     .setPlayer(Players.PLAYER1)
                     .setStats(PlayerStats.MANA)
                     .setInstance(player1)
                     .issueCommand();
         } else {
             player2.setMana(currentMana);
-            new PlayerSetCommandsBuilder(out)
+            new PlayerSetCommandsBuilder(out, isSimulation())
                     .setPlayer(Players.PLAYER2)
                     .setStats(PlayerStats.MANA)
                     .setInstance(player2)
@@ -420,5 +425,9 @@ public class GameState {
 
     public void setBoard(Board board) {
         this.board = board;
+    }
+
+    public boolean isSimulation() {
+        return simulation;
     }
 }

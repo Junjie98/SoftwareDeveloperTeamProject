@@ -61,9 +61,11 @@ public class UnitCommandBuilder extends CommandBuilder{
     // For Interval
     // Defaults to 30 ms. Change dynamically use setDrawInterval.
     private int drawInterval = 30;
+    private boolean simulation;
 
-    public UnitCommandBuilder(ActorRef out) {
+    public UnitCommandBuilder(ActorRef out, boolean simulation) {
         reference = out;
+        this.simulation = simulation;
     }
 
     public UnitCommandBuilder setUnit(Unit unit) {
@@ -111,6 +113,10 @@ public class UnitCommandBuilder extends CommandBuilder{
 
     @Override
     public void issueCommand() {
+        if (simulation) {
+            // Command blocked due to simulation.
+            return;
+        }
         if (mode == UnitCommandBuilderMode.DRAW) {
             Tile tile = Board.getInstance().getTile(tileX, tileY);
             tile.setUnit(unit);

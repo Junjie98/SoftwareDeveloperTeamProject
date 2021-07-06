@@ -37,7 +37,7 @@ public class Highlighter {
 
         if(!tile.hasUnit()) {
             // empty so highlight
-            new TileCommandBuilder(out)
+            new TileCommandBuilder(out, parent.isSimulation())
                     .setTilePosition(pos.getFirst(), pos.getSecond())
                     .setState(States.HIGHLIGHTED)
                     .issueCommand();
@@ -48,7 +48,7 @@ public class Highlighter {
         } else {
             if(Board.getInstance().getTile(pos.getFirst(), pos.getSecond()).getUnit().getPlayerID() != parent.getTurn()) {
                 // Tile has enemy
-                new TileCommandBuilder(out)
+                new TileCommandBuilder(out, parent.isSimulation())
                         .setTilePosition(x, y)
                         .setState(States.RED)
                         .issueCommand();
@@ -56,7 +56,7 @@ public class Highlighter {
                 tile.setTileState(States.RED);
             } else {
                 // Tile has friendly
-                new TileCommandBuilder(out)
+                new TileCommandBuilder(out, parent.isSimulation())
                         .setTilePosition(x, y)
                         .setState(States.NORMAL)
                         .issueCommand();
@@ -76,7 +76,7 @@ public class Highlighter {
                 for (Pair<Integer, Integer> position : enemyUnits) {
                     Tile enemyLocation = Board.getInstance().getTile(position);
                     if (!enemyLocation.getUnit().isAvatar()) {
-                        new TileCommandBuilder(out)
+                        new TileCommandBuilder(out, parent.isSimulation())
                                 .setTilePosition(position.getFirst(), position.getSecond())
                                 .setState(States.RED)
                                 .issueCommand();
@@ -87,7 +87,7 @@ public class Highlighter {
                 }
             } else {        //if Truestike, highlight avatar & units
                 for (Pair<Integer, Integer> position : enemyUnits) {
-                    new TileCommandBuilder(out)
+                    new TileCommandBuilder(out, parent.isSimulation())
                             .setTilePosition(position.getFirst(), position.getSecond())
                             .setState(States.RED)
                             .issueCommand();
@@ -103,7 +103,7 @@ public class Highlighter {
                 for (Pair<Integer, Integer> position : friendlyUnits) {
                     Tile friendlyLocation = Board.getInstance().getTile(position);
                     if (friendlyLocation.getUnit().isAvatar()) {
-                        new TileCommandBuilder(out)
+                        new TileCommandBuilder(out, parent.isSimulation())
                                 .setTilePosition(position.getFirst(), position.getSecond())
                                 .setState(States.HIGHLIGHTED)
                                 .issueCommand();
@@ -114,7 +114,7 @@ public class Highlighter {
                 }
             } else {    //if card Sundrop Elixir then should highlight all units & avatar
                 for (Pair<Integer, Integer> position : friendlyUnits) {
-                    new TileCommandBuilder(out)
+                    new TileCommandBuilder(out, parent.isSimulation())
                             .setTilePosition(position.getFirst(), position.getSecond())
                             .setState(States.HIGHLIGHTED)
                             .issueCommand();
@@ -154,7 +154,7 @@ public class Highlighter {
         parent.getUnitMovementAndAttack().setActiveUnit(null);
         parent.getCardPlayed().clearActiveCard();
         for (Tile tile: highlightedTiles) {
-            new TileCommandBuilder(out)
+            new TileCommandBuilder(out, parent.isSimulation())
                     .setTilePosition(tile.getTilex(), tile.getTiley())
                     .setState(States.NORMAL)
                     .setMode(TileCommandBuilderMode.DRAW)

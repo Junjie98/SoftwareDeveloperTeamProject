@@ -70,13 +70,14 @@ public class UnitFactory {
     }
 
     public Unit generateUnitByUnitConfig(Unit oldUnit) {
+        // This is only used for simulations!
         Unit unit = BasicObjectBuilders.loadUnit(oldUnit.getConfigFile(), -1, Unit.class);
         unit.setName(oldUnit.getName());
         return unit;
     }
 
     public Unit generateUnitByCard(Card card){
-        Unit unit = null;
+        Unit unit;
         String cardname = card.getCardname();
         if(cardname.equals("Pureblade Enforcer")) {
             unit = this.generateUnit(UnitType.PUREBLADE_ENFORCER);

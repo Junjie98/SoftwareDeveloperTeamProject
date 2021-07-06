@@ -43,14 +43,14 @@ public class CardDrawing {
         ArrayList<Card> currentCardInHand = (player == Players.PLAYER1) ? parent.player1CardsInHand : parent.player2CardsInHand;
         for (int idx = 0; idx < MAX_CARD_COUNT_IN_HAND; idx++) {
             if (idx < currentCardInHand.size()) {
-                new CardInHandCommandBuilder(out)
+                new CardInHandCommandBuilder(out, parent.isSimulation())
                         .setCommandMode(CardInHandCommandMode.DRAW)
                         .setCard(currentCardInHand.get(idx))
                         .setPosition(idx)
                         .setState(States.NORMAL)
                         .issueCommand();
             } else {
-                new CardInHandCommandBuilder(out)
+                new CardInHandCommandBuilder(out, parent.isSimulation())
                         .setCommandMode(CardInHandCommandMode.DELETE)
                         .setPosition(idx)
                         .issueCommand();

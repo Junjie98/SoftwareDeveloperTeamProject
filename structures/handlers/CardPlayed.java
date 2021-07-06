@@ -44,7 +44,7 @@ public class CardPlayed {
             if (cardname.equals("Truestrike")) {    // Truestike does -2 damage to any
                 // Highlight enemy units
                 // Set a buff animation and the effects like this.
-                new TileCommandBuilder(out)
+                new TileCommandBuilder(out, parent.isSimulation())
                         .setMode(TileCommandBuilderMode.ANIMATION)
                         .setTilePosition(x, y)
                         .setEffectAnimation(TileEffectAnimation.INMOLATION)
@@ -54,7 +54,7 @@ public class CardPlayed {
             }
 
             if (cardname.equals("Entropic Decay")) {    //Reduces a non-avatar unit to 0 heath, rip
-                new TileCommandBuilder(out)
+                new TileCommandBuilder(out, parent.isSimulation())
                         .setMode(TileCommandBuilderMode.ANIMATION)
                         .setTilePosition(x, y)
                         .setEffectAnimation(TileEffectAnimation.MARTYRDOM)
@@ -64,7 +64,7 @@ public class CardPlayed {
             }
 
             if (cardname.equals("Sundrop Elixir") || cardname.equals("Staff of Y'Kir'")) { //Staff +2 Attack for avatar,
-                new TileCommandBuilder(out)
+                new TileCommandBuilder(out, parent.isSimulation())
                         .setMode(TileCommandBuilderMode.ANIMATION)
                         .setTilePosition(x, y)
                         .setEffectAnimation(TileEffectAnimation.BUFF)
@@ -94,7 +94,7 @@ public class CardPlayed {
             }
 
             //Play summon effect each time a player cast a card
-            new TileCommandBuilder(out)
+            new TileCommandBuilder(out, parent.isSimulation())
                     .setMode(TileCommandBuilderMode.ANIMATION)
                     .setTilePosition(x, y)
                     .setEffectAnimation(TileEffectAnimation.SUMMON)
@@ -107,7 +107,7 @@ public class CardPlayed {
             // Ana: Ranged Attack
             unit.setRanged(cardname.equals("Pyromancer") || cardname.equals("Fire Spitter"));
 
-            UnitCommandBuilder builder = new UnitCommandBuilder(out)
+            UnitCommandBuilder builder = new UnitCommandBuilder(out, parent.isSimulation())
                     .setUnit(unit);
 
             builder.setMode(UnitCommandBuilderMode.DRAW)
@@ -147,7 +147,7 @@ public class CardPlayed {
     public void spellAction(ActorRef out, int x, int y, int strengthOfSpell) {
         Tile targetLocation = Board.getInstance().getTile(x, y);
         Unit target = targetLocation.getUnit();
-        UnitCommandBuilder targetCommandBuilder = new UnitCommandBuilder(out).setUnit(target);
+        UnitCommandBuilder targetCommandBuilder = new UnitCommandBuilder(out, parent.isSimulation()).setUnit(target);
 
         if(cardname.equals("Sundrop Elixir") || cardname.equals("Entropic Decay") || cardname.equals("Truestrike")) {
             int targetHealth = target.getHealth();
@@ -177,14 +177,14 @@ public class CardPlayed {
         // update avatar health to UI player health.
         if(target.isAvatar() && target.getPlayerID() == Players.PLAYER1) {
             parent.getPlayer1().setHealth(target.getHealth());
-            new PlayerSetCommandsBuilder(out)
+            new PlayerSetCommandsBuilder(out, parent.isSimulation())
                     .setPlayer(Players.PLAYER1)
                     .setStats(PlayerStats.HEALTH)
                     .setInstance(parent.getPlayer1())
                     .issueCommand();
         } else if(target.isAvatar() && target.getPlayerID()== Players.PLAYER2) {
             parent.getPlayer2().setHealth(target.getHealth());
-            new PlayerSetCommandsBuilder(out)
+            new PlayerSetCommandsBuilder(out, parent.isSimulation())
                     .setPlayer(Players.PLAYER2)
                     .setStats(PlayerStats.HEALTH)
                     .setInstance(parent.getPlayer2())
@@ -209,7 +209,7 @@ public class CardPlayed {
     public void deleteUnit(ActorRef out, int x, int y, Tile enemyLocation) {
         //Delete the enemy unit if dies
         try {Thread.sleep(1000);} catch (InterruptedException e) {e.printStackTrace();} // Unit will disappear with effect
-        new UnitCommandBuilder(out)
+        new UnitCommandBuilder(out, parent.isSimulation())
                 .setMode(UnitCommandBuilderMode.DELETE)
                 .setUnit(enemyLocation.getUnit())
                 .issueCommand();

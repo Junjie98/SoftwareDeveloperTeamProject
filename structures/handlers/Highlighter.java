@@ -19,6 +19,54 @@ public class Highlighter {
         this.parent = parent;
     }
 
+    public boolean checkAttackHighlight(ActorRef out, Pair<Integer, Integer> pos)
+    {
+        int x = pos.getFirst();
+        int y = pos.getSecond();
+
+        //limiting input
+        if(x < 0 || x > 8) {
+            return false;
+        }
+        if(y < 0 || y > 4) {
+            return false;
+        }
+
+        Tile tile = Board.getInstance().getTile(x, y);
+
+        if(!tile.hasUnit()) {
+            // empty so DONT highlight
+            new TileCommandBuilder(out)
+                    .setTilePosition(pos.getFirst(), pos.getSecond())
+                    .setState(States.NORMAL)
+                    .issueCommand();
+
+            highlightedTiles.add(tile);
+            tile.setTileState(States.NORMAL);
+            return true;
+        } else {
+            if(Board.getInstance().getTile(pos.getFirst(), pos.getSecond()).getUnit().getPlayerID() != parent.getTurn()) {
+                // Tile has enemy
+                new TileCommandBuilder(out)
+                        .setTilePosition(x, y)
+                        .setState(States.RED)
+                        .issueCommand();
+                highlightedTiles.add(tile);
+                tile.setTileState(States.RED);
+            } else {
+                // Tile has friendly
+                new TileCommandBuilder(out)
+                        .setTilePosition(x, y)
+                        .setState(States.NORMAL)
+                        .issueCommand();
+                highlightedTiles.add(tile);
+                tile.setTileState(States.NORMAL);
+            }
+            return false;
+
+        }
+    }
+
     public boolean checkTileHighlight(ActorRef out, Pair<Integer, Integer> pos)  {
         int x = pos.getFirst();
         int y = pos.getSecond();

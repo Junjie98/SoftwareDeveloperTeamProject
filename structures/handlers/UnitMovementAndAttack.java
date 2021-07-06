@@ -61,6 +61,10 @@ public class UnitMovementAndAttack {
         ArrayList<Pair<Integer, Integer>> secondDir = parent.getMoveTiles(x, y,2, 0);
         ArrayList<Pair<Integer, Integer>> interDir = parent.getMoveTiles(x, y, 1, 1);
 
+   
+
+
+        
         boolean[] initDirB = {true,true,true,true};
 
         int count = 0;
@@ -93,6 +97,23 @@ public class UnitMovementAndAttack {
         if(initDirB[2] == true || initDirB[3] == true) {
             parent.getHighlighter().checkTileHighlight(out, interDir.get(3));
         }
+
+
+        //basica attack highlight connected to normal movement highlight
+        ArrayList<Pair<Integer, Integer>> initAtk = parent.getMoveTiles(x, y, 3, 0);
+        ArrayList<Pair<Integer, Integer>> secondAtk = parent.getMoveTiles(x, y,2, 1);
+        ArrayList<Pair<Integer, Integer>> interAtk = parent.getMoveTiles(x, y, 1, 2);
+
+        for (Pair<Integer, Integer> pos : initAtk) {
+            parent.getHighlighter().checkAttackHighlight(out, pos);
+        }
+        for (Pair<Integer, Integer> pos : secondAtk) {
+            parent.getHighlighter().checkAttackHighlight(out, pos);
+        }
+        for (Pair<Integer, Integer> pos : interAtk) {
+            parent.getHighlighter().checkAttackHighlight(out, pos);
+        }
+
     }
 
     public void moveHighlight(ActorRef out, int x, int y) {

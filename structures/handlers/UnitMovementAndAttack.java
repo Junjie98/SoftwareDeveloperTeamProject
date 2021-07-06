@@ -210,7 +210,7 @@ public class UnitMovementAndAttack {
     public void launchAttack(ActorRef out, int x, int y) {
         if (activeUnit == null) { return; }
         if (Board.getInstance().getTile(x, y).getUnit().getPlayerID() != parent.getTurn()) {
-        
+        	
             Tile enemyLocation = Board.getInstance().getTile(x, y);
             Tile attackerLocation =  Board.getInstance().getTile(activeUnit);
             Unit enemy = enemyLocation.getUnit();

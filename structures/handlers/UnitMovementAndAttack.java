@@ -242,30 +242,34 @@ public class UnitMovementAndAttack {
                 int enemyHealthAfterAttack = attack(out, attackerLocation, enemy, attacker, x, y, isRanged);
                 
                 if (enemyHealthAfterAttack > 0) {
-                    // Launch Counter Attack
-                    int counterAttackResult = attack(out, enemyLocation, attacker, enemy, attacker.getPosition().getTilex(), attacker.getPosition().getTiley(), isRanged);
-                    
-                    if (counterAttackResult <= 0) {
-                        // Handle unit died of counter attack
-                    	BasicCommands.playUnitAnimation(out, attacker, UnitAnimationType.death);
-            			try {Thread.sleep(3000);} catch (InterruptedException e) {e.printStackTrace();}
-                    	
-                    	new UnitCommandBuilder(out)
-	                        .setMode(UnitCommandBuilderMode.DELETE)
-	                        .setUnit(attackerLocation.getUnit())
-	                        .issueCommand();
-
-                        attackerLocation.setUnit(null);
-                        ArrayList<Pair<Integer, Integer>> pool = (parent.getTurn() == Players.PLAYER1) ?
-                                parent.player1UnitsPosition : parent.player2UnitsPosition;
-                        Pair<Integer, Integer> positionToRemove = new Pair<>(attackerLocation.getTilex(), attackerLocation.getTiley());
-                        for (Pair<Integer, Integer> position: pool) {
-                            if (position.equals(positionToRemove)) {
-                                pool.remove(position);
-                                break;
-                            }
-                        }
-                    }
+                	
+                	int counterAttackResult = 0;
+                	if (!isRanged) {
+	                    // Launch Counter Attack
+	                    counterAttackResult = attack(out, enemyLocation, attacker, enemy, attacker.getPosition().getTilex(), attacker.getPosition().getTiley(), isRanged);
+	                    
+	                    if (counterAttackResult <= 0) {
+	                        // Handle unit died of counter attack
+	                    	BasicCommands.playUnitAnimation(out, attacker, UnitAnimationType.death);
+	            			try {Thread.sleep(3000);} catch (InterruptedException e) {e.printStackTrace();}
+	                    	
+	                    	new UnitCommandBuilder(out)
+		                        .setMode(UnitCommandBuilderMode.DELETE)
+		                        .setUnit(attackerLocation.getUnit())
+		                        .issueCommand();
+	
+	                        attackerLocation.setUnit(null);
+	                        ArrayList<Pair<Integer, Integer>> pool = (parent.getTurn() == Players.PLAYER1) ?
+	                                parent.player1UnitsPosition : parent.player2UnitsPosition;
+	                        Pair<Integer, Integer> positionToRemove = new Pair<>(attackerLocation.getTilex(), attackerLocation.getTiley());
+	                        for (Pair<Integer, Integer> position: pool) {
+	                            if (position.equals(positionToRemove)) {
+	                                pool.remove(position);
+	                                break;
+	                            }
+	                        }
+	                    }
+                	}
                 } else {
                 	BasicCommands.playUnitAnimation(out, enemy, UnitAnimationType.death);
         			try {Thread.sleep(3000);} catch (InterruptedException e) {e.printStackTrace();}
@@ -288,6 +292,7 @@ public class UnitMovementAndAttack {
                 }
             }
         }
+        resetMoveAttackAndCounterAttack(out);
     }
 
     // Ana: Counter attack, including ranged attack
@@ -298,27 +303,19 @@ public class UnitMovementAndAttack {
 
         if (healthAfterDamage < 0)
             healthAfterDamage = 0;
-
-        if (healthAfterDamage < 0)
-            healthAfterDamage = 0;
         
-//        if(isRanged) {
-//			System.err.println("Ranged attack incoming!");
-//			new ProjectTileAnimationCommandBuilder(out)
-//			.setSource(attackerLocation)
-//			.setDistination(Board.getInstance().getTile(x, y))
-//			.issueCommand();
-//		}
-        
-		new ProjectTileAnimationCommandBuilder(out)
+        if(isRanged) {
+			System.err.println("Ranged attack incoming!");
+			new ProjectTileAnimationCommandBuilder(out)
 			.setSource(attackerLocation)
 			.setDistination(Board.getInstance().getTile(x, y))
 			.issueCommand();
+		}
         
-//        BasicCommands.playUnitAnimation(out, attacker, UnitAnimationType.attack);
-//		try {Thread.sleep(2000);} catch (InterruptedException e) {e.printStackTrace();}
-
-
+        else {
+        	BasicCommands.playUnitAnimation(out, attacker, UnitAnimationType.attack);
+    		try {Thread.sleep(2000);} catch (InterruptedException e) {e.printStackTrace();}
+        }
 
         enemyCommandBuilder
             .setMode(UnitCommandBuilderMode.SET)
@@ -328,16 +325,13 @@ public class UnitMovementAndAttack {
         //unhighlight all the tiles
         parent.getHighlighter().clearBoardHighlights(out);
 
-        
-//        // To be added if needed
-//        //restrict human player to attack again
-//        enemy.setHasGotAttacked(true);
-//        moveAttackAndCounterAttack.add(enemy);
-//
-//        //restrict player to move after attack
-//        attacker.setHasAttacked(true);
-//        moveAttackAndCounterAttack.add(attacker);
-//        //
+        //restrict human player to attack again
+        enemy.setHasGotAttacked(true);
+        moveAttackAndCounterAttack.add(enemy);
+
+        //restrict player to move after attack
+        attacker.setHasAttacked(true);
+        moveAttackAndCounterAttack.add(attacker);
         
         //update avatar health to UI player health.
         if(enemy.isAvatar() && enemy.getPlayerID() == Players.PLAYER1) {
@@ -409,6 +403,8 @@ public class UnitMovementAndAttack {
             unit.setHasMoved(false);
             unit.setHasAttacked(false);
             unit.setHasGotAttacked(false);
+            
+            try {Thread.sleep(30);} catch (InterruptedException e) {e.printStackTrace();}
             
             new UnitCommandBuilder(out)
 	            .setUnit(unit)

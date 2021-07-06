@@ -8,7 +8,6 @@ import structures.basic.Card;
 import structures.basic.Player;
 import structures.basic.Tile;
 import structures.basic.Unit;
-import structures.extractor.ExtractedGameState;
 import structures.extractor.GameStateExtractor;
 import structures.handlers.*;
 import structures.memento.GameMemento;
@@ -25,7 +24,7 @@ import static commandbuilders.enums.Players.*;
 
 public class GameState {
     private final int INITIAL_CARD_COUNT = 3;
-    private int roundNumber = 3;
+    protected int roundNumber = 3;
     private Players turn = Players.PLAYER1;
     private Player player1, player2;
     public ArrayList<Card> player1CardsInHand = new ArrayList<>();
@@ -37,7 +36,6 @@ public class GameState {
     // This is in preparation to Extracted GameState.
     // Basically, this will be used within GameState, and when extracted, it will be set to a copy of the GameState.
     protected boolean simulation = false;
-    protected Board board = Board.getInstance();
     private GameStateExtractor extractor = new GameStateExtractor(this);
 
     // ===========================================================================
@@ -156,10 +154,14 @@ public class GameState {
     public void endTurnClicked(ActorRef out) {
         highlighter.clearBoardHighlights(out);
 
-        System.out.println("----- Game Memento -----");
-        for (GameMemento mem: memento) {
-            System.out.println(mem);
-        }
+//        System.out.println("----- Game Memento -----");
+//        for (GameMemento mem: memento) {
+//            System.out.println(mem);
+//        }
+//        System.out.println("-----------------------");
+
+        System.out.println("-----------------------");
+        System.out.println(extractor.extract());
         System.out.println("-----------------------");
 
         turn = (turn == Players.PLAYER1) ? PLAYER2 : PLAYER1;
@@ -205,7 +207,7 @@ public class GameState {
     }
 
     public void tileClicked(ActorRef out, int x, int y) {
-        Tile tile = board.getTile(x, y);
+        Tile tile = Board.getInstance().getTile(x, y);
         if (tile.getTileState() == States.RED) {
             if (cardPlayed.getActiveCard() != null) {
                 // Handle spell
@@ -370,6 +372,7 @@ public class GameState {
         return this.roundNumber / 2;
     }
 
+
     public Players getTurn() {
         return turn;
     }
@@ -379,14 +382,14 @@ public class GameState {
     }
 
     public Board getBoard() {
-        return board;
-    }
-
-    public void setBoard(Board board) {
-        this.board = board;
+        return Board.getInstance();
     }
 
     public boolean isSimulation() {
         return simulation;
+    }
+
+    public int getRoundNumber() {
+        return roundNumber;
     }
 }

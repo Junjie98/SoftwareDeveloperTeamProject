@@ -292,7 +292,7 @@ public class UnitMovementAndAttack {
 //			System.err.println("Ranged attack incoming!");
 //			new ProjectTileAnimationCommandBuilder(out)
 //			.setSource(attackerLocation)
-//			.setDistination(Board.getInstance().getTile(x, y))
+//			.setDistination(parent.getBoard().getTile(x, y))
 //			.issueCommand();
 //		}
         

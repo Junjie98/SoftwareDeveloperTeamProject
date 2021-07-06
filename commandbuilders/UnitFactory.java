@@ -73,6 +73,8 @@ public class UnitFactory {
         // This is only used for simulations!
         Unit unit = BasicObjectBuilders.loadUnit(oldUnit.getConfigFile(), -1, Unit.class);
         unit.setName(oldUnit.getName());
+        unit.setHealth(oldUnit.getHealth());
+        unit.setDamage(oldUnit.getDamage());
         return unit;
     }
 

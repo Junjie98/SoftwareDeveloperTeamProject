@@ -24,7 +24,11 @@ public class CardDrawing {
         this.parent = parent;
     }
 
-    public void drawNewCardFor(ActorRef out,Players player) {
+    public void drawNewCardFor(ActorRef out, Players player) {
+        if (parent.isSimulation()) {
+            // Block card drawing for simulation.
+            return;
+        }
         ArrayList<Card> current = (player == Players.PLAYER1) ? parent.player1CardsInHand : parent.player2CardsInHand;
         if (current.isEmpty()) {
             if (player == Players.PLAYER1 && deck1.isEmpty()) {
@@ -40,6 +44,9 @@ public class CardDrawing {
         }
     }
     public void displayCardsOnScreenFor(ActorRef out, Players player) {
+        if (parent.isSimulation()) {
+            return;
+        }
         ArrayList<Card> currentCardInHand = (player == Players.PLAYER1) ? parent.player1CardsInHand : parent.player2CardsInHand;
         for (int idx = 0; idx < MAX_CARD_COUNT_IN_HAND; idx++) {
             if (idx < currentCardInHand.size()) {

@@ -46,8 +46,10 @@ public class Board {
         Board copy = new Board();
         for (int x = 0; x < 9; x++) {
             for (int y = 0; y < 5; y++) {
-                Unit cp = new UnitFactory().generateUnitByUnitConfig(instance.board[x][y].getUnit());
-                copy.board[x][y].setUnit(cp);
+                if (instance.board[x][y].hasUnit()) {
+                    Unit cp = new UnitFactory().generateUnitByUnitConfig(instance.board[x][y].getUnit());
+                    copy.board[x][y].setUnit(cp);
+                }
             }
         }
         return copy;

@@ -20,7 +20,7 @@ public class GameStateExtractor {
     // ===========================================================================
     public ExtractedGameState extract() {
         ExtractedGameState output = new ExtractedGameState();
-        output.setSimulation(true);       // Simulation will be used to block draw board and prevent changes to affect the main GameState.
+        output.setSimulation(true);       // Simulation will be used to block draw board and prevent changes to affect the main GameState, including card drawing.
 
         output.setBoard(Board.getCopy());
         output.player1CardsInHand = cloneCardList(parent.player1CardsInHand);
@@ -28,6 +28,8 @@ public class GameStateExtractor {
         output.player1UnitsPosition = clonePairList(parent.player1UnitsPosition);
         output.player2UnitsPosition = clonePairList(parent.player2UnitsPosition);
         output.memento = cloneMementoList(parent.memento);
+
+        output.setRoundNumber(parent.getRoundNumber());
 
         return output;
     }

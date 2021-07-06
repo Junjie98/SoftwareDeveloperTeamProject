@@ -76,8 +76,13 @@ public class CardPlayed {
                     spellAction(out, x, y, 2);
                 }
             }
-        // if normal Unit
+        
+        // If normal Unit
         } else {
+        	
+        	if (current.isSpecialCard())
+        		specialAction(out, current, x, y);
+        	
             Tile tile = Board.getInstance().getTile(x, y);
             if (tile.hasUnit()) {
                 // Cannot deal a card to a Tile that has unit.
@@ -192,6 +197,38 @@ public class CardPlayed {
         if (parent.getPlayer1().getHealth() < 1 || parent.getPlayer2().getHealth() < 1) {
             parent.endGame(out);
         }
+    }
+    
+    public void specialAction(ActorRef out, Card current, int x, int y) {
+    	switch (current.getCardname()) {
+    		case "Azure Herald":
+    			boolean isPlayer1 = false;
+    			if (parent.getTurn() == PLAYER1)
+    				isPlayer1 = true;
+    			
+    			if (isPlayer1) {
+    				int newHealth = parent.getPlayer1().getHealth() + 3;
+    				if(newHealth > 20)
+    					newHealth = 20;
+	               parent.getPlayer1().setHealth(newHealth);
+    			   new PlayerSetCommandsBuilder(out)
+	                   .setPlayer(Players.PLAYER1)
+	                   .setStats(PlayerStats.HEALTH)
+	                   .setInstance(parent.getPlayer1())
+	                   .issueCommand();
+    			}
+                else {
+            		int newHealth = parent.getPlayer2().getHealth() + 3;
+    				if(newHealth > 20)
+    					newHealth = 20;
+    				parent.getPlayer2().setHealth(newHealth);
+                	new PlayerSetCommandsBuilder(out)
+	                    .setPlayer(Players.PLAYER2)
+	                    .setStats(PlayerStats.HEALTH)
+	                    .setInstance(parent.getPlayer2())
+	                    .issueCommand();
+                }
+    	}
     }
 
     // ===========================================================================

@@ -4,7 +4,6 @@ import akka.actor.ActorRef;
 import commandbuilders.TileCommandBuilder;
 import commandbuilders.enums.States;
 import commandbuilders.enums.TileCommandBuilderMode;
-import structures.Board;
 import structures.GameState;
 import structures.basic.Tile;
 
@@ -41,7 +40,6 @@ public class Highlighter {
                     .setState(States.NORMAL)
                     .issueCommand();
 
-            highlightedTiles.add(tile);
             tile.setTileState(States.NORMAL);
             return true;
         } else {
@@ -59,7 +57,6 @@ public class Highlighter {
                         .setTilePosition(x, y)
                         .setState(States.NORMAL)
                         .issueCommand();
-                highlightedTiles.add(tile);
                 tile.setTileState(States.NORMAL);
             }
             return false;
@@ -106,7 +103,6 @@ public class Highlighter {
                         .setTilePosition(x, y)
                         .setState(States.NORMAL)
                         .issueCommand();
-                highlightedTiles.add(tile);
                 tile.setTileState(States.NORMAL);
             }
             return false;

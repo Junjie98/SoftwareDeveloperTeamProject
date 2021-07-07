@@ -14,7 +14,6 @@ import structures.memento.ActionType;
 import structures.memento.AttackInformation;
 import structures.memento.GameMemento;
 import structures.memento.MovementInformation;
-import java.util.HashSet;
 import java.util.ArrayList;
 
 public class UnitMovementAndAttack {
@@ -266,7 +265,6 @@ public class UnitMovementAndAttack {
 
                 boolean isRanged = attacker.isRanged();
                 int enemyHealthAfterAttack =enemy.getHealth();
-                parent.memento.add(new GameMemento(parent.getTurn(), ActionType.ATTACK, new AttackInformation(activeUnit, new Pair<>(x, y), attacker, enemy)));
 
                 if(isRanged){
                     //do ranged attack
@@ -343,6 +341,8 @@ public class UnitMovementAndAttack {
                 else{
                     enemyHealthAfterAttack = attack(out, attackerLocation, enemy, attacker, x, y, isRanged);
                 }
+                parent.memento.add(new GameMemento(parent.getTurn(), ActionType.ATTACK, new AttackInformation(new Pair<>(attacker.getPosition().getTilex(), attacker.getPosition().getTiley()),
+                        new Pair<>(x, y), attacker, enemy)));
 
 
                 if (enemyHealthAfterAttack > 0) {

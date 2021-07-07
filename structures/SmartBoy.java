@@ -14,6 +14,9 @@ public class SmartBoy {
 
     public void tester(ActorRef out) {
         ExtractedGameState information = getExtractedGameState();
+
+//        System.out.println(information);
+
 //        information.tileClicked(out, information.player2UnitsPosition.get(0).getFirst(), information.player2UnitsPosition.get(0).getSecond());
 //        information.cardClicked(out, 0);
 

@@ -296,7 +296,7 @@ public class UnitMovementAndAttack {
 
                         if(goodMoves.size()>0)
                         {   //otherwise the first good move is fine
-                           
+                           boolean found =false;
 
                             for (Pair<Integer,Integer> pair : goodMoves) { //mx =move x 
                                 
@@ -317,9 +317,14 @@ public class UnitMovementAndAttack {
                                     attackerLocation =  Board.getInstance().getTile(pair);
                                     enemyHealthAfterAttack = attack(out, attackerLocation, enemy, attacker, x, y, isRanged);
                                     System.out.println("found new pos using selective method");
+                                    found = true;
                                 }
                             
                                 
+                            }
+                            if (!found)
+                            {
+                                return;
                             }
                             
                         }

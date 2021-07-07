@@ -100,19 +100,12 @@ public class UnitMovementAndAttack {
 
 
         //basica attack highlight connected to normal movement highlight
-        ArrayList<Pair<Integer, Integer>> initAtk = parent.getMoveTiles(x, y, 3, 0);
-        ArrayList<Pair<Integer, Integer>> secondAtk = parent.getMoveTiles(x, y,2, 1);
-        ArrayList<Pair<Integer, Integer>> interAtk = parent.getMoveTiles(x, y, 1, 2);
+        ArrayList<Pair<Integer, Integer>> atkTiles = getAllAtkTiles(x, y);
 
-        for (Pair<Integer, Integer> pos : initAtk) {
+        for (Pair<Integer, Integer> pos : atkTiles) {
             parent.getHighlighter().checkAttackHighlight(out, pos);
         }
-        for (Pair<Integer, Integer> pos : secondAtk) {
-            parent.getHighlighter().checkAttackHighlight(out, pos);
-        }
-        for (Pair<Integer, Integer> pos : interAtk) {
-            parent.getHighlighter().checkAttackHighlight(out, pos);
-        }
+       
 
     }
 
@@ -150,7 +143,38 @@ public class UnitMovementAndAttack {
         output.addAll(parent.getMoveTiles(x, y, 1, 1));
         return output;
     }
+    public ArrayList<Pair<Integer, Integer>> getAllAtkTiles(int x, int y) {
+        ArrayList<Pair<Integer, Integer>> output = parent.getMoveTiles(x, y, 2, 1);
+        output.addAll(parent.getMoveTiles(x, y, 2, 2));
+        output.addAll(parent.getMoveTiles(x, y, 1, 2));
+        output.addAll(parent.getMoveTiles(x, y, 1, 3));
+        output.addAll(parent.getMoveTiles(x, y, 3, 0));
+        output.addAll(parent.getMoveTiles(x, y, 3, 1));
+        return output;
+    }
+    public ArrayList<Pair<Integer, Integer>> get1RAtkTiles(int x, int y) {
+        ArrayList<Pair<Integer, Integer>> output = parent.getMoveTiles(x, y, 1, 0);
+        output.addAll(parent.getMoveTiles(x, y, 1, 1));
+        return output;
+    }
+    public Pair<Integer,Integer> getMoveTileForAttack(int Ax, int Ay, int Ex, int Ey)
+    {
+        //ArrayList<Pair<Integer,Integer>> rangeTiles = get1RAtkTiles(x, y);
+        int mx = Ax-Ex;
+        int my = Ay-Ey; //my butterfly, suga baby //https://youtu.be/6FEDrU85FLE?t=7
 
+        if(Math.abs(mx)>0)
+        {
+            mx = mx > 0 ? 1 : -1;
+        }
+        if(Math.abs(my) > 0)
+        {
+            my = my > 0 ? 1 : -1;
+        }
+        Pair<Integer, Integer> out = new Pair<>(Ex + mx, Ey + my);
+        return out;
+
+    }
     public ArrayList<Pair<Integer, Integer>> getFlyMoveTiles() {
         int[][] maxContainer = new int[45][2];
         int count = 0 ;
@@ -174,7 +198,7 @@ public class UnitMovementAndAttack {
 
     public void highlightedMoveTileClicked(ActorRef out, int x, int y) {
         Tile activatedTile = Board.getInstance().getTile(activeUnit);
-
+        System.out.println("move activated");
         if (activatedTile.getUnit().getHasAttacked()) {
             // Units that has attacked should not be able to move.
             parent.getHighlighter().clearBoardHighlights(out);
@@ -188,7 +212,7 @@ public class UnitMovementAndAttack {
         }
 
         Tile destinationTile = Board.getInstance().getTile(x, y);
-
+        System.out.println("chekcing move");
         if (destinationTile.getTileState() == States.NORMAL) {
             parent.getHighlighter().clearBoardHighlights(out);
         } else if (destinationTile.getTileState() == States.HIGHLIGHTED) {
@@ -231,16 +255,32 @@ public class UnitMovementAndAttack {
     public void launchAttack(ActorRef out, int x, int y) {
         if (activeUnit == null) { return; }
         if (Board.getInstance().getTile(x, y).getUnit().getPlayerID() != parent.getTurn()) {
-        	
+        	System.out.println("attackLaunched");
             Tile enemyLocation = Board.getInstance().getTile(x, y);
             Tile attackerLocation =  Board.getInstance().getTile(activeUnit);
             Unit enemy = enemyLocation.getUnit();
             Unit attacker = attackerLocation.getUnit();
             
             if(attackCheck(x, y) || attacker.isRanged()) {
+                System.err.println("attack check passed");
+
                 boolean isRanged = attacker.isRanged();
-                int enemyHealthAfterAttack = attack(out, attackerLocation, enemy, attacker, x, y, isRanged);
+                int enemyHealthAfterAttack =0;
                 
+                if(isRanged){
+                    //do ranged attack
+                }
+                else{
+                    //move to a range then attack
+                    Pair<Integer,Integer> moveTile = getMoveTileForAttack(attackerLocation.getTilex(), attackerLocation.getTiley(), x, y);
+                    System.out.println(moveTile);
+                    highlightedMoveTileClicked(out, moveTile.getFirst(), moveTile.getSecond());
+                    attackerLocation =  Board.getInstance().getTile(moveTile);
+                    enemyHealthAfterAttack = attack(out, attackerLocation, enemy, attacker, x, y, isRanged);
+
+                }
+
+
                 if (enemyHealthAfterAttack > 0) {
                 	
                 	int counterAttackResult = 0;
@@ -297,10 +337,10 @@ public class UnitMovementAndAttack {
 
     // Ana: Counter attack, including ranged attack
     public int attack(ActorRef out, Tile attackerLocation, Unit enemy, Unit attacker, int x, int y, boolean isRanged) {
+
         UnitCommandBuilder enemyCommandBuilder = new UnitCommandBuilder(out).setUnit(enemy);
         int enemyHealth = enemy.getHealth();
         int healthAfterDamage = enemyHealth - attacker.getDamage();
-
         if (healthAfterDamage < 0)
             healthAfterDamage = 0;
         
@@ -313,6 +353,7 @@ public class UnitMovementAndAttack {
 		}
         
         else {
+            System.out.println("Basic attack");
         	BasicCommands.playUnitAnimation(out, attacker, UnitAnimationType.attack);
     		try {Thread.sleep(2000);} catch (InterruptedException e) {e.printStackTrace();}
         }
@@ -377,6 +418,7 @@ public class UnitMovementAndAttack {
 
         int[] acPos = {x, y};
         ArrayList<Pair<Integer, Integer>> tileActive = getAllMoveTiles(activeUnit.getFirst(), activeUnit.getSecond());
+        tileActive.addAll(getAllAtkTiles(activeUnit.getFirst(), activeUnit.getSecond()));
 
         //Ana: for counter attack
         if (Board.getInstance().getTile(x, y).getUnit() != null && Board.getInstance().getTile(x, y).getUnit().getHasGotAttacked())
@@ -384,14 +426,15 @@ public class UnitMovementAndAttack {
 
         for (Pair<Integer, Integer> ip: tileActive) {
             if(ip.getFirst()== acPos[0] && ip.getSecond() == acPos[1]) {
+                System.out.println("ip stuff: "+ip.getFirst() + ip.getSecond());
                 if(Board.getInstance().getTile(x, y).getUnit() != null) {
                     //enemy is in this tile
                     return true;
                 }
+
                 return false;
             }
         }
-
         return false;
     }
 

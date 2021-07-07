@@ -30,57 +30,125 @@ public class AI
 
     public void TakeTurn(ActorRef out, GameState gs)
     {
+        System.out.println("AI Started");
         moveInit(out, gs);
         castInit(out, gs);
     }
 
-    public void castInit(ActorRef out, GameState gs)
+    
+    
+    // ===========================================================================
+    // Control Methods
+    // ===========================================================================
+
+
+    //Part of the AI control "interface"
+    public void AI_SummonUnit(ActorRef out, GameState gs, int cardIndex, Pair<Integer, Integer> pos)
     {
-        ArrayList<Card> summonCards = new ArrayList<Card>();
-        ArrayList<Card> spellCards = new ArrayList<Card>();
-
-        //check mana
-        //check spells
-        //prioritise and cast
-        mana = gs.getPlayer2().getMana();
-        for (int i = 0; i < gs.player2CardsInHand.size(); i++) {
-            if(gs.player2CardsInHand.get(i).getManacost() <= mana){
-                if(gs.player2CardsInHand.get(i).isSpell()){
-                    spellCards.add(gs.player2CardsInHand.get(i));
-                }
-                else{
-                    summonCards.add(gs.player2CardsInHand.get(i));
-                }
-            }
-        }
-
- 
+        gs.cardClicked(out, cardIndex);
+        try {Thread.sleep(2500);} catch (InterruptedException e) {e.printStackTrace();}
+        gs.tileClicked(out, pos.getFirst(), pos.getSecond());
+        try {Thread.sleep(2500);} catch (InterruptedException e) {e.printStackTrace();}
+    }
+    public void AI_MoveUnit(ActorRef out, GameState gs, Pair<Integer, Integer> friendlyPosition, Pair<Integer, Integer> moveToPosition)
+    {
+        gs.tileClicked(out, friendlyPosition.getFirst(), friendlyPosition.getSecond());
+        try {Thread.sleep(2500);} catch (InterruptedException e) {e.printStackTrace();}
+        gs.tileClicked(out, moveToPosition.getFirst(), moveToPosition.getSecond());
+        try {Thread.sleep(2500);} catch (InterruptedException e) {e.printStackTrace();}
+    }
+    public void AI_AtkUnit(ActorRef out, GameState gs, Pair<Integer, Integer> friendlyPosition, Pair<Integer, Integer> enemyPosition)
+    {
+        gs.tileClicked(out, friendlyPosition.getFirst(), friendlyPosition.getSecond());
+        try {Thread.sleep(2500);} catch (InterruptedException e) {e.printStackTrace();}
+        gs.tileClicked(out, enemyPosition.getFirst(), enemyPosition.getSecond());
+        try {Thread.sleep(2500);} catch (InterruptedException e) {e.printStackTrace();}
+        moreUnitsToMoveAtk(out, gs);
     }
 
-    public void moveCheck(ActorRef out, GameState gs)
+    public void moreUnitsToMoveAtk(ActorRef out, GameState gs)
     {
-        System.err.println("recieve pulse");
-        if(friendlies != null && moveIndex < friendlies.size())
+        if(moveIndex < friendlies.size())
         {
             move(out, gs);
         }
     }
 
-    public Pair<Integer, Integer> findEnemyTarget(ArrayList<Pair<Integer, Integer>> units, GameState gs)
+    // ===========================================================================
+    // Cast Methods
+    // ===========================================================================
+
+    public void castInit(ActorRef out, GameState gs)
     {
-        int x = -1;
-        for (Pair<Integer,Integer> pos : units) 
+        HashMap<Card,Integer> summonCards = new HashMap<Card,Integer>();
+        HashMap<Card,Integer> spellCards = new HashMap<Card,Integer>();
+
+        //check mana
+        //check spells
+        //prioritise and cast
+        mana = gs.getPlayer2().getMana();
+        System.out.println("player 2 mana: " + mana);
+
+        if(gs.player2CardsInHand.size()==0)
         {
-            if(x<pos.getFirst())
-            {
-                System.err.println(pos.getFirst());
-                x = pos.getFirst();
-                enemyTarget = pos;
+            return;
+        }
+        for (int i = 0; i < gs.player2CardsInHand.size(); i++) {
+            if(gs.player2CardsInHand.get(i).getManacost() <= mana){
+                System.out.println("manacost: " + gs.player2CardsInHand.get(i).getManacost());
+                //for each castable spell this round split into summons and spells
+                if(gs.player2CardsInHand.get(i).isSpell()){
+                    spellCards.put(gs.player2CardsInHand.get(i),i);
+                    System.out.println("spell card");
+                }
+                else{
+                    summonCards.put(gs.player2CardsInHand.get(i),i);
+                    System.out.println("unit card");
+
+                }
             }
         }
-        return enemyTarget;
+        int indexOfHigh = 0;
+        int highCost = 0;
+        Pair<Integer,Integer> targ = null;
+        if(summonCards.size()>0)
+        {   //lets prioritise summons and do them first since game pieces are more efficient than spells
+            for(Card key : summonCards.keySet())
+            {
+                if(key.getManacost()>highCost)
+                {
+                    highCost = key.getManacost();
+                    indexOfHigh = summonCards.get(key).intValue();
+                }
+            }
+
+            ArrayList<Pair<Integer,Integer>> tiles = new ArrayList<>();
+
+            for(int i =0; i < gs.player2UnitsPosition.size(); i++)
+            {
+                Pair<Integer,Integer> pos = gs.player2UnitsPosition.get(i);
+                tiles.addAll(gs.getUnitMovementAndAttack().get1RAtkTiles(pos.getFirst(), pos.getSecond()));
+            }
+
+            for (Pair<Integer,Integer> pair : tiles) {
+                if(!Board.getInstance().getTile(pair).hasUnit())
+                {
+                    targ = pair;
+                }
+            }
+
+
+            AI_SummonUnit(out, gs, indexOfHigh, targ);
+        }
+ 
+
+
+ 
     }
 
+    // ===========================================================================
+    // Move Methods
+    // ===========================================================================
 
     public void moveInit(ActorRef out, GameState gs)
     {
@@ -91,13 +159,6 @@ public class AI
         move(out, gs);
 
     }
-
-
-    public  void getSecondaryTiles(int x, int y)
-    {
-
-    }
-
 
     public void move(ActorRef out, GameState gs)
     {
@@ -138,16 +199,13 @@ public class AI
         System.out.println("init targ pos: " + targPos);
         System.out.println("init targ state: " + Board.getInstance().getTile(targPos).getTileState());
 
-        gs.tileClicked(out, unitPos.getFirst(), unitPos.getSecond());
-        try {Thread.sleep(2500);} catch (InterruptedException e) {e.printStackTrace();}
-
-
-        if(Board.getInstance().getTile(targPos).getTileState() == States.RED)
+        if(gs.getUnitMovementAndAttack().getAllAtkTiles(unitPos.getFirst(), unitPos.getSecond()).contains(targPos)
+            && Board.getInstance().getTile(unitPos).hasUnit())
         {   //if we can attack and move then go for it and let that logic take care of itself
             moved = true; 
 
-            gs.tileClicked(out, targPos.getFirst(), targPos.getSecond());
-            try {Thread.sleep(2500);} catch (InterruptedException e) {e.printStackTrace();}
+            moveIndex++;
+            AI_AtkUnit(out, gs, unitPos, targPos);
             System.out.println("Attack from range AI using move-to-attack");
         }
         
@@ -192,39 +250,55 @@ public class AI
             System.err.println("Tiles selected by ai: ");
             System.err.println(unitPos);
             System.err.println(targPos);
-            //System.err.println("Number of friendlies: " + friendlies.size());
 
             System.err.println("enemy targ pos: ");
             System.err.println(enemyTarget);
 
-            // gs.tileClicked(out, unitPos.getFirst(), unitPos.getSecond());
-            // //System.err.println("Units selected for move waiting...");
-            // try {Thread.sleep(2500);} catch (InterruptedException e) {e.printStackTrace();}
-
-
-            gs.tileClicked(out, targPos.getFirst(), targPos.getSecond());
-            //System.err.println("Units moving for target waiting...");
-
-            try {Thread.sleep(1000);} catch (InterruptedException e) {e.printStackTrace();}
-            // System.err.println("Number of friendlies: " + friendlies.size());
-
-
-        }
-        else
-        {
             moveIndex++;
+
+            AI_MoveUnit(out, gs, unitPos, targPos);
         }
+      
             
 
 
     
 
-       if(targPos == enemyTarget)
-       {
-           //we are attacking
-           move(out, gs);
-       }
+    //    if(targPos == enemyTarget)
+    //    {
+    //        //we are attacking
+    //        move(out, gs);
+    //    }
  
+    }
+
+
+    // ===========================================================================
+    // Helper Methods
+    // ===========================================================================
+
+    public void moveCheck(ActorRef out, GameState gs)
+    {
+        System.err.println("recieve pulse");
+        if(friendlies != null && moveIndex < friendlies.size())
+        {
+            move(out, gs);
+        }
+    }
+
+    public Pair<Integer, Integer> findEnemyTarget(ArrayList<Pair<Integer, Integer>> units, GameState gs)
+    {
+        int x = -1;
+        for (Pair<Integer,Integer> pos : units) 
+        {
+            if(x<pos.getFirst())
+            {
+                System.err.println(pos.getFirst());
+                x = pos.getFirst();
+                enemyTarget = pos;
+            }
+        }
+        return enemyTarget;
     }
 
 }

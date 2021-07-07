@@ -194,7 +194,7 @@ public class UnitMovementAndAttack {
             for(int y = 0; y < 5; y ++) {
                 if(!Board.getInstance().getTile(x, y).hasUnit()) {
                     int[] temp = {x, y};
-                    System.err.println("tile: " + x + "," + y);
+                    //System.err.println("tile: " + x + "," + y);
                     maxContainer[count++] = temp;
                 }
             }
@@ -223,14 +223,14 @@ public class UnitMovementAndAttack {
         }
 
         Tile destinationTile = Board.getInstance().getTile(x, y);
-        System.out.println("chekcing move");
+        //System.out.println("chekcing move");
         if (destinationTile.getTileState() == States.NORMAL) {
             parent.getHighlighter().clearBoardHighlights(out);
         } else if (destinationTile.getTileState() == States.HIGHLIGHTED) {
             unitsCanMove = false;   // Prevent other units from moving.
             
 
-            System.out.println("move valid");
+            //System.out.println("move valid");
 
             new UnitCommandBuilder(out)
                     .setMode(UnitCommandBuilderMode.MOVE)
@@ -243,9 +243,9 @@ public class UnitMovementAndAttack {
                     parent.player1UnitsPosition : parent.player2UnitsPosition;
             for (Pair<Integer, Integer> position: pool) {
 
-               System.err.println("a unit in the pool" + position);
+               //System.err.println("a unit in the pool" + position);
                     if (position.equals(activeUnit)) {
-                        System.err.println("REMOVING UNIT!");
+                        //System.err.println("REMOVING UNIT!");
                         pool.remove(position);
                         break;
                     }
@@ -273,14 +273,14 @@ public class UnitMovementAndAttack {
     public void launchAttack(ActorRef out, int x, int y) {
         if (activeUnit == null) { return; }
         if (Board.getInstance().getTile(x, y).getUnit().getPlayerID() != parent.getTurn()) {
-        	System.out.println("attackLaunched");
+        	//System.out.println("attackLaunched");
             Tile enemyLocation = Board.getInstance().getTile(x, y);
             Tile attackerLocation =  Board.getInstance().getTile(activeUnit);
             Unit enemy = enemyLocation.getUnit();
             Unit attacker = attackerLocation.getUnit();
             
             if(attackCheck(x, y) || attacker.isRanged()) {
-                System.err.println("attack check passed");
+                //System.err.println("attack check passed");
 
                 boolean isRanged = attacker.isRanged();
                 int enemyHealthAfterAttack =enemy.getHealth();

@@ -41,7 +41,7 @@ public class CardPlayed {
         	ArrayList<Pair<Integer, Integer>> enemyUnits = (parent.getTurn() == Players.PLAYER1) ?
                     parent.player2UnitsPosition : parent.player1UnitsPosition;
 			for (Pair<Integer, Integer> position : enemyUnits) {
-                Tile enemyLocation = Board.getInstance().getTile(position);
+                Tile enemyLocation = parent.getBoard().getTile(position);
               
                 if(enemyLocation.getUnit().getType() == UnitType.PUREBLADE_ENFORCER) {
                 	System.out.println("bleh");
@@ -116,7 +116,7 @@ public class CardPlayed {
         	if (current.isSpecialCard())
         		specialAction(out, current, x, y);
         	
-            Tile tile = Board.getInstance().getTile(x, y);
+            Tile tile = parent.getBoard().getTile(x, y);
             if (tile.hasUnit()) {
                 // Cannot deal a card to a Tile that has unit.
                 return;
@@ -262,7 +262,7 @@ public class CardPlayed {
 //    			ArrayList<Pair<Integer, Integer>> enemyUnits = (parent.getTurn() == PLAYER1) ?
 //                        parent.player2UnitsPosition : parent.player1UnitsPosition;
 //    			for (Pair<Integer, Integer> position : enemyUnits) {
-//                    Tile enemyLocation = Board.getInstance().getTile(position);
+//                    Tile enemyLocation = parent.getBoard().getTile(position);
 //                  
 //                    if(enemyLocation.getUnit().getType() == UnitType.PUREBLADE_ENFORCER) {
 //                    	System.out.println("bleh");

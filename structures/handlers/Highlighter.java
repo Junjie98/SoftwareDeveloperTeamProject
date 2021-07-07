@@ -32,7 +32,7 @@ public class Highlighter {
             return false;
         }
 
-        Tile tile = Board.getInstance().getTile(x, y);
+        Tile tile = parent.getBoard().getTile(x, y);
 
         if(!tile.hasUnit()) {
             // empty so DONT highlight
@@ -45,7 +45,7 @@ public class Highlighter {
             tile.setTileState(States.NORMAL);
             return true;
         } else {
-            if(Board.getInstance().getTile(pos.getFirst(), pos.getSecond()).getUnit().getPlayerID() != parent.getTurn()) {
+            if(parent.getBoard().getTile(pos.getFirst(), pos.getSecond()).getUnit().getPlayerID() != parent.getTurn()) {
                 // Tile has enemy
                 new TileCommandBuilder(out, parent.isSimulation())
                         .setTilePosition(x, y)

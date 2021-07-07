@@ -69,7 +69,7 @@ public class Highlighter {
         }
     }
 
-    public boolean checkTileHighlight(ActorRef out, Pair<Integer, Integer> pos)  {
+    public boolean checkTileHighlight(ActorRef out, Pair<Integer, Integer> pos, boolean provoked)  {
         int x = pos.getFirst();
         int y = pos.getSecond();
 
@@ -102,6 +102,8 @@ public class Highlighter {
                         .issueCommand();
                 highlightedTiles.add(tile);
                 tile.setTileState(States.RED);
+                return false;
+
             } else {
                 // Tile has friendly
                 new TileCommandBuilder(out)
@@ -110,8 +112,8 @@ public class Highlighter {
                         .issueCommand();
                 highlightedTiles.add(tile);
                 tile.setTileState(States.NORMAL);
+                return true;
             }
-            return false;
 
         }
     }

@@ -24,7 +24,8 @@ public class Heartbeat implements EventProcessor{
 	public void processEvent(ActorRef out, GameState gameState, JsonNode message) {
 		if(gameState.getTurn() != Players.PLAYER2)
         {
-            gameState.ai.moveCheck(out, gameState);;
+			//System.out.println("Send to ai pulse");
+            //gameState.ai.moveCheck(out, gameState);;
         }
 		
 	}

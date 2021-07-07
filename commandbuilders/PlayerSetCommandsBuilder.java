@@ -21,9 +21,11 @@ public class PlayerSetCommandsBuilder extends CommandBuilder {
     private Players player;
     private PlayerStats stats;
     private Player instance;
+    private boolean simulation;
 
-    public PlayerSetCommandsBuilder(ActorRef out) {
+    public PlayerSetCommandsBuilder(ActorRef out, boolean simulation) {
         reference = out;
+        this.simulation = simulation;
     }
 
     public PlayerSetCommandsBuilder setPlayer(Players player) {
@@ -43,6 +45,10 @@ public class PlayerSetCommandsBuilder extends CommandBuilder {
 
     @Override
     public void issueCommand() {
+        if (simulation) {
+            // Command blocked due to simulation.
+            return;
+        }
         if (player == Players.PLAYER1) {
             if (stats == PlayerStats.HEALTH) {
                 BasicCommands.setPlayer1Health(reference, instance);

@@ -9,25 +9,26 @@ import structures.GameState;
 import structures.basic.Card;
 import structures.basic.Tile;
 import structures.basic.Unit;
+import structures.memento.ActionType;
+import structures.memento.GameMemento;
+import structures.memento.SpellInformation;
+import structures.memento.SummonInformation;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import static commandbuilders.enums.Players.PLAYER1;
-
 public class CardPlayed {
     String cardname;
-    private GameState parent;
-    private HashMap<Integer, Integer> unitsOriginalHealth = new HashMap<Integer, Integer>();
+    private final GameState parent;
+    private HashMap<Integer, Integer> unitsOriginalHealth = new HashMap<>();
     Pair<Card, Integer> activeCard = null;
     public CardPlayed(GameState parent) { this.parent = parent; }
-    private UnitMovementAndAttack unitMovementAndAttack = new UnitMovementAndAttack(this.parent);
-
 
     // ===========================================================================
     // Move card to the Board and logic behind it.
     // ===========================================================================
     public void moveCardToBoard(ActorRef out, int x, int y) {
-        Card current = (parent.getTurn() == PLAYER1) ?
+        Card current = (parent.getTurn() == Players.PLAYER1) ?
                 parent.player1CardsInHand.get(activeCard.getSecond()) : parent.player2CardsInHand.get(activeCard.getSecond());
         this.cardname = current.getCardname();
         System.out.println(cardname);
@@ -37,10 +38,10 @@ public class CardPlayed {
         if (current.isSpell()) {
         	
         	// Checking if enemy casted a spell for Pureblade Enforcer
-        	ArrayList<Pair<Integer, Integer>> enemyUnits = (parent.getTurn() == PLAYER1) ?
+        	ArrayList<Pair<Integer, Integer>> enemyUnits = (parent.getTurn() == Players.PLAYER1) ?
                     parent.player2UnitsPosition : parent.player1UnitsPosition;
 			for (Pair<Integer, Integer> position : enemyUnits) {
-                Tile enemyLocation = Board.getInstance().getTile(position);
+                Tile enemyLocation = parent.getBoard().getTile(position);
               
                 if(enemyLocation.getUnit().getType() == UnitType.PUREBLADE_ENFORCER) {
                 	System.out.println("bleh");
@@ -49,13 +50,13 @@ public class CardPlayed {
                 	enemyLocation.getUnit().setHealth(enemyLocation.getUnit().getHealth() + 1);
                 	enemyLocation.getUnit().setDamage(enemyLocation.getUnit().getDamage() + 1);
                 	
-                	new UnitCommandBuilder(out)
+                	new UnitCommandBuilder(out, parent.isSimulation())
                     .setMode(UnitCommandBuilderMode.SET)
                     .setUnit(enemyLocation.getUnit())
                     .setStats(UnitStats.HEALTH, newHealth)
                     .issueCommand();
 
-                    new UnitCommandBuilder(out)
+                    new UnitCommandBuilder(out, parent.isSimulation())
                     .setMode(UnitCommandBuilderMode.SET)
                     .setUnit(enemyLocation.getUnit())
                     .setStats(UnitStats.ATTACK, newDamage)
@@ -66,10 +67,11 @@ public class CardPlayed {
         	
         	
             //Set the effect of the spell and call spellAction
-            if (cardname.equals("Truestrike")) {    // Truestrike does -2 damage to any
+            Unit targetUnit = parent.getBoard().getTile(x, y).getUnit();
+            if (cardname.equals("Truestrike")) {    // Truestike does -2 damage to any
                 // Highlight enemy units
                 // Set a buff animation and the effects like this.
-                new TileCommandBuilder(out)
+                new TileCommandBuilder(out, parent.isSimulation())
                         .setMode(TileCommandBuilderMode.ANIMATION)
                         .setTilePosition(x, y)
                         .setEffectAnimation(TileEffectAnimation.INMOLATION)
@@ -79,7 +81,7 @@ public class CardPlayed {
             }
 
             if (cardname.equals("Entropic Decay")) {    //Reduces a non-avatar unit to 0 heath, rip
-                new TileCommandBuilder(out)
+                new TileCommandBuilder(out, parent.isSimulation())
                         .setMode(TileCommandBuilderMode.ANIMATION)
                         .setTilePosition(x, y)
                         .setEffectAnimation(TileEffectAnimation.MARTYRDOM)
@@ -89,7 +91,7 @@ public class CardPlayed {
             }
 
             if (cardname.equals("Sundrop Elixir") || cardname.equals("Staff of Y'Kir'")) { //Staff +2 Attack for avatar,
-                new TileCommandBuilder(out)
+                new TileCommandBuilder(out, parent.isSimulation())
                         .setMode(TileCommandBuilderMode.ANIMATION)
                         .setTilePosition(x, y)
                         .setEffectAnimation(TileEffectAnimation.BUFF)
@@ -97,31 +99,31 @@ public class CardPlayed {
 
                 if(cardname.equals("Sundrop Elixir")){
                     //Calculate how much health the spell will recover based on the original health
-                    Unit unit = Board.getInstance().getTile(x,y).getUnit();
+                    Unit unit = parent.getBoard().getTile(x,y).getUnit();
                     int currentHealth = unit.getHealth();
                     int originalHealth = unitsOriginalHealth.get(unit.getId());
                     int gap = originalHealth - currentHealth;
-                    int totalRecovery = (gap <= 5) ? gap : 5;
+                    int totalRecovery = Math.min(gap, 5);
                     spellAction(out, x, y, totalRecovery);
                 } else {
                     spellAction(out, x, y, 2);
                 }
             }
-        
+            // Track this action in the memento.
+            parent.memento.add(new GameMemento(parent.getTurn(), ActionType.SPELL, new SpellInformation(targetUnit, new Pair<>(x, y), current)));
         // If normal Unit
         } else {
-        	
         	if (current.isSpecialCard())
         		specialAction(out, current, x, y);
         	
-            Tile tile = Board.getInstance().getTile(x, y);
+            Tile tile = parent.getBoard().getTile(x, y);
             if (tile.hasUnit()) {
                 // Cannot deal a card to a Tile that has unit.
                 return;
             }
 
             //Play summon effect each time a player cast a card
-            new TileCommandBuilder(out)
+            new TileCommandBuilder(out, parent.isSimulation())
                     .setMode(TileCommandBuilderMode.ANIMATION)
                     .setTilePosition(x, y)
                     .setEffectAnimation(TileEffectAnimation.SUMMON)
@@ -130,47 +132,41 @@ public class CardPlayed {
             try {Thread.sleep(500);} catch (InterruptedException e) {e.printStackTrace();} // Unit will appear with effect
 
             Unit unit = new UnitFactory().generateUnitByCard(current);
-            if (cardname.equals("WindShrike")) {
-                unit.setFlying(true);
-            } else {
-                unit.setFlying(false);
-            }
-            
+            unit.setFlying(cardname.equals("WindShrike"));
             // Ana: Ranged Attack
-            if(cardname.equals("Pyromancer") || cardname.equals("Fire Spitter")) {
-                unit.setRanged(true);
-            } else {
-                unit.setRanged(false);
-            }
-            
-            new UnitCommandBuilder(out)
-                    .setMode(UnitCommandBuilderMode.DRAW)
+            unit.setRanged(cardname.equals("Pyromancer") || cardname.equals("Fire Spitter"));
+
+            UnitCommandBuilder builder = new UnitCommandBuilder(out, parent.isSimulation())
+                    .setUnit(unit);
+
+            builder.setMode(UnitCommandBuilderMode.DRAW)
                     .setTilePosition(x, y)
                     .setPlayerID(parent.getTurn())
-                    .setUnit(unit)
                     .issueCommand();
-            
-            //updates the UI from bigCard stats
-            new UnitCommandBuilder(out)
-            .setMode(UnitCommandBuilderMode.SET)
-            .setUnit(unit)
-            .setStats(UnitStats.HEALTH, current.getBigCard().getHealth())
-            .issueCommand();
 
-            new UnitCommandBuilder(out)
-            .setMode(UnitCommandBuilderMode.SET)
-            .setUnit(unit)
-            .setStats(UnitStats.ATTACK, current.getBigCard().getAttack())
-            .issueCommand();
+            try {Thread.sleep(30);} catch (InterruptedException e) {e.printStackTrace();}
+
+            //updates the UI from bigCard stats
+            builder.setMode(UnitCommandBuilderMode.SET)
+                    .setStats(UnitStats.HEALTH, current.getBigCard().getHealth())
+                    .issueCommand();
+
+            try {Thread.sleep(30);} catch (InterruptedException e) {e.printStackTrace();}
+
+            builder.setMode(UnitCommandBuilderMode.SET)
+                    .setStats(UnitStats.ATTACK, current.getBigCard().getAttack())
+                    .issueCommand();
 
             unitsOriginalHealth.put(unit.getId(),current.getBigCard().getHealth());
 //            System.out.println("the health of "+ unit +" is " + unitsOriginalHealth.get(unit.getId()));
 
-            if (parent.getTurn() == PLAYER1) {
+            if (parent.getTurn() == Players.PLAYER1) {
                 parent.player1UnitsPosition.add(new Pair<>(x, y));
             } else {
                 parent.player2UnitsPosition.add(new Pair<>(x, y));
             }
+
+            parent.memento.add(new GameMemento(parent.getTurn(), ActionType.SUMMON, new SummonInformation(new Pair<>(x, y), unit)));
         }
         deleteCardFromHand(out, tempCardToDelete);      //these two have to take place at the end to avoid a bug.
         parent.decreaseManaPerCardPlayed(out, current.getManacost());
@@ -178,9 +174,9 @@ public class CardPlayed {
     }
     
     public void spellAction(ActorRef out, int x, int y, int strengthOfSpell) {
-        Tile targetLocation = Board.getInstance().getTile(x, y);
+        Tile targetLocation = parent.getBoard().getTile(x, y);
         Unit target = targetLocation.getUnit();
-        UnitCommandBuilder targetCommandBuilder = new UnitCommandBuilder(out).setUnit(target);
+        UnitCommandBuilder targetCommandBuilder = new UnitCommandBuilder(out, parent.isSimulation()).setUnit(target);
 
         if(cardname.equals("Sundrop Elixir") || cardname.equals("Entropic Decay") || cardname.equals("Truestrike")) {
             int targetHealth = target.getHealth();
@@ -209,24 +205,26 @@ public class CardPlayed {
 
         // update avatar health to UI player health.
         if(target.isAvatar() && target.getPlayerID() == Players.PLAYER1) {
-            parent.getPlayer1().setHealth(target.getHealth());
-            new PlayerSetCommandsBuilder(out)
+            parent.getPlayer(Players.PLAYER1).setHealth(target.getHealth());
+            new PlayerSetCommandsBuilder(out, parent.isSimulation())
                     .setPlayer(Players.PLAYER1)
                     .setStats(PlayerStats.HEALTH)
-                    .setInstance(parent.getPlayer1())
+                    .setInstance(parent.getPlayer(Players.PLAYER1))
                     .issueCommand();
         } else if(target.isAvatar() && target.getPlayerID()== Players.PLAYER2) {
-            parent.getPlayer2().setHealth(target.getHealth());
-            new PlayerSetCommandsBuilder(out)
+            parent.getPlayer(Players.PLAYER2).setHealth(target.getHealth());
+            new PlayerSetCommandsBuilder(out, parent.isSimulation())
                     .setPlayer(Players.PLAYER2)
                     .setStats(PlayerStats.HEALTH)
-                    .setInstance(parent.getPlayer2())
+                    .setInstance(parent.getPlayer(Players.PLAYER2))
                     .issueCommand();
         }
 
         // Win condition: should be moved to a method where we are checking player's health
-        if (parent.getPlayer1().getHealth() < 1 || parent.getPlayer2().getHealth() < 1) {
-            parent.endGame(out);
+        for (Players player: Players.values()) {
+            if (parent.getPlayer(player).getHealth() < 1) {
+                parent.endGame(out);
+            }
         }
     }
     
@@ -234,29 +232,29 @@ public class CardPlayed {
     	switch (current.getCardname()) {
     		case "Azure Herald":
     			boolean isPlayer1 = false;
-    			if (parent.getTurn() == PLAYER1)
+    			if (parent.getTurn() == Players.PLAYER1)
     				isPlayer1 = true;
     			
     			if (isPlayer1) {
-    				int newHealth = parent.getPlayer1().getHealth() + 3;
+    				int newHealth = parent.getPlayer(Players.PLAYER1).getHealth() + 3;
     				if(newHealth > 20)
     					newHealth = 20;
-	               parent.getPlayer1().setHealth(newHealth);
-    			   new PlayerSetCommandsBuilder(out)
+	               parent.getPlayer(Players.PLAYER1).setHealth(newHealth);
+    			   new PlayerSetCommandsBuilder(out, parent.isSimulation())
 	                   .setPlayer(Players.PLAYER1)
 	                   .setStats(PlayerStats.HEALTH)
-	                   .setInstance(parent.getPlayer1())
+	                   .setInstance(parent.getPlayer(Players.PLAYER1))
 	                   .issueCommand();
     			}
                 else {
-            		int newHealth = parent.getPlayer2().getHealth() + 3;
+            		int newHealth = parent.getPlayer(Players.PLAYER2).getHealth() + 3;
     				if(newHealth > 20)
     					newHealth = 20;
-    				parent.getPlayer2().setHealth(newHealth);
-                	new PlayerSetCommandsBuilder(out)
+    				parent.getPlayer(Players.PLAYER2).setHealth(newHealth);
+                	new PlayerSetCommandsBuilder(out, parent.isSimulation())
 	                    .setPlayer(Players.PLAYER2)
 	                    .setStats(PlayerStats.HEALTH)
-	                    .setInstance(parent.getPlayer2())
+	                    .setInstance(parent.getPlayer(Players.PLAYER2))
 	                    .issueCommand();
                 }
     			
@@ -264,7 +262,7 @@ public class CardPlayed {
 //    			ArrayList<Pair<Integer, Integer>> enemyUnits = (parent.getTurn() == PLAYER1) ?
 //                        parent.player2UnitsPosition : parent.player1UnitsPosition;
 //    			for (Pair<Integer, Integer> position : enemyUnits) {
-//                    Tile enemyLocation = Board.getInstance().getTile(position);
+//                    Tile enemyLocation = parent.getBoard().getTile(position);
 //                  
 //                    if(enemyLocation.getUnit().getType() == UnitType.PUREBLADE_ENFORCER) {
 //                    	System.out.println("bleh");
@@ -279,7 +277,7 @@ public class CardPlayed {
     // Delete Cards and Units
     // ===========================================================================
     public void deleteCardFromHand(ActorRef out, int pos) {
-        ArrayList<Card> current = (parent.getTurn() == PLAYER1) ? parent.player1CardsInHand : parent.player2CardsInHand;
+        ArrayList<Card> current = (parent.getTurn() == Players.PLAYER1) ? parent.player1CardsInHand : parent.player2CardsInHand;
         current.remove(pos);
         parent.getCardDrawing().displayCardsOnScreenFor(out, parent.getTurn());
     }
@@ -287,7 +285,7 @@ public class CardPlayed {
     public void deleteUnit(ActorRef out, int x, int y, Tile enemyLocation) {
         //Delete the enemy unit if dies
         try {Thread.sleep(1000);} catch (InterruptedException e) {e.printStackTrace();} // Unit will disappear with effect
-        new UnitCommandBuilder(out)
+        new UnitCommandBuilder(out, parent.isSimulation())
                 .setMode(UnitCommandBuilderMode.DELETE)
                 .setUnit(enemyLocation.getUnit())
                 .issueCommand();

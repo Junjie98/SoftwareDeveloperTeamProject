@@ -24,9 +24,11 @@ import utils.StaticConfFiles;
 public class ProjectTileAnimationCommandBuilder extends CommandBuilder {
     private final ActorRef reference;
     private Tile tile1, tile2;
+    private boolean simulation;
 
-    public ProjectTileAnimationCommandBuilder(ActorRef out) {
+    public ProjectTileAnimationCommandBuilder(ActorRef out, boolean simulation) {
         reference = out;
+        this.simulation = simulation;
     }
 
     public ProjectTileAnimationCommandBuilder setSource(Tile tile) {
@@ -41,6 +43,10 @@ public class ProjectTileAnimationCommandBuilder extends CommandBuilder {
 
     @Override
     public void issueCommand() {
+        if (simulation) {
+            // Command blocked due to simulation.
+            return;
+        }
         EffectAnimation projectile = BasicObjectBuilders.loadEffect(StaticConfFiles.f1_projectiles);
         BasicCommands.playUnitAnimation(reference, tile1.getUnit(), UnitAnimationType.attack);
         try {Thread.sleep(1000);} catch (InterruptedException e) {e.printStackTrace();}
@@ -51,7 +57,6 @@ public class ProjectTileAnimationCommandBuilder extends CommandBuilder {
         	BasicCommands.playUnitAnimation(reference, tile2.getUnit(), UnitAnimationType.death);
         	try {Thread.sleep(2000);} catch (InterruptedException e) {e.printStackTrace();}
         	BasicCommands.deleteUnit(reference, tile2.getUnit());
-        	
         }else {
         	try {Thread.sleep(2000);} catch (InterruptedException e) {e.printStackTrace();}
             BasicCommands.playUnitAnimation(reference, tile2.getUnit(), UnitAnimationType.hit);

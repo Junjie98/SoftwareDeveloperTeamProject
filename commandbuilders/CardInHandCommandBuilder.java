@@ -27,8 +27,10 @@ public class CardInHandCommandBuilder extends CommandBuilder {
     private CardInHandCommandMode command = CardInHandCommandMode.DRAW;
     private States state = States.NORMAL;
     private int position = 0;
+    private boolean simulation = false;
 
-    public CardInHandCommandBuilder(ActorRef out) {
+    public CardInHandCommandBuilder(ActorRef out, boolean simulation) {
+        this.simulation = simulation;
         reference = out;
     }
 
@@ -54,6 +56,10 @@ public class CardInHandCommandBuilder extends CommandBuilder {
 
     @Override
     public void issueCommand() {
+        if (simulation) {
+            // Command blocked due to simulation.
+            return;
+        }
         if (command == CardInHandCommandMode.DRAW) {
             int mode = (this.state == States.NORMAL) ? 0 : 1;
             BasicCommands.drawCard(reference, card, position, mode);

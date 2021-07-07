@@ -76,6 +76,7 @@ public class BasicObjectBuilders {
 		try {
 			Unit unit = mapper.readValue(new File(configFile), classType);
 			unit.setId(id);
+			unit.setConfigFile(configFile);		// For unit copies
 			return unit;
 		} catch (Exception e) {
 			e.printStackTrace();

@@ -11,7 +11,6 @@ import structures.basic.Unit;
 import structures.extractor.GameStateExtractor;
 import structures.handlers.*;
 import structures.memento.GameMemento;
-import structures.handlers.UnitMovementAndAttack;
 
 /**
  * This class can be used to hold information about the on-going game.

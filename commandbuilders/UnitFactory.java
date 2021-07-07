@@ -75,10 +75,14 @@ public class UnitFactory {
     public Unit generateUnitByUnitConfig(Unit oldUnit) {
         // This is only used for simulations!
         Unit unit = BasicObjectBuilders.loadUnit(oldUnit.getConfigFile(), -1, Unit.class);
+        unit.setPlayerID(oldUnit.getPlayerID());
         unit.setName(oldUnit.getName());
         unit.setHealth(oldUnit.getHealth());
         unit.setDamage(oldUnit.getDamage());
         unit.setType(oldUnit.getType());
+        unit.setAvatar(oldUnit.isAvatar());
+        unit.setRanged(oldUnit.isRanged());
+        unit.setFlying(oldUnit.isFlying());
         return unit;
     }
 

@@ -12,7 +12,6 @@ import structures.extractor.GameStateExtractor;
 import structures.handlers.*;
 import structures.memento.GameMemento;
 
-import static commandbuilders.enums.Players.*;
 
 /**
  * This class can be used to hold information about the on-going game.
@@ -23,7 +22,6 @@ import static commandbuilders.enums.Players.*;
  */
 
 public class GameState {
-    private final int INITIAL_CARD_COUNT = 3;
     protected int roundNumber = 3;
     private Players turn = Players.PLAYER1;
     protected Player player1, player2;
@@ -34,18 +32,17 @@ public class GameState {
     public ArrayList<Pair<Integer, Integer>> player2UnitsPosition = new ArrayList<>();
     public ArrayList<GameMemento> memento = new ArrayList<>();
 
-    // This is in preparation to Extracted GameState.
-    // Basically, this will be used within GameState, and when extracted, it will be set to a copy of the GameState.
     protected boolean simulation = false;
-    private GameStateExtractor extractor = new GameStateExtractor(this);
+    final private GameStateExtractor extractor = new GameStateExtractor(this);
+    final private SmartBoy smartBoy = new SmartBoy(this);
 
     // ===========================================================================
     // Handler Classes
     // ===========================================================================
-    private UnitMovementAndAttack unitMovementAndAttack = new UnitMovementAndAttack(this);
-    private CardDrawing cardDrawing = new CardDrawing(this);
-    private CardPlayed cardPlayed = new CardPlayed(this);
-    private Highlighter highlighter = new Highlighter(this);
+    final private UnitMovementAndAttack unitMovementAndAttack = new UnitMovementAndAttack(this);
+    final private CardDrawing cardDrawing = new CardDrawing(this);
+    final private CardPlayed cardPlayed = new CardPlayed(this);
+    final private Highlighter highlighter = new Highlighter(this);
 
 	// ===========================================================================
     // Game Initialisation
@@ -139,6 +136,7 @@ public class GameState {
 
     // This method add 3 cards to both Players as part of initialisation.
     public void drawInitialCards(ActorRef out) {
+        int INITIAL_CARD_COUNT = 3;
         for (int idx = 0; idx < INITIAL_CARD_COUNT; idx++) {
             cardDrawing.drawNewCardFor(out, Players.PLAYER1);
             cardDrawing.drawNewCardFor(out, Players.PLAYER2);
@@ -151,18 +149,7 @@ public class GameState {
     // ===========================================================================
     public void endTurnClicked(ActorRef out) {
         highlighter.clearBoardHighlights(out);
-
-//        System.out.println("----- Game Memento -----");
-//        for (GameMemento mem: memento) {
-//            System.out.println(mem);
-//        }
-//        System.out.println("-----------------------");
-
-        System.out.println("-----------------------");
-        System.out.println(extractor.extract());
-        System.out.println("-----------------------");
-
-        turn = (turn == Players.PLAYER1) ? PLAYER2 : PLAYER1;
+        turn = (turn == Players.PLAYER1) ? Players.PLAYER2 : Players.PLAYER1;
         unitMovementAndAttack.resetMoveAttackAndCounterAttack(out);
         setManaByRound(out);
         if (roundNumber > 3) {
@@ -170,17 +157,20 @@ public class GameState {
         }
         cardDrawing.displayCardsOnScreenFor(out, turn);
         ++roundNumber; // Divide this by 2 when we are going to use this.
+        if (turn == Players.PLAYER2) {
+            smartBoy.tester(out);
+        }
     }
 
     public void cardClicked(ActorRef out, int idx) {
-        Card current = (turn == PLAYER1) ? player1CardsInHand.get(idx) : player2CardsInHand.get(idx);
+        Card current = (turn == Players.PLAYER1) ? player1CardsInHand.get(idx) : player2CardsInHand.get(idx);
         System.out.println("Card Clicked: " + current.getCardname());
         Pair<Card, Integer> card = cardPlayed.getActiveCard();
 
         // Decrease Mana
         int manaCost = current.getManacost();
-        int playersMana = (turn == PLAYER1) ? player1.getMana() : player2.getMana();
-        boolean enoughMana = (playersMana >= manaCost) ? true : false;   //if enough mana then true
+        int playersMana = (turn == Players.PLAYER1) ? player1.getMana() : player2.getMana();
+        boolean enoughMana = playersMana >= manaCost;   //if enough mana then true
 
         // Redraw cards at hand at every card click
         cardDrawing.displayCardsOnScreenFor(out, turn);
@@ -191,7 +181,7 @@ public class GameState {
             if (card == null || card.getSecond() != idx) {
                 cardPlayed.setActiveCard(current, idx);
                 ArrayList<Pair<Integer, Integer>> friendlyUnits =
-                        (turn == PLAYER1) ? player1UnitsPosition : player2UnitsPosition;
+                        (turn == Players.PLAYER1) ? player1UnitsPosition : player2UnitsPosition;
                 for (Pair<Integer, Integer> position : friendlyUnits) {
                     highlighter.cardTileHighlight(out, position.getFirst(), position.getSecond());
                 }
@@ -199,7 +189,7 @@ public class GameState {
         } else {
             new PlayerNotificationCommandBuilder(out, isSimulation())
                     .setMessage("Insufficient Mana")
-                    .setPlayer(PLAYER1)
+                    .setPlayer(Players.PLAYER1)
                     .setDisplaySeconds(2)
                     .issueCommand();
         }
@@ -212,8 +202,9 @@ public class GameState {
     }
 
     public void tileClicked(ActorRef out, int x, int y) {
-        Tile tile = Board.getInstance().getTile(x, y);
+        Tile tile = getBoard().getTile(x, y);
         if (tile.getTileState() == States.RED) {
+            System.out.println("A");
             if (cardPlayed.getActiveCard() != null) {
                 // Handle spell
                 cardPlayed.moveCardToBoard(out, x ,y);
@@ -223,6 +214,7 @@ public class GameState {
                 unitMovementAndAttack.launchAttack(out, x, y);
             }
         } else if (tile.getTileState() == States.HIGHLIGHTED) {
+            System.out.println("B");
             if (cardPlayed.getActiveCard() != null) {
                 // Card Played or spell played
                 cardPlayed.moveCardToBoard(out, x, y);
@@ -245,15 +237,17 @@ public class GameState {
                 }
             } else {
                 if (tile != null && tile.hasUnit()) {
+                    System.out.println("G");
                     // If player clicked on a unit and clicked on another.
                     unitMovementAndAttack.unitClicked(out, x, y);
                 } else if (tile != null && tile.getTileState() == States.NORMAL) {
+                    System.out.println("H");
                     // Click on another unit or the activated unit will cancel the board highlight.
                     highlighter.clearBoardHighlights(out);
                 }
             }
         }
-        if (cardPlayed.getActiveCard() != null && tile.hasUnit() == false) {
+        if (cardPlayed.getActiveCard() != null && !tile.hasUnit()) {
             // Cancel the highlights on clicking on a not highlighted cell, excluding the unit.
             highlighter.clearBoardHighlights(out);
         }
@@ -273,15 +267,10 @@ public class GameState {
             winner = player1;
         }
         if (winner != null) {
-            String message = "";
-            if (winner == player1) {
-                message = "Player 1 won!";
-            } else {
-                message = "Player 2 won!";
-            }
+            String message = (winner == player1) ? "Player 1 won!" : "Player 2 won!" ;
             new PlayerNotificationCommandBuilder(out, isSimulation())
                 .setMessage(message)
-                .setPlayer(PLAYER1)
+                .setPlayer(Players.PLAYER1)
                 .setDisplaySeconds(4)
                 .issueCommand();
         }
@@ -289,7 +278,7 @@ public class GameState {
 
     private int getCurrentRoundMana() {
         // This is separated for the potential use in simulation.
-        return (getRound() + 1 > 9) ? 9 : getRound() + 1;
+        return Math.min(getRound() + 1, 9);
     }
 
     private void setManaByRound(ActorRef out) {
@@ -313,7 +302,7 @@ public class GameState {
     }
 
     public void decreaseManaPerCardPlayed(ActorRef out, int manaCost) {
-        int previousMana = (turn == PLAYER1) ? player1.getMana() : player2.getMana();
+        int previousMana = (turn == Players.PLAYER1) ? player1.getMana() : player2.getMana();
         int currentMana = previousMana - manaCost;      // We check beforehand that currentMana always >=0
         if(turn == Players.PLAYER1) {
             player1.setMana(currentMana);
@@ -390,6 +379,10 @@ public class GameState {
         return this.roundNumber / 2;
     }
 
+    public ArrayList<Tile> getAllHighlightedTiles() {
+        return highlighter.getHighlightedTiles();
+    }
+
     public Players getTurn() {
         return turn;
     }
@@ -408,5 +401,9 @@ public class GameState {
 
     public int getRoundNumber() {
         return roundNumber;
+    }
+
+    public GameStateExtractor getExtractor() {
+        return extractor;
     }
 }

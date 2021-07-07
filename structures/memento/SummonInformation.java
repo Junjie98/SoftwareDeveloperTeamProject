@@ -4,8 +4,8 @@ import structures.basic.Unit;
 import structures.handlers.Pair;
 
 public class SummonInformation implements RelevantInformation {
-    private Pair<Integer, Integer> target;
-    private Unit summonedUnit;
+    final private Pair<Integer, Integer> target;
+    final private Unit summonedUnit;
     public SummonInformation(Pair<Integer, Integer> target, Unit summonedUnit) {
         this.target = target;
         this.summonedUnit = summonedUnit;

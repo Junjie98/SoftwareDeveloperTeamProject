@@ -4,8 +4,8 @@ import structures.basic.Unit;
 import structures.handlers.Pair;
 
 public class AttackInformation implements RelevantInformation {
-    private Pair<Integer, Integer> source, target;
-    private Unit sourceUnit, targetUnit;
+    final private Pair<Integer, Integer> source, target;
+    final private Unit sourceUnit, targetUnit;
     public AttackInformation(Pair<Integer, Integer> source, Pair<Integer, Integer> target, Unit sourceUnit, Unit targetUnit) {
         this.source = source;
         this.target = target;

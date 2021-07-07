@@ -4,6 +4,9 @@ import commandbuilders.enums.Players;
 import structures.Board;
 import structures.GameState;
 import structures.basic.Player;
+import structures.handlers.Pair;
+
+import java.util.ArrayList;
 
 public class ExtractedGameState extends GameState {
     protected Board board = null;
@@ -31,6 +34,35 @@ public class ExtractedGameState extends GameState {
             case PLAYER2:
                 this.player2 = item;
         }
+    }
+
+    public Pair<Integer, Integer> getMyAvatarPosition() {
+        for (Pair<Integer, Integer> pair: player2UnitsPosition) {
+            if (getBoard().getTile(pair).getUnit().isAvatar()) {
+                return pair;
+            }
+        }
+        return null;
+    }
+
+    public ArrayList<Pair<Integer, Integer>> getAllRangedUnits() {
+        ArrayList<Pair<Integer, Integer>> output = new ArrayList<>();
+        for (Pair<Integer, Integer> pair: player2UnitsPosition) {
+            if (getBoard().getTile(pair).getUnit().isRanged()) {
+                output.add(pair);
+            }
+        }
+        return output;
+    }
+
+    public ArrayList<Pair<Integer, Integer>> getAllFlyingUnits() {
+        ArrayList<Pair<Integer, Integer>> output = new ArrayList<>();
+        for (Pair<Integer, Integer> pair: player2UnitsPosition) {
+            if (getBoard().getTile(pair).getUnit().isFlying()) {
+                output.add(pair);
+            }
+        }
+        return output;
     }
 
     @Override

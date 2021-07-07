@@ -1,7 +1,6 @@
 package structures.extractor;
 
 import commandbuilders.enums.Players;
-import play.api.Play;
 import structures.Board;
 import structures.GameState;
 import structures.basic.Card;
@@ -12,7 +11,7 @@ import structures.memento.GameMemento;
 import java.util.ArrayList;
 
 public class GameStateExtractor {
-    private GameState parent;
+    private final GameState parent;
 
     public GameStateExtractor(GameState parent) {
         this.parent = parent;
@@ -36,16 +35,13 @@ public class GameStateExtractor {
         output.setPlayer(Players.PLAYER1, clonePlayer(parent.getPlayer(Players.PLAYER1)));
         output.setPlayer(Players.PLAYER2, clonePlayer(parent.getPlayer(Players.PLAYER2)));
 
+        output.setTurn(parent.getTurn());
+
         return output;
     }
 
     private ArrayList<Card> cloneCardList(ArrayList<Card> input) {
-        ArrayList<Card> output = new ArrayList<>();
-        for (Card card: input) {
-            // If we will not change the content of the card, we will not need to clone it.
-            output.add(card);
-        }
-        return output;
+        return new ArrayList<>(input);
     }
 
     private ArrayList<Pair<Integer, Integer>> clonePairList(ArrayList<Pair<Integer, Integer>> input) {
@@ -61,11 +57,6 @@ public class GameStateExtractor {
     }
 
     private ArrayList<GameMemento> cloneMementoList(ArrayList<GameMemento> mementos) {
-        ArrayList<GameMemento> output = new ArrayList<>();
-        for (GameMemento memento: mementos) {
-            output.add(memento);
-        }
-        return output;
+        return new ArrayList<>(mementos);
     }
-
 }

@@ -13,12 +13,12 @@ import structures.basic.Card;
 import java.util.ArrayList;
 
 public class CardDrawing {
-    private GameState parent;
+    final private GameState parent;
 
     private final int MAX_CARD_COUNT_IN_HAND = 6;
 
-    private DeckOne deck1 = new DeckOne();
-    private DeckTwo deck2 = new DeckTwo();
+    final private DeckOne deck1 = new DeckOne();
+    final private DeckTwo deck2 = new DeckTwo();
 
     public CardDrawing(GameState parent) {
         this.parent = parent;

@@ -7,7 +7,6 @@ import commandbuilders.enums.TileCommandBuilderMode;
 import structures.Board;
 import structures.GameState;
 import structures.basic.Tile;
-import structures.basic.Unit;
 
 import java.util.ArrayList;
 
@@ -15,14 +14,13 @@ import static commandbuilders.enums.Players.PLAYER1;
 
 public class Highlighter {
     private ArrayList<Tile> highlightedTiles = new ArrayList<>();
-    private GameState parent;
+    private final GameState parent;
 
     public Highlighter(GameState parent) {
         this.parent = parent;
     }
 
-    public boolean checkAttackHighlight(ActorRef out, Pair<Integer, Integer> pos)
-    {
+    public boolean checkAttackHighlight(ActorRef out, Pair<Integer, Integer> pos) {
         int x = pos.getFirst();
         int y = pos.getSecond();
 
@@ -183,19 +181,23 @@ public class Highlighter {
                 count++;
             }
 
-            if (initDirB[0] == true || initDirB[1] == true) {
+            if (initDirB[0] || initDirB[1]) {
                 checkTileHighlight(out, interDir.get(0));
             }
-            if (initDirB[1] == true || initDirB[3] == true) {
+            if (initDirB[1] || initDirB[3]) {
                 checkTileHighlight(out, interDir.get(1));
             }
-            if (initDirB[2] == true || initDirB[0] == true) {
+            if (initDirB[2] || initDirB[0]) {
                 checkTileHighlight(out, interDir.get(2));
             }
-            if (initDirB[2] == true || initDirB[3] == true) {
+            if (initDirB[2] || initDirB[3]) {
                 checkTileHighlight(out, interDir.get(3));
             }
         }
+    }
+
+    public ArrayList<Tile> getHighlightedTiles() {
+        return highlightedTiles;
     }
 
     public void clearBoardHighlights(ActorRef out) {

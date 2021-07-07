@@ -5,9 +5,9 @@ import structures.basic.Unit;
 import structures.handlers.Pair;
 
 public class SpellInformation implements RelevantInformation {
-    private Pair<Integer, Integer> target;
-    private Card spellCard;
-    private Unit spellTarget;
+    final private Pair<Integer, Integer> target;
+    final private Card spellCard;
+    final private Unit spellTarget;
     public SpellInformation(Unit spellTarget, Pair<Integer, Integer> target, Card spellCard) {
         this.spellTarget = spellTarget;
         this.target = target;
@@ -23,6 +23,9 @@ public class SpellInformation implements RelevantInformation {
     }
     public Card getSpellCard() {
         return spellCard;
+    }
+    public Unit getSpellTarget() {
+        return spellTarget;
     }
 
     @Override

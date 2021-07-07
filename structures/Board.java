@@ -7,7 +7,7 @@ import structures.handlers.Pair;
 import utils.BasicObjectBuilders;
 
 public class Board {
-    private Tile[][] board = new Tile[9][5];
+    final private Tile[][] board = new Tile[9][5];
     private static Board instance = new Board();
 
     private Board() {
@@ -17,8 +17,6 @@ public class Board {
             }
         }
     }
-
-    private Board(boolean copy) { }
 
     public static Board getInstance() {
         return instance;

@@ -125,7 +125,6 @@ public class UnitCommandBuilder extends CommandBuilder{
             BasicCommands.drawUnit(reference, unit, tile);
         } else if (mode == UnitCommandBuilderMode.MOVE) {
             Tile tile = Board.getInstance().getTile(tileX, tileY);
-            tile.setUnit(unit);
             unit.setPositionByTile(tile);
             boolean dir = (direction == MoveDirection.VERTICAL);
             BasicCommands.moveUnitToTile(reference, unit, tile, dir);

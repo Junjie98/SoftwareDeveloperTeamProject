@@ -19,12 +19,10 @@ import java.util.HashMap;
 
 public class CardPlayed {
     String cardname;
-    private GameState parent;
-    private HashMap<Integer, Integer> unitsOriginalHealth = new HashMap<Integer, Integer>();
+    private final GameState parent;
+    private HashMap<Integer, Integer> unitsOriginalHealth = new HashMap<>();
     Pair<Card, Integer> activeCard = null;
     public CardPlayed(GameState parent) { this.parent = parent; }
-    private UnitMovementAndAttack unitMovementAndAttack = new UnitMovementAndAttack(this.parent);
-
 
     // ===========================================================================
     // Move card to the Board and logic behind it.
@@ -105,7 +103,7 @@ public class CardPlayed {
                     int currentHealth = unit.getHealth();
                     int originalHealth = unitsOriginalHealth.get(unit.getId());
                     int gap = originalHealth - currentHealth;
-                    int totalRecovery = (gap <= 5) ? gap : 5;
+                    int totalRecovery = Math.min(gap, 5);
                     spellAction(out, x, y, totalRecovery);
                 } else {
                     spellAction(out, x, y, 2);

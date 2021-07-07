@@ -6,8 +6,6 @@ import commandbuilders.ProjectTileAnimationCommandBuilder;
 import commandbuilders.UnitCommandBuilder;
 import commandbuilders.enums.*;
 import commands.BasicCommands;
-import play.api.Play;
-import structures.Board;
 import structures.GameState;
 import structures.basic.Tile;
 import structures.basic.Unit;
@@ -17,13 +15,11 @@ import structures.memento.AttackInformation;
 import structures.memento.GameMemento;
 import structures.memento.MovementInformation;
 
-import java.util.HashSet;
 import java.util.ArrayList;
-import java.util.HashSet;
 
 public class UnitMovementAndAttack {
     Pair<Integer, Integer> activeUnit = null;
-    private GameState parent;
+    private final GameState parent;
 
     ArrayList<Unit> moveAttackAndCounterAttack = new ArrayList<>();
 
@@ -44,7 +40,6 @@ public class UnitMovementAndAttack {
         }
         if(activeUnit != null) {
             Tile previousUnitLocation = parent.getBoard().getTile(activeUnit);
-
             //Unhighlight previously selected unit
             parent.getHighlighter().clearBoardHighlights(out);
 
@@ -66,10 +61,6 @@ public class UnitMovementAndAttack {
         ArrayList<Pair<Integer, Integer>> initDir = parent.getMoveTiles(x, y, 1, 0);
         ArrayList<Pair<Integer, Integer>> secondDir = parent.getMoveTiles(x, y,2, 0);
         ArrayList<Pair<Integer, Integer>> interDir = parent.getMoveTiles(x, y, 1, 1);
-
-   
-
-
         
         boolean[] initDirB = {true,true,true,true};
 
@@ -83,7 +74,7 @@ public class UnitMovementAndAttack {
         count = 0;
         for (Pair<Integer, Integer> sd: secondDir) {
             //for the next tiles
-            if(initDirB[count] == true) {
+            if(initDirB[count]) {
                 //if the previous one is clear
                 parent.getHighlighter().checkTileHighlight(out, sd);                  //check for units then highlight
             }
@@ -91,16 +82,16 @@ public class UnitMovementAndAttack {
         }
 
         //for the inter tiles do some logic
-        if(initDirB[0] == true || initDirB[1] == true) {
+        if(initDirB[0] || initDirB[1]) {
             parent.getHighlighter().checkTileHighlight(out, interDir.get(0));
         }
-        if(initDirB[1] == true || initDirB[3] == true) {
+        if(initDirB[1] || initDirB[3]) {
             parent.getHighlighter().checkTileHighlight(out, interDir.get(1));
         }
-        if(initDirB[2] == true || initDirB[0] == true) {
+        if(initDirB[2] || initDirB[0]) {
             parent.getHighlighter().checkTileHighlight(out, interDir.get(2));
         }
-        if(initDirB[2] == true || initDirB[3] == true) {
+        if(initDirB[2] || initDirB[3]) {
             parent.getHighlighter().checkTileHighlight(out, interDir.get(3));
         }
 
@@ -209,7 +200,7 @@ public class UnitMovementAndAttack {
                     .issueCommand();
 
             parent.memento.add(new GameMemento(parent.getTurn(), ActionType.MOVE, new MovementInformation(activatedTile.getUnit(), activeUnit, new Pair<>(x, y))));
-
+            System.out.println(parent.memento.get(parent.memento.size() - 1));
             // Update the units position in the stored position lists.
             ArrayList<Pair<Integer, Integer>> pool = (parent.getTurn() == Players.PLAYER1) ?
                     parent.player1UnitsPosition : parent.player2UnitsPosition;
@@ -221,6 +212,7 @@ public class UnitMovementAndAttack {
             }
             pool.add(new Pair<>(x, y));
 
+            destinationTile.setUnit(activatedTile.getUnit());
             parent.getHighlighter().clearBoardHighlights(out);
             activatedTile.getUnit().setHasMoved(true);
             moveAttackAndCounterAttack.add(activatedTile.getUnit());
@@ -250,7 +242,7 @@ public class UnitMovementAndAttack {
                 int enemyHealthAfterAttack = attack(out, attackerLocation, enemy, attacker, x, y, isRanged);
                 if (enemyHealthAfterAttack > 0) {
                 	
-                	int counterAttackResult = 0;
+                	int counterAttackResult;
                 	if (!isRanged) {
 	                    // Launch Counter Attack
 	                    counterAttackResult = attack(out, enemyLocation, attacker, enemy, attacker.getPosition().getTilex(), attacker.getPosition().getTiley(), isRanged);
@@ -392,14 +384,10 @@ public class UnitMovementAndAttack {
 
         for (Pair<Integer, Integer> ip: tileActive) {
             if(ip.getFirst()== acPos[0] && ip.getSecond() == acPos[1]) {
-                if(parent.getBoard().getTile(x, y).getUnit() != null) {
-                    //enemy is in this tile
-                    return true;
-                }
-                return false;
+                //enemy is in this tile
+                return parent.getBoard().getTile(x, y).hasUnit();
             }
         }
-
         return false;
     }
 

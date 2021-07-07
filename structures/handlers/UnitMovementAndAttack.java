@@ -201,7 +201,7 @@ public class UnitMovementAndAttack {
 
     public void highlightedMoveTileClicked(ActorRef out, int x, int y) {
         Tile activatedTile = Board.getInstance().getTile(activeUnit);
-        System.out.println("move activated");
+        System.out.println("move activated to: " +x + ":" + y);
         if (activatedTile.getUnit().getHasAttacked()) {
             // Units that has attacked should not be able to move.
             parent.getHighlighter().clearBoardHighlights(out);
@@ -294,49 +294,34 @@ public class UnitMovementAndAttack {
                             }
                         }
 
-                        if(goodMoves.size()==1 && !Board.getInstance().getTile(goodMoves.get(0)).hasUnit())
-                        {   //if we only have one good move then check and do that
-                            highlightedMoveTileClicked(out, goodMoves.get(0).getFirst(), goodMoves.get(0).getSecond());
-                            try {Thread.sleep(3000);} catch (InterruptedException e) {e.printStackTrace();}
-
-                            attackerLocation =  Board.getInstance().getTile(goodMoves.get(0));
-                            enemyHealthAfterAttack = attack(out, attackerLocation, enemy, attacker, x, y, isRanged);
-                        }
-                        else if(goodMoves.size()>1)
+                        if(goodMoves.size()>0)
                         {   //otherwise the first good move is fine
-                            boolean found = false;
-                            for (Pair<Integer,Integer> pair : goodMoves) {
-                                int mx = pair.getFirst() - x;
-                                int my = pair.getSecond() -y;
-                                if(Math.abs(mx)>0 && my ==0)
-                                {
-                                    if(!Board.getInstance().getTile(pair).hasUnit()){
-                                        highlightedMoveTileClicked(out, pair.getFirst(), pair.getSecond());
-                                        try {Thread.sleep(3000);} catch (InterruptedException e) {e.printStackTrace();}
+                           
 
-                                        System.out.println(pair);
-                                        attackerLocation =  Board.getInstance().getTile(pair);
-                                        enemyHealthAfterAttack = attack(out, attackerLocation, enemy, attacker, x, y, isRanged);
-                                        System.out.println("found new pos using selective method");
-                                        found=true;
+                            for (Pair<Integer,Integer> pair : goodMoves) { //mx =move x 
+                                
+                                if(!Board.getInstance().getTile(pair).hasUnit()){
+                                    int tx = pair.getFirst()- attackerLocation.getTilex();
+                                    int ty = pair.getSecond()- attackerLocation.getTiley();
+                                    System.out.println(tx + " : " + ty);
+
+                                    if(moveBlockCheck(attackerLocation.getTilex(), attackerLocation.getTiley(), tx, ty))
+                                    {
+                                        continue;
                                     }
+                                    
+                                    highlightedMoveTileClicked(out, pair.getFirst(), pair.getSecond());
+                                    try {Thread.sleep(3000);} catch (InterruptedException e) {e.printStackTrace();}
+
+                                    System.out.println(pair);
+                                    attackerLocation =  Board.getInstance().getTile(pair);
+                                    enemyHealthAfterAttack = attack(out, attackerLocation, enemy, attacker, x, y, isRanged);
+                                    System.out.println("found new pos using selective method");
                                 }
+                            
                                 
                             }
-                            if(found ==false)
-                            {
-                                for (Pair<Integer,Integer> pair : goodMoves) {
-                                    if(!Board.getInstance().getTile(pair).hasUnit()){
-                                        highlightedMoveTileClicked(out, pair.getFirst(), pair.getSecond());
-                                        try {Thread.sleep(3000);} catch (InterruptedException e) {e.printStackTrace();}
-
-                                        System.out.println(pair);
-                                        attackerLocation =  Board.getInstance().getTile(pair);
-                                        enemyHealthAfterAttack = attack(out, attackerLocation, enemy, attacker, x, y, isRanged);
-                                        System.out.println("found new pos");
-                                    }
-                                }
-                            }
+                            
                         }
                         else {
                             return;
@@ -410,6 +395,36 @@ public class UnitMovementAndAttack {
         }
         resetMoveAttackAndCounterAttack(out);
     }
+
+    public boolean moveBlockCheck(int x, int y, int movex, int movey)
+    {
+        
+        if(Math.abs(movex)==2)
+        {
+            int mx = movex > 0 ? 1 : -1;
+            return Board.getInstance().getTile(x+mx , y).hasUnit();
+
+        }
+        else if(Math.abs(movey)==2)
+        {
+            int my = movey > 0 ? 1 : -1;
+            return Board.getInstance().getTile(x , y+ my).hasUnit();
+        }
+        else if (Math.abs(movex)==1 && Math.abs(movey)==1)
+        {
+            return (Board.getInstance().getTile(x+(movex > 0 ? 1 : -1), y).hasUnit() && Board.getInstance().getTile(x, y+(movey > 0 ? 1 : -1)).hasUnit());
+
+        }
+        else if(Math.abs(movex)==1 || Math.abs(movey)==1)
+        {
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
+
+    
 
     // Ana: Counter attack, including ranged attack
     public int attack(ActorRef out, Tile attackerLocation, Unit enemy, Unit attacker, int x, int y, boolean isRanged) {

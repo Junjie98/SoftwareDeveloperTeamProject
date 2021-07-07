@@ -418,6 +418,8 @@ public class UnitMovementAndAttack {
 
     public boolean moveBlockCheck(int x, int y, int movex, int movey)
     {
+        if(Board.getInstance().getTile(x+movex , y+movey).hasUnit())
+        {return true;}
         
         if(Math.abs(movex)==2)
         {

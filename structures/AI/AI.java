@@ -49,6 +49,8 @@ public class AI
         try {Thread.sleep(2500);} catch (InterruptedException e) {e.printStackTrace();}
         gs.tileClicked(out, pos.getFirst(), pos.getSecond());
         try {Thread.sleep(2500);} catch (InterruptedException e) {e.printStackTrace();}
+        moreUnitsToMoveAtk(out, gs);
+
     }
     public void AI_MoveUnit(ActorRef out, GameState gs, Pair<Integer, Integer> friendlyPosition, Pair<Integer, Integer> moveToPosition)
     {
@@ -70,6 +72,7 @@ public class AI
     {
         if(moveIndex < friendlies.size())
         {
+            System.out.print("more moving to happen");
             move(out, gs);
         }
     }
@@ -197,10 +200,21 @@ public class AI
         boolean moved = false;
         targPos = enemyTarget;
         System.out.println("init targ pos: " + targPos);
-        System.out.println("init targ state: " + Board.getInstance().getTile(targPos).getTileState());
 
-        if(gs.getUnitMovementAndAttack().getAllAtkTiles(unitPos.getFirst(), unitPos.getSecond()).contains(targPos)
-            && Board.getInstance().getTile(unitPos).hasUnit())
+        if(Board.getInstance().getTile(unitPos).getUnit().isRanged())
+        {
+            if(gs.getUnitMovementAndAttack().getFlyMoveTiles().contains(targPos)
+                && Board.getInstance().getTile(targPos).hasUnit())
+            {
+                moved = true; 
+
+                moveIndex++;
+                AI_AtkUnit(out, gs, unitPos, targPos);
+                System.out.println("Attack from range AI using move-to-attack");
+            }
+        }
+        else if(gs.getUnitMovementAndAttack().getAllAtkTiles(unitPos.getFirst(), unitPos.getSecond()).contains(targPos)
+            && Board.getInstance().getTile(targPos).hasUnit())
         {   //if we can attack and move then go for it and let that logic take care of itself
             moved = true; 
 
@@ -229,6 +243,7 @@ public class AI
             if(gs.getUnitMovementAndAttack().moveBlockCheck(unitPos.getFirst(), unitPos.getSecond(), xMove, yMove)){
                 if(Math.abs(yMove) >= 2 || Math.abs(xMove) >= 2){
                     if(gs.getUnitMovementAndAttack().moveBlockCheck(unitPos.getFirst(), unitPos.getSecond(), xMove/2, yMove/2)){
+                        System.out.println("Tile prior blocked2");
                         return;
                     }
                     else{
@@ -237,6 +252,8 @@ public class AI
 
                 }
                 else{
+                    System.out.println("Tile prior blocked1");
+
                     return;
                 }
 

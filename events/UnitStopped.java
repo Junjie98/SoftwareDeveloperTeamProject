@@ -29,7 +29,7 @@ public class UnitStopped implements EventProcessor{
 		if(gameState.getTurn() == Players.PLAYER2)
 		{
 			//System.err.println("unit stop, call ai move");
-			gameState.ai.move(out, gameState);
+			gameState.ai.moreUnitsToMoveAtk(out, gameState);
 
 		}
 	}

@@ -340,10 +340,22 @@ public class GameState {
     // ===========================================================================
     public ArrayList<Pair<Integer, Integer>> getMoveTiles(int x, int y, int depth, int diag) {
         ArrayList<Pair<Integer, Integer>> output = new ArrayList<>();
-        output.add(new Pair<>(x-diag, y-depth));
-        output.add(new Pair<>(x-depth, y+diag));
-        output.add(new Pair<>(x+depth, y-diag));
-        output.add(new Pair<>(x+diag, y+depth));
+        if(x-diag >= 0 && x-diag <= 8 && y-depth >= 0 && y-depth <= 4)
+        {
+            output.add(new Pair<>(x-diag, y-depth));
+        }        
+        if(x-depth >= 0 && x-depth <= 8 && y+diag >= 0 && y+diag <= 4)
+        {
+            output.add(new Pair<>(x-depth, y+diag));
+        }  
+        if(x+depth >= 0 && x+depth <= 8 && y-diag >= 0 && y-diag <= 4)
+        {
+            output.add(new Pair<>(x+depth, y-diag));
+        }  
+        if(x+diag >= 0 && x+diag <= 8 && y+depth >= 0 && y+depth <= 4)
+        {
+            output.add(new Pair<>(x+diag, y+depth));
+        }
         return output;
     }
     

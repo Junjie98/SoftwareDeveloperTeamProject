@@ -7,6 +7,8 @@ import commandbuilders.enums.TileCommandBuilderMode;
 import structures.Board;
 import structures.GameState;
 import structures.basic.Tile;
+import structures.basic.Unit;
+
 import java.util.ArrayList;
 
 import static commandbuilders.enums.Players.PLAYER1;
@@ -17,6 +19,54 @@ public class Highlighter {
 
     public Highlighter(GameState parent) {
         this.parent = parent;
+    }
+
+    public boolean checkAttackHighlight(ActorRef out, Pair<Integer, Integer> pos)
+    {
+        int x = pos.getFirst();
+        int y = pos.getSecond();
+
+        //limiting input
+        if(x < 0 || x > 8) {
+            return false;
+        }
+        if(y < 0 || y > 4) {
+            return false;
+        }
+
+        Tile tile = Board.getInstance().getTile(x, y);
+
+        if(!tile.hasUnit()) {
+            // empty so DONT highlight
+            new TileCommandBuilder(out)
+                    .setTilePosition(pos.getFirst(), pos.getSecond())
+                    .setState(States.NORMAL)
+                    .issueCommand();
+
+            highlightedTiles.add(tile);
+            tile.setTileState(States.NORMAL);
+            return true;
+        } else {
+            if(Board.getInstance().getTile(pos.getFirst(), pos.getSecond()).getUnit().getPlayerID() != parent.getTurn()) {
+                // Tile has enemy
+                new TileCommandBuilder(out)
+                        .setTilePosition(x, y)
+                        .setState(States.RED)
+                        .issueCommand();
+                highlightedTiles.add(tile);
+                tile.setTileState(States.RED);
+            } else {
+                // Tile has friendly
+                new TileCommandBuilder(out)
+                        .setTilePosition(x, y)
+                        .setState(States.NORMAL)
+                        .issueCommand();
+                highlightedTiles.add(tile);
+                tile.setTileState(States.NORMAL);
+            }
+            return false;
+
+        }
     }
 
     public boolean checkTileHighlight(ActorRef out, Pair<Integer, Integer> pos)  {
@@ -66,30 +116,62 @@ public class Highlighter {
         }
     }
     public void cardTileHighlight(ActorRef out, int x, int y) {
+        // if spell card
         if (parent.getCardPlayed().getActiveCard().getFirst().getCardname().equals("Truestrike") || parent.getCardPlayed().getActiveCard().getFirst().getCardname().equals("Entropic Decay")) {
             ArrayList<Pair<Integer, Integer>> enemyUnits = (parent.getTurn() == PLAYER1) ?
                     parent.player2UnitsPosition : parent.player1UnitsPosition;
-            for (Pair<Integer, Integer> position: enemyUnits) {
-                new TileCommandBuilder(out)
-                        .setTilePosition(position.getFirst(), position.getSecond())
-                        .setState(States.RED)
-                        .issueCommand();
-                Tile tile = Board.getInstance().getTile(position);
-                tile.setTileState(States.RED);
-                highlightedTiles.add(tile);
+            if(parent.getCardPlayed().getActiveCard().getFirst().getCardname().equals("Entropic Decay")) {
+                for (Pair<Integer, Integer> position : enemyUnits) {
+                    Tile enemyLocation = Board.getInstance().getTile(position);
+                    if (!enemyLocation.getUnit().isAvatar()) {
+                        new TileCommandBuilder(out)
+                                .setTilePosition(position.getFirst(), position.getSecond())
+                                .setState(States.RED)
+                                .issueCommand();
+                        Tile tile = Board.getInstance().getTile(position);
+                        tile.setTileState(States.RED);
+                        highlightedTiles.add(tile);
+                    }
+                }
+            } else {        //if Truestike, highlight avatar & units
+                for (Pair<Integer, Integer> position : enemyUnits) {
+                    new TileCommandBuilder(out)
+                            .setTilePosition(position.getFirst(), position.getSecond())
+                            .setState(States.RED)
+                            .issueCommand();
+                    Tile tile = Board.getInstance().getTile(position);
+                    tile.setTileState(States.RED);
+                    highlightedTiles.add(tile);
+                }
             }
         } else if (parent.getCardPlayed().getActiveCard().getFirst().getCardname().equals("Sundrop Elixir") || parent.getCardPlayed().getActiveCard().getFirst().getCardname().equals("Staff of Y'Kir'")) {
             ArrayList<Pair<Integer, Integer>> friendlyUnits = (parent.getTurn() == PLAYER1) ?
                     parent.player1UnitsPosition : parent.player2UnitsPosition;
-            for (Pair<Integer, Integer> position: friendlyUnits) {
-                new TileCommandBuilder(out)
-                        .setTilePosition(position.getFirst(), position.getSecond())
-                        .setState(States.HIGHLIGHTED)
-                        .issueCommand();
-                Tile tile = Board.getInstance().getTile(position);
-                tile.setTileState(States.HIGHLIGHTED);
-                highlightedTiles.add(tile);
+            if (parent.getCardPlayed().getActiveCard().getFirst().getCardname().equals("Staff of Y'Kir'")) {
+                for (Pair<Integer, Integer> position : friendlyUnits) {
+                    Tile friendlyLocation = Board.getInstance().getTile(position);
+                    if (friendlyLocation.getUnit().isAvatar()) {
+                        new TileCommandBuilder(out)
+                                .setTilePosition(position.getFirst(), position.getSecond())
+                                .setState(States.HIGHLIGHTED)
+                                .issueCommand();
+                        Tile tile = Board.getInstance().getTile(position);
+                        tile.setTileState(States.HIGHLIGHTED);
+                        highlightedTiles.add(tile);
+                    }
+                }
+            } else {    //if card Sundrop Elixir then should highlight all units & avatar
+                for (Pair<Integer, Integer> position : friendlyUnits) {
+                    new TileCommandBuilder(out)
+                            .setTilePosition(position.getFirst(), position.getSecond())
+                            .setState(States.HIGHLIGHTED)
+                            .issueCommand();
+                    Tile tile = Board.getInstance().getTile(position);
+                    tile.setTileState(States.HIGHLIGHTED);
+                    highlightedTiles.add(tile);
+                }
             }
+        //if normal non-spell card
 		} else {
             ArrayList<Pair<Integer, Integer>> initDir = parent.getMoveTiles(x, y, 1, 0);
             ArrayList<Pair<Integer, Integer>> interDir = parent.getMoveTiles(x, y, 1, 1);

@@ -1,5 +1,6 @@
 package structures.basic;
 import commandbuilders.enums.Players;
+import commandbuilders.enums.UnitType;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -30,6 +31,7 @@ public class Unit {
 	int unitHealth = 0;
 	int unitDamage =  0;
 	int unitIdentifier = 0; //0==unit & 1==player avatar
+	UnitType type = null;
 
 	boolean isFlying = false;
 
@@ -207,5 +209,13 @@ public class Unit {
     }
 	public boolean isRanged() {
 		return isRanged;
+	}
+
+	public UnitType getType() {
+		return type;
+	}
+
+	public void setType(UnitType type) {
+		this.type = type;
 	}
 }

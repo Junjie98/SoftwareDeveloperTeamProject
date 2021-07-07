@@ -66,7 +66,10 @@ public class UnitFactory {
                 conf = StaticConfFiles.u_silverguard_knight;
                 break;
         }
-        return BasicObjectBuilders.loadUnit(conf, counter++, Unit.class);
+        Unit loadedUnit =  BasicObjectBuilders.loadUnit(conf, counter++, Unit.class);
+        loadedUnit.setType(type);
+        
+        return loadedUnit;
     }
 
     public Unit generateUnitByCard(Card card){
@@ -100,7 +103,7 @@ public class UnitFactory {
             unit = this.generateUnit(UnitType.PLANAR_SCOUT);
         } else if(cardname.equals("Pyromancer")){
             unit = this.generateUnit(UnitType.PYROMANCER);
-        } else if(cardname.equals("Rock_Pulveriser")){
+        } else if(cardname.equals("Rock Pulveriser")){
             unit = this.generateUnit(UnitType.ROCK_PULVERISER);
         } else if(cardname.equals("Serpenti")){
             unit = this.generateUnit(UnitType.SERPENTI);

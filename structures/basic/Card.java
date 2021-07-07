@@ -13,6 +13,7 @@ package structures.basic;
 public class Card {
 
 	static final String[] spellcards = {"Entropic Decay", "Staff of Y'Kir'", "Truestrike", "Sundrop Elixir"};
+	static final String[] specialCards = {"Azure Herald", "Pureblade Enforcer", "Azurite Lion", "Planar Scout", "Blaze Hound", "Serpenti"};
 
 	int id;
 	String cardname;
@@ -63,6 +64,14 @@ public class Card {
 	}
 	public boolean isSpell() {
 		for (String item: spellcards) {
+			if (item.equals(cardname)) {
+				return true;
+			}
+		}
+		return false;
+	}
+	public boolean isSpecialCard() {
+		for (String item: specialCards) {
 			if (item.equals(cardname)) {
 				return true;
 			}

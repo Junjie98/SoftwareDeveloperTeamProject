@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import akka.actor.ActorRef;
 import commandbuilders.*;
 import commandbuilders.enums.*;
+import commands.BasicCommands;
 import scala.Int;
 import structures.AI.AI;
 import structures.basic.Card;
@@ -11,6 +12,8 @@ import structures.basic.Player;
 import structures.basic.Tile;
 import structures.basic.Unit;
 import structures.handlers.*;
+import utils.BasicObjectBuilders;
+import utils.StaticConfFiles;
 
 import static commandbuilders.enums.Players.*;
 
@@ -27,6 +30,7 @@ public class GameState {
     private int roundNumber = 3;
     private Players turn = Players.PLAYER1;
     private Player player1, player2;
+    private Card currentHighlightedCard;
     public ArrayList<Card> player1CardsInHand = new ArrayList<>();
     public ArrayList<Card> player2CardsInHand = new ArrayList<>();
     public ArrayList<Pair<Integer, Integer>> player1UnitsPosition = new ArrayList<>();
@@ -122,6 +126,11 @@ public class GameState {
     	.setUnit(aiAvatar)
     	.setStats(UnitStats.ATTACK, 2)
     	.issueCommand();
+
+        //Save the original health state to a hashmap. Used for calculations.
+        cardPlayed.setUnitsOriginalHealth(human.getId(),player1.getHealth());
+        cardPlayed.setUnitsOriginalHealth(human.getId(),player2.getHealth());
+
     }
 
     // This method add 3 cards to both Players as part of initialisation.
@@ -170,6 +179,9 @@ public class GameState {
         int playersMana = (turn == PLAYER1) ? player1.getMana() : player2.getMana();
         boolean enoughMana = (playersMana >= manaCost) ? true : false;   //if enough mana then true
 
+        // Redraw cards at hand at every card click
+        cardDrawing.displayCardsOnScreenFor(out, turn);
+        
         // if enough mana, then highlight and play the card, else drop a notification
         if(enoughMana) {
             highlighter.clearBoardHighlights(out);
@@ -180,16 +192,20 @@ public class GameState {
                 for (Pair<Integer, Integer> position : friendlyUnits) {
                     highlighter.cardTileHighlight(out, position.getFirst(), position.getSecond());
                 }
-
-                // TODO: Change the highlighted state of the card and redraw the hand.
             }
         } else {
             new PlayerNotificationCommandBuilder(out)
                     .setMessage("Insufficient Mana")
-                    .setPlayer(getTurn())
-                    .setDisplaySeconds(4)
+                    .setPlayer(PLAYER1)
+                    .setDisplaySeconds(2)
                     .issueCommand();
         }
+        
+        // Highlight clicked card and unhighlight when clicked again
+        if (currentHighlightedCard == null || currentHighlightedCard != current)
+        	highlightCard(out, current, idx);
+        else
+        	currentHighlightedCard = null;
     }
 
     public void tileClicked(ActorRef out, int x, int y) {
@@ -272,10 +288,10 @@ public class GameState {
                 message = "Player 2 won!";
             }
             new PlayerNotificationCommandBuilder(out)
-                    .setMessage(message)
-                    .setPlayer(PLAYER1)
-                    .setDisplaySeconds(4)
-                    .issueCommand();
+                .setMessage(message)
+                .setPlayer(PLAYER1)
+                .setDisplaySeconds(4)
+                .issueCommand();
         }
     }
 
@@ -329,6 +345,19 @@ public class GameState {
         output.add(new Pair<>(x+depth, y-diag));
         output.add(new Pair<>(x+diag, y+depth));
         return output;
+    }
+    
+    // Highlighting the clicked card at hand
+    public void highlightCard(ActorRef out, Card current, int idx) {
+    	// Highlight clicked card
+        new CardInHandCommandBuilder(out)
+	        .setCommandMode(CardInHandCommandMode.DRAW)
+	        .setCard(current)
+	        .setPosition(idx)
+	        .setState(States.HIGHLIGHTED)
+	        .issueCommand();
+        
+        currentHighlightedCard = current;
     }
 
     // ===========================================================================

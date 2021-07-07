@@ -78,6 +78,7 @@ public class UnitFactory {
         unit.setName(oldUnit.getName());
         unit.setHealth(oldUnit.getHealth());
         unit.setDamage(oldUnit.getDamage());
+        unit.setType(oldUnit.getType());
         return unit;
     }
 

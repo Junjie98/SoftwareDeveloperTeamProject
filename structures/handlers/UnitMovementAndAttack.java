@@ -12,6 +12,9 @@ import structures.basic.Tile;
 import structures.basic.Unit;
 import structures.basic.UnitAnimationType;
 import java.util.HashSet;
+
+import javax.lang.model.util.ElementScanner14;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 
@@ -265,19 +268,92 @@ public class UnitMovementAndAttack {
                 System.err.println("attack check passed");
 
                 boolean isRanged = attacker.isRanged();
-                int enemyHealthAfterAttack =0;
+                int enemyHealthAfterAttack =enemy.getHealth();
                 
                 if(isRanged){
                     //do ranged attack
                 }
-                else{
+                else if(!attack1RCheck(x, y)){
+                    //if the unit is not within normal attack range 
                     //move to a range then attack
                     Pair<Integer,Integer> moveTile = getMoveTileForAttack(attackerLocation.getTilex(), attackerLocation.getTiley(), x, y);
                     System.out.println(moveTile);
-                    highlightedMoveTileClicked(out, moveTile.getFirst(), moveTile.getSecond());
-                    attackerLocation =  Board.getInstance().getTile(moveTile);
-                    enemyHealthAfterAttack = attack(out, attackerLocation, enemy, attacker, x, y, isRanged);
 
+                    if(Board.getInstance().getTile(moveTile).hasUnit()){
+                        //if this tile is blocked then we need to see if any other tiles in the atk range are within our move range
+                        ArrayList<Pair<Integer,Integer>> rangeTiles = get1RAtkTiles(x, y);
+                        ArrayList<Pair<Integer,Integer>> moveTiles = getAllMoveTiles(attackerLocation.getTilex(), attackerLocation.getTiley());
+                        ArrayList<Pair<Integer,Integer>> goodMoves = new ArrayList<>();
+                        for (Pair<Integer,Integer> pair : rangeTiles) {
+                            for (Pair<Integer,Integer> pair2 : moveTiles) {
+                                if(pair.equals(pair2))
+                                {   //do any of these tiles match
+                                    goodMoves.add(pair);
+                                }
+
+                            }
+                        }
+
+                        if(goodMoves.size()==1 && !Board.getInstance().getTile(goodMoves.get(0)).hasUnit())
+                        {   //if we only have one good move then check and do that
+                            highlightedMoveTileClicked(out, goodMoves.get(0).getFirst(), goodMoves.get(0).getSecond());
+                            try {Thread.sleep(3000);} catch (InterruptedException e) {e.printStackTrace();}
+
+                            attackerLocation =  Board.getInstance().getTile(goodMoves.get(0));
+                            enemyHealthAfterAttack = attack(out, attackerLocation, enemy, attacker, x, y, isRanged);
+                        }
+                        else if(goodMoves.size()>1)
+                        {   //otherwise the first good move is fine
+                            boolean found = false;
+                            for (Pair<Integer,Integer> pair : goodMoves) {
+                                int mx = pair.getFirst() - x;
+                                int my = pair.getSecond() -y;
+                                if(Math.abs(mx)>0 && my ==0)
+                                {
+                                    if(!Board.getInstance().getTile(pair).hasUnit()){
+                                        highlightedMoveTileClicked(out, pair.getFirst(), pair.getSecond());
+                                        try {Thread.sleep(3000);} catch (InterruptedException e) {e.printStackTrace();}
+
+                                        System.out.println(pair);
+                                        attackerLocation =  Board.getInstance().getTile(pair);
+                                        enemyHealthAfterAttack = attack(out, attackerLocation, enemy, attacker, x, y, isRanged);
+                                        System.out.println("found new pos using selective method");
+                                        found=true;
+                                    }
+                                }
+                                
+                            }
+                            if(found ==false)
+                            {
+                                for (Pair<Integer,Integer> pair : goodMoves) {
+                                    if(!Board.getInstance().getTile(pair).hasUnit()){
+                                        highlightedMoveTileClicked(out, pair.getFirst(), pair.getSecond());
+                                        try {Thread.sleep(3000);} catch (InterruptedException e) {e.printStackTrace();}
+
+                                        System.out.println(pair);
+                                        attackerLocation =  Board.getInstance().getTile(pair);
+                                        enemyHealthAfterAttack = attack(out, attackerLocation, enemy, attacker, x, y, isRanged);
+                                        System.out.println("found new pos");
+                                    }
+                                }
+                            }
+                        }
+                        else {
+                            return;
+                        }
+                    }
+                    else {
+                        highlightedMoveTileClicked(out, moveTile.getFirst(), moveTile.getSecond());
+                        try {Thread.sleep(3000);} catch (InterruptedException e) {e.printStackTrace();}
+
+                        attackerLocation =  Board.getInstance().getTile(moveTile);
+                        enemyHealthAfterAttack = attack(out, attackerLocation, enemy, attacker, x, y, isRanged);
+                    }
+                    
+
+                }
+                else{
+                    enemyHealthAfterAttack = attack(out, attackerLocation, enemy, attacker, x, y, isRanged);
                 }
 
 
@@ -411,6 +487,22 @@ public class UnitMovementAndAttack {
         }
 
         return enemy.getHealth();
+    }
+
+    public boolean attack1RCheck(int x, int y)
+    {
+        Pair<Integer, Integer> test = new Pair<>(x, y);
+        ArrayList<Pair<Integer, Integer>> tiles = get1RAtkTiles(activeUnit.getFirst(), activeUnit.getSecond());
+        for (Pair<Integer,Integer> pair : tiles) {
+            if(pair.equals(test))
+            {
+                return true;
+            }
+        }
+   
+       
+            return false;
+        
     }
 
     public boolean attackCheck(int x, int y) {

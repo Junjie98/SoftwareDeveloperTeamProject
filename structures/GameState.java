@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import akka.actor.ActorRef;
 import commandbuilders.*;
 import commandbuilders.enums.*;
-import commands.BasicCommands;
 import structures.basic.Card;
 import structures.basic.Player;
 import structures.basic.Tile;
@@ -12,8 +11,6 @@ import structures.basic.Unit;
 import structures.extractor.GameStateExtractor;
 import structures.handlers.*;
 import structures.memento.GameMemento;
-import utils.BasicObjectBuilders;
-import utils.StaticConfFiles;
 
 import static commandbuilders.enums.Players.*;
 
@@ -29,7 +26,7 @@ public class GameState {
     private final int INITIAL_CARD_COUNT = 3;
     protected int roundNumber = 3;
     private Players turn = Players.PLAYER1;
-    private Player player1, player2;
+    protected Player player1, player2;
     private Card currentHighlightedCard;
     public ArrayList<Card> player1CardsInHand = new ArrayList<>();
     public ArrayList<Card> player2CardsInHand = new ArrayList<>();
@@ -379,12 +376,12 @@ public class GameState {
         return highlighter;
     }
 
-    public Player getPlayer1() {
-        return player1;
-    }
-
-    public Player getPlayer2() {
-        return player2;
+    public Player getPlayer(Players player) {
+        switch (player) {
+            case PLAYER1: return player1;
+            case PLAYER2: return player2;
+        }
+        return null;
     }
 
     public int getRound() {
@@ -392,7 +389,6 @@ public class GameState {
         // Just / 2 to get the correct turn number.
         return this.roundNumber / 2;
     }
-
 
     public Players getTurn() {
         return turn;

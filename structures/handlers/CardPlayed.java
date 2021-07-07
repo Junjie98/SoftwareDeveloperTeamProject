@@ -17,8 +17,6 @@ import structures.memento.SummonInformation;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import static commandbuilders.enums.Players.PLAYER1;
-
 public class CardPlayed {
     String cardname;
     private GameState parent;
@@ -32,7 +30,7 @@ public class CardPlayed {
     // Move card to the Board and logic behind it.
     // ===========================================================================
     public void moveCardToBoard(ActorRef out, int x, int y) {
-        Card current = (parent.getTurn() == PLAYER1) ?
+        Card current = (parent.getTurn() == Players.PLAYER1) ?
                 parent.player1CardsInHand.get(activeCard.getSecond()) : parent.player2CardsInHand.get(activeCard.getSecond());
         this.cardname = current.getCardname();
         System.out.println(cardname);
@@ -42,7 +40,7 @@ public class CardPlayed {
         if (current.isSpell()) {
         	
         	// Checking if enemy casted a spell for Pureblade Enforcer
-        	ArrayList<Pair<Integer, Integer>> enemyUnits = (parent.getTurn() == PLAYER1) ?
+        	ArrayList<Pair<Integer, Integer>> enemyUnits = (parent.getTurn() == Players.PLAYER1) ?
                     parent.player2UnitsPosition : parent.player1UnitsPosition;
 			for (Pair<Integer, Integer> position : enemyUnits) {
                 Tile enemyLocation = Board.getInstance().getTile(position);
@@ -164,7 +162,7 @@ public class CardPlayed {
             unitsOriginalHealth.put(unit.getId(),current.getBigCard().getHealth());
 //            System.out.println("the health of "+ unit +" is " + unitsOriginalHealth.get(unit.getId()));
 
-            if (parent.getTurn() == PLAYER1) {
+            if (parent.getTurn() == Players.PLAYER1) {
                 parent.player1UnitsPosition.add(new Pair<>(x, y));
             } else {
                 parent.player2UnitsPosition.add(new Pair<>(x, y));
@@ -209,24 +207,26 @@ public class CardPlayed {
 
         // update avatar health to UI player health.
         if(target.isAvatar() && target.getPlayerID() == Players.PLAYER1) {
-            parent.getPlayer1().setHealth(target.getHealth());
+            parent.getPlayer(Players.PLAYER1).setHealth(target.getHealth());
             new PlayerSetCommandsBuilder(out, parent.isSimulation())
                     .setPlayer(Players.PLAYER1)
                     .setStats(PlayerStats.HEALTH)
-                    .setInstance(parent.getPlayer1())
+                    .setInstance(parent.getPlayer(Players.PLAYER1))
                     .issueCommand();
         } else if(target.isAvatar() && target.getPlayerID()== Players.PLAYER2) {
-            parent.getPlayer2().setHealth(target.getHealth());
+            parent.getPlayer(Players.PLAYER2).setHealth(target.getHealth());
             new PlayerSetCommandsBuilder(out, parent.isSimulation())
                     .setPlayer(Players.PLAYER2)
                     .setStats(PlayerStats.HEALTH)
-                    .setInstance(parent.getPlayer2())
+                    .setInstance(parent.getPlayer(Players.PLAYER2))
                     .issueCommand();
         }
 
         // Win condition: should be moved to a method where we are checking player's health
-        if (parent.getPlayer1().getHealth() < 1 || parent.getPlayer2().getHealth() < 1) {
-            parent.endGame(out);
+        for (Players player: Players.values()) {
+            if (parent.getPlayer(player).getHealth() < 1) {
+                parent.endGame(out);
+            }
         }
     }
     
@@ -234,29 +234,29 @@ public class CardPlayed {
     	switch (current.getCardname()) {
     		case "Azure Herald":
     			boolean isPlayer1 = false;
-    			if (parent.getTurn() == PLAYER1)
+    			if (parent.getTurn() == Players.PLAYER1)
     				isPlayer1 = true;
     			
     			if (isPlayer1) {
-    				int newHealth = parent.getPlayer1().getHealth() + 3;
+    				int newHealth = parent.getPlayer(Players.PLAYER1).getHealth() + 3;
     				if(newHealth > 20)
     					newHealth = 20;
-	               parent.getPlayer1().setHealth(newHealth);
+	               parent.getPlayer(Players.PLAYER1).setHealth(newHealth);
     			   new PlayerSetCommandsBuilder(out, parent.isSimulation())
 	                   .setPlayer(Players.PLAYER1)
 	                   .setStats(PlayerStats.HEALTH)
-	                   .setInstance(parent.getPlayer1())
+	                   .setInstance(parent.getPlayer(Players.PLAYER1))
 	                   .issueCommand();
     			}
                 else {
-            		int newHealth = parent.getPlayer2().getHealth() + 3;
+            		int newHealth = parent.getPlayer(Players.PLAYER2).getHealth() + 3;
     				if(newHealth > 20)
     					newHealth = 20;
-    				parent.getPlayer2().setHealth(newHealth);
+    				parent.getPlayer(Players.PLAYER2).setHealth(newHealth);
                 	new PlayerSetCommandsBuilder(out, parent.isSimulation())
 	                    .setPlayer(Players.PLAYER2)
 	                    .setStats(PlayerStats.HEALTH)
-	                    .setInstance(parent.getPlayer2())
+	                    .setInstance(parent.getPlayer(Players.PLAYER2))
 	                    .issueCommand();
                 }
     			
@@ -279,7 +279,7 @@ public class CardPlayed {
     // Delete Cards and Units
     // ===========================================================================
     public void deleteCardFromHand(ActorRef out, int pos) {
-        ArrayList<Card> current = (parent.getTurn() == PLAYER1) ? parent.player1CardsInHand : parent.player2CardsInHand;
+        ArrayList<Card> current = (parent.getTurn() == Players.PLAYER1) ? parent.player1CardsInHand : parent.player2CardsInHand;
         current.remove(pos);
         parent.getCardDrawing().displayCardsOnScreenFor(out, parent.getTurn());
     }

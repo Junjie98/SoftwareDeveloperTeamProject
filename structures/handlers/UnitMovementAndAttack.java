@@ -6,6 +6,7 @@ import commandbuilders.ProjectTileAnimationCommandBuilder;
 import commandbuilders.UnitCommandBuilder;
 import commandbuilders.enums.*;
 import commands.BasicCommands;
+import play.api.Play;
 import structures.Board;
 import structures.GameState;
 import structures.basic.Tile;
@@ -340,40 +341,42 @@ public class UnitMovementAndAttack {
         
         //update avatar health to UI player health.
         if(enemy.isAvatar() && enemy.getPlayerID() == Players.PLAYER1) {
-            parent.getPlayer1().setHealth(enemy.getHealth());
+            parent.getPlayer(Players.PLAYER1).setHealth(enemy.getHealth());
             new PlayerSetCommandsBuilder(out, parent.isSimulation())
                     .setPlayer(Players.PLAYER1)
                     .setStats(PlayerStats.HEALTH)
-                    .setInstance(parent.getPlayer1())
+                    .setInstance(parent.getPlayer(Players.PLAYER1))
                     .issueCommand();
         } else if(enemy.isAvatar() && enemy.getPlayerID()== Players.PLAYER2) {
-            parent.getPlayer2().setHealth(enemy.getHealth());
+            parent.getPlayer(Players.PLAYER2).setHealth(enemy.getHealth());
             new PlayerSetCommandsBuilder(out, parent.isSimulation())
                     .setPlayer(Players.PLAYER2)
                     .setStats(PlayerStats.HEALTH)
-                    .setInstance(parent.getPlayer2())
+                    .setInstance(parent.getPlayer(Players.PLAYER2))
                     .issueCommand();
         } else if(attacker.isAvatar() && attacker.getPlayerID()== Players.PLAYER1) {
-            parent.getPlayer1().setHealth(attacker.getHealth());
+            parent.getPlayer(Players.PLAYER1).setHealth(attacker.getHealth());
             new PlayerSetCommandsBuilder(out, parent.isSimulation())
                     .setPlayer(Players.PLAYER1)
                     .setStats(PlayerStats.HEALTH)
-                    .setInstance(parent.getPlayer1())
+                    .setInstance(parent.getPlayer(Players.PLAYER1))
                     .issueCommand();
         } else if(attacker.isAvatar() && attacker.getPlayerID()== Players.PLAYER2) {
-            parent.getPlayer2().setHealth(attacker.getHealth());
+            parent.getPlayer(Players.PLAYER2).setHealth(attacker.getHealth());
             new PlayerSetCommandsBuilder(out, parent.isSimulation())
                     .setPlayer(Players.PLAYER2)
                     .setStats(PlayerStats.HEALTH)
-                    .setInstance(parent.getPlayer2())
+                    .setInstance(parent.getPlayer(Players.PLAYER2))
                     .issueCommand();
         }
 
         // Win condition: should be moved to a method where we are checking player's health
-        if (parent.getPlayer1().getHealth() < 1 || parent.getPlayer2().getHealth() < 1) {
-            parent.endGame(out);
+        for (Players player: Players.values()) {
+            if (parent.getPlayer(player).getHealth() < 1) {
+                parent.endGame(out);
+                break;
+            }
         }
-
         return enemy.getHealth();
     }
 

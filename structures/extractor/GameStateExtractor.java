@@ -1,8 +1,11 @@
 package structures.extractor;
 
+import commandbuilders.enums.Players;
+import play.api.Play;
 import structures.Board;
 import structures.GameState;
 import structures.basic.Card;
+import structures.basic.Player;
 import structures.handlers.Pair;
 import structures.memento.GameMemento;
 
@@ -30,6 +33,8 @@ public class GameStateExtractor {
         output.memento = cloneMementoList(parent.memento);
 
         output.setRoundNumber(parent.getRoundNumber());
+        output.setPlayer(Players.PLAYER1, clonePlayer(parent.getPlayer(Players.PLAYER1)));
+        output.setPlayer(Players.PLAYER2, clonePlayer(parent.getPlayer(Players.PLAYER2)));
 
         return output;
     }
@@ -49,6 +54,10 @@ public class GameStateExtractor {
             output.add(Pair.copyIntegerPair(pair));
         }
         return output;
+    }
+
+    private Player clonePlayer(Player player) {
+        return new Player(player.getHealth(), player.getMana());
     }
 
     private ArrayList<GameMemento> cloneMementoList(ArrayList<GameMemento> mementos) {

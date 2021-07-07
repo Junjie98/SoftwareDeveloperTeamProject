@@ -260,8 +260,8 @@ public class CardPlayed {
     			break;
     			
     		case "Blaze Hound":
-    			new CardDrawing(parent).drawNewCardFor(out, Players.PLAYER1);
-    			new CardDrawing(parent).drawNewCardFor(out, Players.PLAYER2);
+    			parent.getCardDrawing().drawNewCardFor(out, Players.PLAYER1);
+    			parent.getCardDrawing().drawNewCardFor(out, Players.PLAYER2);
     			break;
     	}
     }

@@ -182,7 +182,7 @@ public class GameState {
             // For unit Planar Scout
         	if (current.getCardname().equals("Planar Scout")) {
         		cardPlayed.setActiveCard(current, idx);
-        		new UnitMovementAndAttack(this).flyingOrRangedMoveHighlight(out);
+        		unitMovementAndAttack.flyingOrRangedMoveHighlight(out);
         	}
        
         	else if (card == null || card.getSecond() != idx) {

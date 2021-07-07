@@ -2,9 +2,6 @@ package structures.AI;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-
-import javax.lang.model.util.ElementScanner14;
-
 import akka.actor.ActorRef;
 
 import commandbuilders.enums.Players;
@@ -39,25 +36,25 @@ public class AI
 
     public void castInit(ActorRef out, GameState gs)
     {
-        ArrayList<Pair<Integer, Integer>> cardPriority = new ArrayList<>();
+        ArrayList<Card> summonCards = new ArrayList<Card>();
+        ArrayList<Card> spellCards = new ArrayList<Card>();
 
         //check mana
         //check spells
         //prioritise and cast
-        mana = gs.getPlayer1().getMana();
+        mana = gs.getPlayer2().getMana();
         for (int i = 0; i < gs.player2CardsInHand.size(); i++) {
             if(gs.player2CardsInHand.get(i).getManacost() <= mana){
-                int priority = 1 + gs.player2CardsInHand.get(i).getManacost();
                 if(gs.player2CardsInHand.get(i).isSpell()){
-                    priority = 0;
+                    spellCards.add(gs.player2CardsInHand.get(i));
                 }
-                cardPriority.add(new Pair<Integer, Integer>(i, priority));
+                else{
+                    summonCards.add(gs.player2CardsInHand.get(i));
+                }
             }
         }
 
-        for (Pair<Integer,Integer> cardInfo : cardPriority) {
-            
-        }
+ 
     }
 
     public void moveCheck(ActorRef out, GameState gs)

@@ -257,19 +257,12 @@ public class CardPlayed {
 	                    .setInstance(parent.getPlayer(Players.PLAYER2))
 	                    .issueCommand();
                 }
+    			break;
     			
-//    		case "Pureblade Enforcer":
-//    			ArrayList<Pair<Integer, Integer>> enemyUnits = (parent.getTurn() == PLAYER1) ?
-//                        parent.player2UnitsPosition : parent.player1UnitsPosition;
-//    			for (Pair<Integer, Integer> position : enemyUnits) {
-//                    Tile enemyLocation = parent.getBoard().getTile(position);
-//                  
-//                    if(enemyLocation.getUnit().getType() == UnitType.PUREBLADE_ENFORCER) {
-//                    	System.out.println("bleh");
-//                    	enemyLocation.getUnit().setHealth(enemyLocation.getUnit().getHealth() + 1);
-//                    	enemyLocation.getUnit().setDamage(enemyLocation.getUnit().getDamage() + 1);
-//                    }
-//                }
+    		case "Blaze Hound":
+    			parent.getCardDrawing().drawNewCardFor(out, Players.PLAYER1);
+    			parent.getCardDrawing().drawNewCardFor(out, Players.PLAYER2);
+    			break;
     	}
     }
 

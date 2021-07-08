@@ -12,7 +12,6 @@ import structures.extractor.GameStateExtractor;
 import structures.handlers.*;
 import structures.memento.GameMemento;
 
-
 /**
  * This class can be used to hold information about the on-going game.
  * Its created with the GameActor.
@@ -178,7 +177,14 @@ public class GameState {
         // if enough mana, then highlight and play the card, else drop a notification
         if(enoughMana) {
             highlighter.clearBoardHighlights(out);
-            if (card == null || card.getSecond() != idx) {
+            
+            // For unit Planar Scout
+        	if (current.getCardname().equals("Planar Scout")) {
+        		cardPlayed.setActiveCard(current, idx);
+        		unitMovementAndAttack.flyingOrRangedMoveHighlight(out);
+        	}
+       
+        	else if (card == null || card.getSecond() != idx) {
                 cardPlayed.setActiveCard(current, idx);
                 ArrayList<Pair<Integer, Integer>> friendlyUnits =
                         (turn == Players.PLAYER1) ? player1UnitsPosition : player2UnitsPosition;

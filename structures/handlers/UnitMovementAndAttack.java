@@ -176,7 +176,7 @@ public class UnitMovementAndAttack {
         int count = 0 ;
 
         for(int x = 0; x < 9; x++ ) {
-            for(int y = 0; y < 5; y ++) {
+            for(int y = 0; y < 5; y++) {
                 if(!parent.getBoard().getTile(x, y).hasUnit()) {
                     int[] temp = {x, y};
                     System.err.println("tile: " + x + "," + y);

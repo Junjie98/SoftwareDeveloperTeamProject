@@ -3,10 +3,12 @@ package structures.extractor;
 import commandbuilders.enums.Players;
 import structures.Board;
 import structures.GameState;
+import structures.basic.Card;
 import structures.basic.Player;
 import structures.handlers.Pair;
 
 import java.util.ArrayList;
+
 
 public class ExtractedGameState extends GameState {
     protected Board board = null;
@@ -37,17 +39,62 @@ public class ExtractedGameState extends GameState {
     }
 
     public Pair<Integer, Integer> getMyAvatarPosition() {
-        for (Pair<Integer, Integer> pair: player2UnitsPosition) {
+        for (Pair<Integer, Integer> pair:  getTurn() == Players.PLAYER2?player2UnitsPosition:player1UnitsPosition) {
             if (getBoard().getTile(pair).getUnit().isAvatar()) {
                 return pair;
             }
         }
         return null;
     }
+ 
+    public Pair<Integer, Integer> getEnemyAvatarPosition() {
+        for (Pair<Integer, Integer> pair:  getTurn() == Players.PLAYER2?player1UnitsPosition:player2UnitsPosition) {
+            if (getBoard().getTile(pair).getUnit().isAvatar()) {
+                return pair;
+            }
+        }
+        return null;
+    }
+    
+    public ArrayList<Pair<Integer,Integer>> getAllUnitsBarAvatar()
+    {
+        ArrayList<Pair<Integer, Integer>> output = new ArrayList<>();
+        for (Pair<Integer, Integer> pair: getTurn() == Players.PLAYER2?player2UnitsPosition:player1UnitsPosition ) {
+            if (!getBoard().getTile(pair).getUnit().isAvatar()) {
+                output.add(pair);
+            }
+        }
+        return output;
+
+    }
+    public ArrayList<Pair<Integer,Integer>> getAllEnemiesBarAvatar()
+    {
+        ArrayList<Pair<Integer, Integer>> output = new ArrayList<>();
+        for (Pair<Integer, Integer> pair: getTurn() == Players.PLAYER2?player1UnitsPosition:player2UnitsPosition ) {
+            if (!getBoard().getTile(pair).getUnit().isAvatar()) {
+                output.add(pair);
+            }
+        }
+        return output;
+
+    }
+    
+    
+    public ArrayList<Pair<Integer, Integer>> getAllOtherUnits() {
+        ArrayList<Pair<Integer, Integer>> output = new ArrayList<>();
+        for (Pair<Integer, Integer> pair:  getTurn() == Players.PLAYER2?player2UnitsPosition:player1UnitsPosition) {
+            if (!getBoard().getTile(pair).getUnit().isRanged()
+                && !getBoard().getTile(pair).getUnit().isFlying()
+                && !getBoard().getTile(pair).getUnit().isAvatar()) {
+                output.add(pair);
+            }
+        }
+        return output;
+    }
 
     public ArrayList<Pair<Integer, Integer>> getAllRangedUnits() {
         ArrayList<Pair<Integer, Integer>> output = new ArrayList<>();
-        for (Pair<Integer, Integer> pair: player2UnitsPosition) {
+        for (Pair<Integer, Integer> pair:  getTurn() == Players.PLAYER2?player2UnitsPosition:player1UnitsPosition) {
             if (getBoard().getTile(pair).getUnit().isRanged()) {
                 output.add(pair);
             }
@@ -57,12 +104,77 @@ public class ExtractedGameState extends GameState {
 
     public ArrayList<Pair<Integer, Integer>> getAllFlyingUnits() {
         ArrayList<Pair<Integer, Integer>> output = new ArrayList<>();
-        for (Pair<Integer, Integer> pair: player2UnitsPosition) {
+        for (Pair<Integer, Integer> pair:  getTurn() == Players.PLAYER2?player2UnitsPosition:player1UnitsPosition) {
             if (getBoard().getTile(pair).getUnit().isFlying()) {
                 output.add(pair);
             }
         }
         return output;
+    }
+
+    public ArrayList<Pair<Integer,Integer>> canStillMove(){
+        ArrayList<Pair<Integer,Integer>> out = new ArrayList<>();
+        for (Pair<Integer,Integer> unit : 
+            ((getTurn()==Players.PLAYER2) ? player2UnitsPosition : player1UnitsPosition)) {
+            if(!board.getTile(unit).getUnit().getHasMoved() &&!board.getTile(unit).getUnit().getHasAttacked())
+            {
+                out.add(unit);
+            }
+        }
+        return out;
+    }
+
+    public ArrayList<Pair<Integer, Card>> canStillSummon(){
+        ArrayList<Pair<Integer, Card>> out = new ArrayList<>();
+        int totalMana = getPlayer(getTurn()).getMana();
+        ArrayList<Card> hand = (getTurn()==Players.PLAYER2) ? player2CardsInHand : player1CardsInHand);
+        for (int i=0; i < hand.size(); i++) {
+            if(!hand.get(i).isSpell() && hand.get(i).getManacost()<=totalMana){
+                out.add(new Pair<>(i,hand.get(i)));
+            }
+        }
+        return out;
+    }
+
+    public ArrayList<Pair<Integer, Card>> canStillCast(){
+        ArrayList<Pair<Integer, Card>> out = new ArrayList<>();
+        int totalMana = getPlayer(getTurn()).getMana();
+        ArrayList<Card> hand = (getTurn()==Players.PLAYER2) ? player2CardsInHand : player1CardsInHand);
+        for (int i=0; i < hand.size(); i++) {
+            if(hand.get(i).isSpell() && hand.get(i).getManacost()<=totalMana){
+                out.add(new Pair<>(i,hand.get(i)));
+            }
+        }
+        return out;
+    }
+
+    public  ArrayList<Pair<Pair<Integer,Integer>,Pair<Integer,Integer>>> canStillAttack()
+    {
+        ArrayList<Pair<Pair<Integer,Integer>,Pair<Integer,Integer>>> out = new ArrayList<>();
+        for (Pair<Integer,Integer> unit : 
+            ((getTurn()==Players.PLAYER2) ? player2UnitsPosition : player1UnitsPosition)) {
+            if(!board.getTile(unit).getUnit().getHasAttacked())
+            {
+                ArrayList<Pair<Integer,Integer>> allAtkTilesR = getUnitMovementAndAttack().getAllAtkTiles(unit.getFirst(), unit.getSecond());
+                allAtkTilesR.addAll(getUnitMovementAndAttack().getAllMoveTiles(unit.getFirst(), unit.getSecond()));
+            
+                for (Pair<Integer,Integer> enemy : (getTurn()==Players.PLAYER2) ? player1UnitsPosition : player2UnitsPosition) {
+                    if(allAtkTilesR.contains(enemy))
+                    {
+                        int movex = enemy.getFirst()-unit.getFirst();
+                        int movey = enemy.getFirst() - unit.getFirst();
+                        if(!getUnitMovementAndAttack().moveBlockCheck(unit.getFirst(), unit.getSecond(), movex, movey))
+                        {
+                            Pair<Integer,Integer> attaker = unit;
+                            Pair<Integer,Integer> attackee = enemy;
+
+                            out.add(new Pair<>(attaker, attackee));
+                        }
+                    }
+                }
+            }
+        }
+        return out;
     }
 
     @Override

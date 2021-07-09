@@ -1,9 +1,13 @@
 package structures;
 
+import java.util.ArrayList;
+
 import akka.actor.ActorRef;
+import structures.AI.AI;
 import structures.basic.Tile;
 import structures.extractor.ExtractedGameState;
 import structures.handlers.Pair;
+import structures.memento.GameMemento;
 
 public class SmartBoy {
     private GameState parent;
@@ -12,8 +16,24 @@ public class SmartBoy {
         this.parent = parent;
     }
 
-    public void tester(ActorRef out) {
+    public ExtractedGameState tester(ActorRef out) {
         ExtractedGameState information = getExtractedGameState();
+        information.setSimulation(true);
+
+        if(information.canStillMove())
+        {
+            Pair<Integer,Integer> avatarPos = information.getMyAvatarPosition();
+            ArrayList<Pair<Integer,Integer>> flyingUnitsPos = information.getAllFlyingUnits();
+            ArrayList<Pair<Integer,Integer>> rangedUnitsPos = information.getAllRangedUnits();
+            ArrayList<Pair<Integer,Integer>> otherUnitsPos = information.getAllOtherUnits();
+    
+            Pair<Integer,Integer> target = AI.findEnemyTarget(information);
+    
+    
+
+        }
+        
+     
 
 //        System.out.println(information);
 
@@ -26,8 +46,9 @@ public class SmartBoy {
 //        System.out.println(information.getMyAvatarPosition());
     }
 
-    private ExtractedGameState getExtractedGameState() {
+    public ExtractedGameState getExtractedGameState() {
         return parent.getExtractor().extract();
     }
 
+   
 }

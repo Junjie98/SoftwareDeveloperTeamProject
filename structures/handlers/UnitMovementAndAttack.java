@@ -6,6 +6,7 @@ import commandbuilders.ProjectTileAnimationCommandBuilder;
 import commandbuilders.UnitCommandBuilder;
 import commandbuilders.enums.*;
 import commands.BasicCommands;
+import structures.Board;
 import structures.GameState;
 import structures.AI.AI;
 import structures.basic.Tile;
@@ -41,12 +42,7 @@ public class UnitMovementAndAttack {
             return;
         }
         if(activeUnit != null) {
-<<<<<<< HEAD
-            previousUnitLocation = Board.getInstance().getTile(activeUnit);
-
-=======
             Tile previousUnitLocation = parent.getBoard().getTile(activeUnit);
->>>>>>> develop
             //Unhighlight previously selected unit
             parent.getHighlighter().clearBoardHighlights(out);
             errorBool = true;
@@ -220,13 +216,8 @@ public class UnitMovementAndAttack {
             return;
         }
 
-<<<<<<< HEAD
-        Tile destinationTile = Board.getInstance().getTile(x, y);
-        //System.out.println("chekcing move");
-=======
         Tile destinationTile = parent.getBoard().getTile(x, y);
         System.out.println("chekcing move");
->>>>>>> develop
         if (destinationTile.getTileState() == States.NORMAL) {
             parent.getHighlighter().clearBoardHighlights(out);
         } else if (destinationTile.getTileState() == States.HIGHLIGHTED) {
@@ -278,17 +269,10 @@ public class UnitMovementAndAttack {
     // ===========================================================================
     public void launchAttack(ActorRef out, int x, int y) {
         if (activeUnit == null) { return; }
-<<<<<<< HEAD
-        if (Board.getInstance().getTile(x, y).getUnit().getPlayerID() != parent.getTurn()) {
-        	//System.out.println("attackLaunched");
-            Tile enemyLocation = Board.getInstance().getTile(x, y);
-            Tile attackerLocation =  Board.getInstance().getTile(activeUnit);
-=======
         if (parent.getBoard().getTile(x, y).getUnit().getPlayerID() != parent.getTurn()) {
             System.out.println("attackLaunched");
             Tile enemyLocation = parent.getBoard().getTile(x, y);
             Tile attackerLocation =  parent.getBoard().getTile(activeUnit);
->>>>>>> develop
             Unit enemy = enemyLocation.getUnit();
             Unit attacker = attackerLocation.getUnit();
             
@@ -500,55 +484,30 @@ public class UnitMovementAndAttack {
         moveAttackAndCounterAttack.add(attacker);
         
         //update avatar health to UI player health.
-<<<<<<< HEAD
-        if(enemy.getIdentifer() == 1 && enemy.getPlayerID() == Players.PLAYER1) {
-            parent.getPlayer1().setHealth(enemy.getHealth());
-            new PlayerSetCommandsBuilder(out)
-=======
         if(enemy.isAvatar() && enemy.getPlayerID() == Players.PLAYER1) {
             parent.getPlayer(Players.PLAYER1).setHealth(enemy.getHealth());
             new PlayerSetCommandsBuilder(out, parent.isSimulation())
->>>>>>> develop
                     .setPlayer(Players.PLAYER1)
                     .setStats(PlayerStats.HEALTH)
                     .setInstance(parent.getPlayer(Players.PLAYER1))
                     .issueCommand();
-<<<<<<< HEAD
-        } else if(enemy.getIdentifer() == 1 && enemy.getPlayerID()== Players.PLAYER2) {
-            parent.getPlayer2().setHealth(enemy.getHealth());
-            new PlayerSetCommandsBuilder(out)
-=======
         } else if(enemy.isAvatar() && enemy.getPlayerID()== Players.PLAYER2) {
             parent.getPlayer(Players.PLAYER2).setHealth(enemy.getHealth());
             new PlayerSetCommandsBuilder(out, parent.isSimulation())
->>>>>>> develop
                     .setPlayer(Players.PLAYER2)
                     .setStats(PlayerStats.HEALTH)
                     .setInstance(parent.getPlayer(Players.PLAYER2))
                     .issueCommand();
-<<<<<<< HEAD
-        } else if(attacker.getIdentifer() == 1 && attacker.getPlayerID()== Players.PLAYER1) {
-            parent.getPlayer1().setHealth(attacker.getHealth());
-
-            new PlayerSetCommandsBuilder(out)
-=======
         } else if(attacker.isAvatar() && attacker.getPlayerID()== Players.PLAYER1) {
             parent.getPlayer(Players.PLAYER1).setHealth(attacker.getHealth());
             new PlayerSetCommandsBuilder(out, parent.isSimulation())
->>>>>>> develop
                     .setPlayer(Players.PLAYER1)
                     .setStats(PlayerStats.HEALTH)
                     .setInstance(parent.getPlayer(Players.PLAYER1))
                     .issueCommand();
-<<<<<<< HEAD
-        } else if(attacker.getIdentifer() == 1 && attacker.getPlayerID()== Players.PLAYER2) {
-            parent.getPlayer2().setHealth(attacker.getHealth());
-            new PlayerSetCommandsBuilder(out)
-=======
         } else if(attacker.isAvatar() && attacker.getPlayerID()== Players.PLAYER2) {
             parent.getPlayer(Players.PLAYER2).setHealth(attacker.getHealth());
             new PlayerSetCommandsBuilder(out, parent.isSimulation())
->>>>>>> develop
                     .setPlayer(Players.PLAYER2)
                     .setStats(PlayerStats.HEALTH)
                     .setInstance(parent.getPlayer(Players.PLAYER2))

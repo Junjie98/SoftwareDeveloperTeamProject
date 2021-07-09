@@ -4,18 +4,19 @@ import java.util.ArrayList;
 import akka.actor.ActorRef;
 import commandbuilders.*;
 import commandbuilders.enums.*;
+<<<<<<< HEAD
 import commands.BasicCommands;
 import scala.Int;
 import structures.AI.AI;
+=======
+>>>>>>> develop
 import structures.basic.Card;
 import structures.basic.Player;
 import structures.basic.Tile;
 import structures.basic.Unit;
+import structures.extractor.GameStateExtractor;
 import structures.handlers.*;
-import utils.BasicObjectBuilders;
-import utils.StaticConfFiles;
-
-import static commandbuilders.enums.Players.*;
+import structures.memento.GameMemento;
 
 /**
  * This class can be used to hold information about the on-going game.
@@ -26,25 +27,29 @@ import static commandbuilders.enums.Players.*;
  */
 
 public class GameState {
-    private final int INITIAL_CARD_COUNT = 3;
-    private int roundNumber = 3;
+    protected int roundNumber = 3;
     private Players turn = Players.PLAYER1;
-    private Player player1, player2;
+    protected Player player1, player2;
     private Card currentHighlightedCard;
     public ArrayList<Card> player1CardsInHand = new ArrayList<>();
     public ArrayList<Card> player2CardsInHand = new ArrayList<>();
     public ArrayList<Pair<Integer, Integer>> player1UnitsPosition = new ArrayList<>();
     public ArrayList<Pair<Integer, Integer>> player2UnitsPosition = new ArrayList<>();
+    public ArrayList<GameMemento> memento = new ArrayList<>();
+
+    protected boolean simulation = false;
+    final private GameStateExtractor extractor = new GameStateExtractor(this);
+    final private SmartBoy smartBoy = new SmartBoy(this);
 
 
     public AI ai = new AI();
     // ===========================================================================
     // Handler Classes
     // ===========================================================================
-    private UnitMovementAndAttack unitMovementAndAttack = new UnitMovementAndAttack(this);
-    private CardDrawing cardDrawing = new CardDrawing(this);
-    private CardPlayed cardPlayed = new CardPlayed(this);
-    private Highlighter highlighter = new Highlighter(this);
+    final private UnitMovementAndAttack unitMovementAndAttack = new UnitMovementAndAttack(this);
+    final private CardDrawing cardDrawing = new CardDrawing(this);
+    final private CardPlayed cardPlayed = new CardPlayed(this);
+    final private Highlighter highlighter = new Highlighter(this);
 
 
     
@@ -59,12 +64,12 @@ public class GameState {
     	player1 = new Player(20,2); //set players health and mana to 20
         player2 = new Player(20,2); //player start with 2 mana in round 1.
 
-        new PlayerSetCommandsBuilder(out)
+        new PlayerSetCommandsBuilder(out, isSimulation())
                 .setPlayer(Players.PLAYER1)
                 .setStats(PlayerStats.ALL)
                 .setInstance(player1)
                 .issueCommand();
-        new PlayerSetCommandsBuilder(out)
+        new PlayerSetCommandsBuilder(out, isSimulation())
                 .setPlayer(Players.PLAYER2)
                 .setStats(PlayerStats.ALL)
                 .setInstance(player2)
@@ -73,7 +78,9 @@ public class GameState {
 
     //Spawns Avatars in starting positions at init
     public void spawnAvatars(ActorRef out) {
+        //Avatar1
         Unit human = new UnitFactory().generateUnit(UnitType.HUMAN);
+<<<<<<< HEAD
         human.setIdentifier(1);
         
         Unit aiAvatar = new UnitFactory().generateUnit(UnitType.AI);
@@ -85,11 +92,23 @@ public class GameState {
                     .setPlayerID(Players.PLAYER1)
                     .setUnit(human)
                     .issueCommand();
+=======
+        human.setAvatar(true);
+        human.setName("Human Avatar");
+>>>>>>> develop
 
-        player1UnitsPosition.add(new Pair<>(1, 2));
+        UnitCommandBuilder humanCommands = new UnitCommandBuilder(out, isSimulation())
+                .setUnit(human);
 
-        //setting health & attack to board. *They doesn't stack*
+        humanCommands.setMode(UnitCommandBuilderMode.DRAW)
+                .setTilePosition(1, 2)
+                .setPlayerID(Players.PLAYER1)
+                .issueCommand();
 
+        // setting health & attack to board. *They doesn't stack*
+        // uses the health that has been initialised earlier with the player constructor
+
+<<<<<<< HEAD
         //Avatar1
         new UnitCommandBuilder(out)
         	.setMode(UnitCommandBuilderMode.SET)
@@ -110,10 +129,26 @@ public class GameState {
                     .setPlayerID(Players.PLAYER2)
                     .setUnit(aiAvatar)
                     .issueCommand();
+=======
+        try {Thread.sleep(30);} catch (InterruptedException e) {e.printStackTrace();}
+>>>>>>> develop
 
-        player2UnitsPosition.add(new Pair<>(7, 2));
+        humanCommands.setMode(UnitCommandBuilderMode.SET)
+                .setStats(UnitStats.HEALTH, player1.getHealth())
+                .issueCommand();
+
+        try {Thread.sleep(30);} catch (InterruptedException e) {e.printStackTrace();}
+
+        humanCommands.setMode(UnitCommandBuilderMode.SET)
+                .setStats(UnitStats.ATTACK, 2)
+                .issueCommand();
+
+        player1UnitsPosition.add(new Pair<>(1, 2));
+
+        try {Thread.sleep(30);} catch (InterruptedException e) {e.printStackTrace();}
 
         //Avatar2
+<<<<<<< HEAD
         new UnitCommandBuilder(out)
         	.setMode(UnitCommandBuilderMode.SET)
         	.setUnit(aiAvatar) 
@@ -126,15 +161,46 @@ public class GameState {
     	.setUnit(aiAvatar)
     	.setStats(UnitStats.ATTACK, 2)
     	.issueCommand();
+=======
+        Unit aiAvatar = new UnitFactory().generateUnit(UnitType.AI);
+        aiAvatar.setAvatar(true);
+        aiAvatar.setName("AI Avatar");
+
+        UnitCommandBuilder aiCommands = new UnitCommandBuilder(out, isSimulation())
+                .setUnit(aiAvatar);
+
+        aiCommands.setMode(UnitCommandBuilderMode.DRAW)
+                .setTilePosition(7, 2)
+                .setPlayerID(Players.PLAYER2)
+                .issueCommand();
+
+        try {Thread.sleep(30);} catch (InterruptedException e) {e.printStackTrace();}
+
+        //uses the health that has been initialised earlier with the player constructor
+
+        aiCommands.setMode(UnitCommandBuilderMode.SET)
+                .setStats(UnitStats.HEALTH, player2.getHealth())
+                .issueCommand();
+
+        try {Thread.sleep(30);} catch (InterruptedException e) {e.printStackTrace();}
+
+        aiCommands.setMode(UnitCommandBuilderMode.SET)
+                .setStats(UnitStats.ATTACK, 2)
+                .issueCommand();
+
+        try {Thread.sleep(30);} catch (InterruptedException e) {e.printStackTrace();}
+
+        player2UnitsPosition.add(new Pair<>(7, 2));
+>>>>>>> develop
 
         //Save the original health state to a hashmap. Used for calculations.
         cardPlayed.setUnitsOriginalHealth(human.getId(),player1.getHealth());
         cardPlayed.setUnitsOriginalHealth(human.getId(),player2.getHealth());
-
     }
 
     // This method add 3 cards to both Players as part of initialisation.
     public void drawInitialCards(ActorRef out) {
+        int INITIAL_CARD_COUNT = 3;
         for (int idx = 0; idx < INITIAL_CARD_COUNT; idx++) {
             cardDrawing.drawNewCardFor(out, Players.PLAYER1);
             cardDrawing.drawNewCardFor(out, Players.PLAYER2);
@@ -147,7 +213,7 @@ public class GameState {
     // ===========================================================================
     public void endTurnClicked(ActorRef out) {
         highlighter.clearBoardHighlights(out);
-        turn = (turn == Players.PLAYER1) ? PLAYER2 : PLAYER1;
+        turn = (turn == Players.PLAYER1) ? Players.PLAYER2 : Players.PLAYER1;
         unitMovementAndAttack.resetMoveAttackAndCounterAttack(out);
         setManaByRound(out);
         if (roundNumber > 3) {
@@ -155,6 +221,7 @@ public class GameState {
         }
         cardDrawing.displayCardsOnScreenFor(out, turn);
         ++roundNumber; // Divide this by 2 when we are going to use this.
+<<<<<<< HEAD
         
         if(turn==PLAYER2)
         {
@@ -167,17 +234,22 @@ public class GameState {
     public void AiPulse(ActorRef out, GameState gs)
     {
         ai.moreUnitsToMoveAtk(out, gs);
+=======
+        if (turn == Players.PLAYER2) {
+            smartBoy.tester(out);
+        }
+>>>>>>> develop
     }
 
     public void cardClicked(ActorRef out, int idx) {
-        Card current = (turn == PLAYER1) ? player1CardsInHand.get(idx) : player2CardsInHand.get(idx);
+        Card current = (turn == Players.PLAYER1) ? player1CardsInHand.get(idx) : player2CardsInHand.get(idx);
         System.out.println("Card Clicked: " + current.getCardname());
         Pair<Card, Integer> card = cardPlayed.getActiveCard();
 
         // Decrease Mana
         int manaCost = current.getManacost();
-        int playersMana = (turn == PLAYER1) ? player1.getMana() : player2.getMana();
-        boolean enoughMana = (playersMana >= manaCost) ? true : false;   //if enough mana then true
+        int playersMana = (turn == Players.PLAYER1) ? player1.getMana() : player2.getMana();
+        boolean enoughMana = playersMana >= manaCost;   //if enough mana then true
 
         // Redraw cards at hand at every card click
         cardDrawing.displayCardsOnScreenFor(out, turn);
@@ -185,18 +257,25 @@ public class GameState {
         // if enough mana, then highlight and play the card, else drop a notification
         if(enoughMana) {
             highlighter.clearBoardHighlights(out);
-            if (card == null || card.getSecond() != idx) {
+            
+            // For unit Planar Scout
+        	if (current.getCardname().equals("Planar Scout")) {
+        		cardPlayed.setActiveCard(current, idx);
+        		unitMovementAndAttack.flyingOrRangedMoveHighlight(out);
+        	}
+       
+        	else if (card == null || card.getSecond() != idx) {
                 cardPlayed.setActiveCard(current, idx);
                 ArrayList<Pair<Integer, Integer>> friendlyUnits =
-                        (turn == PLAYER1) ? player1UnitsPosition : player2UnitsPosition;
+                        (turn == Players.PLAYER1) ? player1UnitsPosition : player2UnitsPosition;
                 for (Pair<Integer, Integer> position : friendlyUnits) {
                     highlighter.cardTileHighlight(out, position.getFirst(), position.getSecond());
                 }
             }
         } else {
-            new PlayerNotificationCommandBuilder(out)
+            new PlayerNotificationCommandBuilder(out, isSimulation())
                     .setMessage("Insufficient Mana")
-                    .setPlayer(PLAYER1)
+                    .setPlayer(Players.PLAYER1)
                     .setDisplaySeconds(2)
                     .issueCommand();
         }
@@ -209,8 +288,9 @@ public class GameState {
     }
 
     public void tileClicked(ActorRef out, int x, int y) {
-        Tile tile = Board.getInstance().getTile(x, y);
+        Tile tile = getBoard().getTile(x, y);
         if (tile.getTileState() == States.RED) {
+            System.out.println("A");
             if (cardPlayed.getActiveCard() != null) {
                 // Handle spell
                 cardPlayed.moveCardToBoard(out, x ,y);
@@ -224,6 +304,7 @@ public class GameState {
 
             }
         } else if (tile.getTileState() == States.HIGHLIGHTED) {
+            System.out.println("B");
             if (cardPlayed.getActiveCard() != null) {
                 // Card Played or spell played
                 cardPlayed.moveCardToBoard(out, x, y);
@@ -251,17 +332,19 @@ public class GameState {
                 }
             } else {
                 if (tile != null && tile.hasUnit()) {
+                    System.out.println("G");
                     // If player clicked on a unit and clicked on another.
                     unitMovementAndAttack.unitClicked(out, x, y);
                     System.err.println("unit clicked");
 
                 } else if (tile != null && tile.getTileState() == States.NORMAL) {
+                    System.out.println("H");
                     // Click on another unit or the activated unit will cancel the board highlight.
                     highlighter.clearBoardHighlights(out);
                 }
             }
         }
-        if (cardPlayed.getActiveCard() != null && tile.hasUnit() == false) {
+        if (cardPlayed.getActiveCard() != null && !tile.hasUnit()) {
             // Cancel the highlights on clicking on a not highlighted cell, excluding the unit.
             highlighter.clearBoardHighlights(out);
         }
@@ -281,33 +364,33 @@ public class GameState {
             winner = player1;
         }
         if (winner != null) {
-            String message = "";
-            if (winner == player1) {
-                message = "Player 1 won!";
-            } else {
-                message = "Player 2 won!";
-            }
-            new PlayerNotificationCommandBuilder(out)
+            String message = (winner == player1) ? "Player 1 won!" : "Player 2 won!" ;
+            new PlayerNotificationCommandBuilder(out, isSimulation())
                 .setMessage(message)
-                .setPlayer(PLAYER1)
+                .setPlayer(Players.PLAYER1)
                 .setDisplaySeconds(4)
                 .issueCommand();
         }
     }
 
+    private int getCurrentRoundMana() {
+        // This is separated for the potential use in simulation.
+        return Math.min(getRound() + 1, 9);
+    }
+
     private void setManaByRound(ActorRef out) {
-        int mana = (getRound() + 1 > 9) ? 9 : getRound() + 1;
+        int mana = getCurrentRoundMana();
 
         if(turn == Players.PLAYER1) {
             player1.setMana(mana);
-            new PlayerSetCommandsBuilder(out)
+            new PlayerSetCommandsBuilder(out, isSimulation())
                     .setPlayer(Players.PLAYER1)
                     .setStats(PlayerStats.MANA)
                     .setInstance(player1)
                     .issueCommand();
         } else {
             player2.setMana(mana);
-            new PlayerSetCommandsBuilder(out)
+            new PlayerSetCommandsBuilder(out, isSimulation())
                     .setPlayer(Players.PLAYER2)
                     .setStats(PlayerStats.MANA)
                     .setInstance(player2)
@@ -316,18 +399,18 @@ public class GameState {
     }
 
     public void decreaseManaPerCardPlayed(ActorRef out, int manaCost) {
-        int previousMana = (turn == PLAYER1) ? player1.getMana() : player2.getMana();
+        int previousMana = (turn == Players.PLAYER1) ? player1.getMana() : player2.getMana();
         int currentMana = previousMana - manaCost;      // We check beforehand that currentMana always >=0
         if(turn == Players.PLAYER1) {
             player1.setMana(currentMana);
-            new PlayerSetCommandsBuilder(out)
+            new PlayerSetCommandsBuilder(out, isSimulation())
                     .setPlayer(Players.PLAYER1)
                     .setStats(PlayerStats.MANA)
                     .setInstance(player1)
                     .issueCommand();
         } else {
             player2.setMana(currentMana);
-            new PlayerSetCommandsBuilder(out)
+            new PlayerSetCommandsBuilder(out, isSimulation())
                     .setPlayer(Players.PLAYER2)
                     .setStats(PlayerStats.MANA)
                     .setInstance(player2)
@@ -362,7 +445,7 @@ public class GameState {
     // Highlighting the clicked card at hand
     public void highlightCard(ActorRef out, Card current, int idx) {
     	// Highlight clicked card
-        new CardInHandCommandBuilder(out)
+        new CardInHandCommandBuilder(out, isSimulation())
 	        .setCommandMode(CardInHandCommandMode.DRAW)
 	        .setCard(current)
 	        .setPosition(idx)
@@ -391,12 +474,12 @@ public class GameState {
         return highlighter;
     }
 
-    public Player getPlayer1() {
-        return player1;
-    }
-
-    public Player getPlayer2() {
-        return player2;
+    public Player getPlayer(Players player) {
+        switch (player) {
+            case PLAYER1: return player1;
+            case PLAYER2: return player2;
+        }
+        return null;
     }
 
     public int getRound() {
@@ -405,11 +488,31 @@ public class GameState {
         return this.roundNumber / 2;
     }
 
+    public ArrayList<Tile> getAllHighlightedTiles() {
+        return highlighter.getHighlightedTiles();
+    }
+
     public Players getTurn() {
         return turn;
     }
 
     public void setTurn(Players player) {
         turn = player;
+    }
+
+    public Board getBoard() {
+        return Board.getInstance();
+    }
+
+    public boolean isSimulation() {
+        return simulation;
+    }
+
+    public int getRoundNumber() {
+        return roundNumber;
+    }
+
+    public GameStateExtractor getExtractor() {
+        return extractor;
     }
 }

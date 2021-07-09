@@ -1,4 +1,5 @@
 package structures.basic;
+import commandbuilders.UnitFactory;
 import commandbuilders.enums.Players;
 import commandbuilders.enums.UnitType;
 
@@ -33,8 +34,11 @@ public class Unit {
 	int unitIdentifier = 0; //0==unit & 1==player avatar
 	UnitType type = null;
 
-	boolean isFlying = false;
+	String configFile = ""; // For copies
+	String name = ""; // For memento
 
+	boolean isFlying = false;
+	boolean isAvatar = false;
 	//Ana: for counter attack
 	boolean hasGotAttacked = false;
 	//Ana : For ranged
@@ -42,9 +46,6 @@ public class Unit {
 	//JJ: for attack logic. If attacked without move, it forfeits the move ability
 	boolean hasMoved = false; //moved this for visibility
 	boolean hasAttacked = false;
-
-	private boolean isAvatar;
-
 	public Unit() {}
 	
 	public Unit(int id, UnitAnimationSet animations, ImageCorrection correction) {
@@ -97,7 +98,7 @@ public class Unit {
 		if(health<=0) {
 			unitHealth = 0;
 		} else {
-		unitHealth = health;
+			unitHealth = health;
 		}
 	}
 
@@ -173,6 +174,19 @@ public class Unit {
 		position = new Position(tile.getXpos(),tile.getYpos(),tile.getTilex(),tile.getTiley());
 	}
 
+	public void setConfigFile(String configFile) {
+		this.configFile = configFile;
+	}
+	public String getConfigFile() {
+		return configFile;
+	}
+	public void setName(String name) {
+		this.name = name;
+	}
+	public String getName() {
+		return name;
+	}
+
 	public void setPlayerID(Players Player) 
 	{
 		this.owningPlayer = Player;
@@ -199,8 +213,9 @@ public class Unit {
 	public boolean isFlying() {
 		return isFlying;
 	}
-	public boolean isAvatar() { return isAvatar; }
-
+	public boolean isAvatar() {
+		return isAvatar;
+	}
 	public void setAvatar(boolean avatar) {
 		isAvatar = avatar;
 	}

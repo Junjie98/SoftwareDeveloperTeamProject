@@ -23,9 +23,11 @@ public class PlayerNotificationCommandBuilder extends CommandBuilder {
     private String message = "";
     private int seconds = 2;
     private Players player = Players.PLAYER1;
+    private boolean simulation;
 
-    public PlayerNotificationCommandBuilder(ActorRef out) {
+    public PlayerNotificationCommandBuilder(ActorRef out, boolean simulation) {
         reference = out;
+        this.simulation = simulation;
     }
 
     public PlayerNotificationCommandBuilder setMessage(String message) {
@@ -45,6 +47,10 @@ public class PlayerNotificationCommandBuilder extends CommandBuilder {
 
     @Override
     public void issueCommand() {
+        if (simulation) {
+            // Command blocked due to simulation.
+            return;
+        }
         if (player == Players.PLAYER1) {
             BasicCommands.addPlayer1Notification(reference, message, seconds);
         } else {

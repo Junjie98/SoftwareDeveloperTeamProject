@@ -72,8 +72,22 @@ public class UnitFactory {
         return loadedUnit;
     }
 
+    public Unit generateUnitByUnitConfig(Unit oldUnit) {
+        // This is only used for simulations!
+        Unit unit = BasicObjectBuilders.loadUnit(oldUnit.getConfigFile(), -1, Unit.class);
+        unit.setPlayerID(oldUnit.getPlayerID());
+        unit.setName(oldUnit.getName());
+        unit.setHealth(oldUnit.getHealth());
+        unit.setDamage(oldUnit.getDamage());
+        unit.setType(oldUnit.getType());
+        unit.setAvatar(oldUnit.isAvatar());
+        unit.setRanged(oldUnit.isRanged());
+        unit.setFlying(oldUnit.isFlying());
+        return unit;
+    }
+
     public Unit generateUnitByCard(Card card){
-        Unit unit = null;
+        Unit unit;
         String cardname = card.getCardname();
         if(cardname.equals("Pureblade Enforcer")) {
             unit = this.generateUnit(UnitType.PUREBLADE_ENFORCER);
@@ -120,8 +134,7 @@ public class UnitFactory {
         }else {
             unit = this.generateUnit(UnitType.WINDSHRIKE);
         }
-       
-
+        unit.setName(cardname);
         return unit;
     }
 }

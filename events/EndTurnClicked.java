@@ -29,21 +29,14 @@ public class EndTurnClicked implements EventProcessor{
 	}
 
 	private void processChangedTurns(ActorRef out, GameState gameState) {
-		if (gameState.getTurn() == Players.PLAYER1) {
-			new PlayerNotificationCommandBuilder(out)
-					.setMessage("Player 1's turn")
-					.setDisplaySeconds(2)
-					.setPlayer(Players.PLAYER1)
-					.issueCommand();
-		} else {
-			// Setting Player to PLAYER2 should in theory work.
-			// However, it is not properly supported by the front-end so it is strongly discouraged.
-			new PlayerNotificationCommandBuilder(out)
-					.setMessage("Player 2's turn")
-					.setDisplaySeconds(2)
-					.setPlayer(Players.PLAYER1)
-					.issueCommand();
-		}
+		String msg = (gameState.getTurn() == Players.PLAYER1) ? "Player 1's turn" : "Player 2's turn";
+		new PlayerNotificationCommandBuilder(out, gameState.isSimulation())
+				.setMessage(msg)
+				.setDisplaySeconds(2)
+				// Setting Player to PLAYER2 should in theory work.
+				// However, it is not properly supported by the front-end so it is strongly discouraged.
+				.setPlayer(Players.PLAYER1)
+				.issueCommand();
 	}
 
 }

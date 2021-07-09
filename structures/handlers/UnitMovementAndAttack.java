@@ -101,6 +101,63 @@ public class UnitMovementAndAttack {
         for (Pair<Integer, Integer> pos : atkTiles) {
             parent.getHighlighter().checkAttackHighlight(out, pos);
         }
+
+        //////////////
+                //Set provoke
+        
+        //ArrayList<Tile> previousRedTileUnit = new ArrayList<>();
+        if(parent.getBoard().getTile(x,y).getUnit().getProvoker()){
+            for(Tile t : parent.getHighlighter().getRedTile()){
+                t.getUnit().setProvoked(true);
+                //setProvokedMove is a reuse code, just for better illustration on what's going on.
+                t.getUnit().setProvokedMove(true); //blocks it from moving. It can only attack.
+               // previousRedTileUnit.add(t);
+                System.out.println(t.getUnit().getProvoked() );//debug purpose
+            }
+
+        }
+        //doesnt matter i figured. Since every unit click it will reset. So yeah imma ditch this.
+       // if(Board.getInstance().getTile(x,y).getUnit().getProvoker() && parent.getHighlighter().getRedTile().size()==0){ 
+            //if provoker moves away reset previous provoked unit
+        //    System.out.println("I AM INGAGA" );
+        //    for(Tile tp : previousRedTileUnit){
+         //       tp.getUnit().setProvoked(false);
+         //       System.out.println(tp.getUnit().getProvoked());//debug purpose
+         //   }
+        //    previousRedTileUnit.clear();
+      //  }
+
+        if(!parent.getBoard().getTile(x,y).getUnit().getProvoker()){
+            Unit nonProvokerUnit = parent.getBoard().getTile(x,y).getUnit();
+            System.out.println("Not provoker unit");
+            for(int i = 0; i<parent.getHighlighter().getRedTile().size(); i++){
+                boolean provokerExist = parent.getHighlighter().getRedTile().get(i).getUnit().getProvoker();
+                Unit provokerUnit = parent.getHighlighter().getRedTile().get(i).getUnit();
+                if(provokerExist){
+                    nonProvokerUnit.setProvoked(true);
+                    nonProvokerUnit.setProvokedMove(true); //blocks it from moving. It can only attack.
+                    nonProvokerUnit.setUnitProvoked(provokerUnit);
+                    System.out.println(parent.getBoard().getTile(x,y).getUnit().getProvoked());//debug purpose
+                }
+            }
+            if(parent.getHighlighter().getRedTile().size()==0){ //if my unit tile is all empty, no longer provoked. (Reset)
+                parent.getBoard().getTile(x,y).getUnit().setProvoked(false);
+                parent.getBoard().getTile(x,y).getUnit().setProvokedMove(false);
+                System.out.println(parent.getBoard().getTile(x,y).getUnit().getProvoked());//debug purpose
+            } 
+
+            
+            // for(Tile t : parent.getHighlighter().getRedTile()){
+            //     if(t.getUnit().getProvoker()){ //Within range of a provoker.
+            //         Board.getInstance().getTile(x,y).getUnit().setProvoked(true);
+            //         System.out.println(Board.getInstance().getTile(x,y).getUnit().getProvoked());//debug purpose
+            //     }else{
+            //         System.out.println("I am in");
+            //         Board.getInstance().getTile(x,y).getUnit().setProvoked(false); //reset it
+            //         System.out.println(Board.getInstance().getTile(x,y).getUnit().getProvoked());//debug purpose
+            //     }
+            // }
+        }
        
 
     }

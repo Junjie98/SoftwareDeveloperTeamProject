@@ -44,7 +44,6 @@ public class CardPlayed {
                 Tile enemyLocation = parent.getBoard().getTile(position);
               
                 if(enemyLocation.getUnit().getType() == UnitType.PUREBLADE_ENFORCER) {
-                	System.out.println("bleh");
                 	int newHealth = enemyLocation.getUnit().getHealth() + 1;
                 	int newDamage = enemyLocation.getUnit().getDamage() + 1;
                 	enemyLocation.getUnit().setHealth(enemyLocation.getUnit().getHealth() + 1);

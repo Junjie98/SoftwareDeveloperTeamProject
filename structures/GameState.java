@@ -166,7 +166,7 @@ public class GameState {
 
     public void AiPulse(ActorRef out, GameState gs)
     {
-        ai.move(out, gs);
+        ai.moreUnitsToMoveAtk(out, gs);
     }
 
     public void cardClicked(ActorRef out, int idx) {

@@ -321,12 +321,11 @@ public class UnitMovementAndAttack {
                                     attackerLocation =  parent.getBoard().getTile(pair);
                                     
                                     enemyHealthAfterAttack = attack(out, attackerLocation, enemy, attacker, x, y, isRanged);
-                                    System.out.println("bro's name is "+attacker.getType());
+                                    
+                                    // Attack twice: attack-attack
                                     if(attacker.getType().equals(UnitType.AZURITE_LION) || attacker.getType().equals(UnitType.SERPENTI))
-                                    {
-                                    	System.out.println("bro us attacking");
                                     	 enemyHealthAfterAttack = attack(out, attackerLocation, enemy, attacker, x, y, isRanged);
-                                    }
+                                    
                                     System.out.println("found new pos using selective method");
                                     found = true;
                                 }
@@ -349,8 +348,9 @@ public class UnitMovementAndAttack {
 
                         attackerLocation =  parent.getBoard().getTile(moveTile);
                         
-                        // Attack twice: move-attack-attack
                         enemyHealthAfterAttack = attack(out, attackerLocation, enemy, attacker, x, y, isRanged);
+                        
+                        // Attack twice: move-attack-attack
                         if(attacker.getType().equals(UnitType.AZURITE_LION) || attacker.getType().equals(UnitType.SERPENTI))
                         	enemyHealthAfterAttack = attack(out, attackerLocation, enemy, attacker, x, y, isRanged);
                     }

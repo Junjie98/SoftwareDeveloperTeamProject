@@ -9,7 +9,6 @@ import java.util.Collections;
 
 public class DeckOne {
     private ArrayList<Card> cards = new ArrayList<>();
-    // TODO: This is not a deck implementation. This is just written to test draw card.
 
     public DeckOne() {
         String[] deck1Cards = {

@@ -1,7 +1,8 @@
 package structures.basic;
+import commandbuilders.UnitFactory;
 import commandbuilders.enums.Players;
+import commandbuilders.enums.UnitType;
 import java.util.ArrayList;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -30,6 +31,14 @@ public class Unit {
 	Players owningPlayer;
 	int unitHealth = 0;
 	int unitDamage =  0;
+	UnitType type = null;
+
+	boolean provoked = false;
+	boolean provoker =false;
+	ArrayList<Unit> unitProvoked = new ArrayList<>();
+
+	String configFile = ""; // For copies
+	String name = ""; // For memento
 
 	boolean isFlying = false;
 	boolean isAvatar = false;
@@ -40,12 +49,6 @@ public class Unit {
 	//JJ: for attack logic. If attacked without move, it forfeits the move ability
 	boolean hasMoved = false; //moved this for visibility
 	boolean hasAttacked = false;
-	
-	//JJ: for provoke
-	boolean provoked = false;
-	boolean provoker =false;
-	ArrayList<Unit> unitProvoked = new ArrayList<>();
-
 	public Unit() {}
 	
 	public Unit(int id, UnitAnimationSet animations, ImageCorrection correction) {
@@ -82,7 +85,7 @@ public class Unit {
 		if(health<=0) {
 			unitHealth = 0;
 		} else {
-		unitHealth = health;
+			unitHealth = health;
 		}
 	}
 
@@ -180,6 +183,19 @@ public class Unit {
 		position = new Position(tile.getXpos(),tile.getYpos(),tile.getTilex(),tile.getTiley());
 	}
 
+	public void setConfigFile(String configFile) {
+		this.configFile = configFile;
+	}
+	public String getConfigFile() {
+		return configFile;
+	}
+	public void setName(String name) {
+		this.name = name;
+	}
+	public String getName() {
+		return name;
+	}
+
 	public void setPlayerID(Players Player) 
 	{
 		this.owningPlayer = Player;
@@ -206,7 +222,9 @@ public class Unit {
 	public boolean isFlying() {
 		return isFlying;
 	}
-	public boolean isAvatar() { return isAvatar; }
+	public boolean isAvatar() {
+		return isAvatar;
+	}
 	public void setAvatar(boolean avatar) {
 		isAvatar = avatar;
 	}
@@ -215,5 +233,13 @@ public class Unit {
     }
 	public boolean isRanged() {
 		return isRanged;
+	}
+
+	public UnitType getType() {
+		return type;
+	}
+
+	public void setType(UnitType type) {
+		this.type = type;
 	}
 }

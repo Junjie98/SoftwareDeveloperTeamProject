@@ -418,8 +418,6 @@ public class UnitMovementAndAttack {
         if (healthAfterDamage < 0)
             healthAfterDamage = 0;
 
-        if (healthAfterDamage < 0)
-            healthAfterDamage = 0;
         
 //        if(isRanged) {
 //			System.err.println("Ranged attack incoming!");

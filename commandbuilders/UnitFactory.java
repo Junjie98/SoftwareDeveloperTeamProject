@@ -66,11 +66,28 @@ public class UnitFactory {
                 conf = StaticConfFiles.u_silverguard_knight;
                 break;
         }
-        return BasicObjectBuilders.loadUnit(conf, counter++, Unit.class);
+        Unit loadedUnit =  BasicObjectBuilders.loadUnit(conf, counter++, Unit.class);
+        loadedUnit.setType(type);
+        
+        return loadedUnit;
+    }
+
+    public Unit generateUnitByUnitConfig(Unit oldUnit) {
+        // This is only used for simulations!
+        Unit unit = BasicObjectBuilders.loadUnit(oldUnit.getConfigFile(), -1, Unit.class);
+        unit.setPlayerID(oldUnit.getPlayerID());
+        unit.setName(oldUnit.getName());
+        unit.setHealth(oldUnit.getHealth());
+        unit.setDamage(oldUnit.getDamage());
+        unit.setType(oldUnit.getType());
+        unit.setAvatar(oldUnit.isAvatar());
+        unit.setRanged(oldUnit.isRanged());
+        unit.setFlying(oldUnit.isFlying());
+        return unit;
     }
 
     public Unit generateUnitByCard(Card card){
-        Unit unit = null;
+        Unit unit;
         String cardname = card.getCardname();
         if(cardname.equals("Pureblade Enforcer")) {
             unit = this.generateUnit(UnitType.PUREBLADE_ENFORCER);
@@ -100,7 +117,7 @@ public class UnitFactory {
             unit = this.generateUnit(UnitType.PLANAR_SCOUT);
         } else if(cardname.equals("Pyromancer")){
             unit = this.generateUnit(UnitType.PYROMANCER);
-        } else if(cardname.equals("Rock_Pulveriser")){
+        } else if(cardname.equals("Rock Pulveriser")){
             unit = this.generateUnit(UnitType.ROCK_PULVERISER);
         } else if(cardname.equals("Serpenti")){
             unit = this.generateUnit(UnitType.SERPENTI);
@@ -117,8 +134,7 @@ public class UnitFactory {
         }else {
             unit = this.generateUnit(UnitType.WINDSHRIKE);
         }
-       
-
+        unit.setName(cardname);
         return unit;
     }
 }

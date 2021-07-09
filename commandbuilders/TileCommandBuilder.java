@@ -37,9 +37,11 @@ public class TileCommandBuilder extends CommandBuilder {
     // For Interval
     // Defaults to 30 ms. Change dynamically use setDrawInterval.
     private int drawInterval = 30;
+    private boolean simulation;
 
-    public TileCommandBuilder(ActorRef out) {
+    public TileCommandBuilder(ActorRef out, boolean simulation) {
         reference = out;
+        this.simulation = simulation;
     }
 
     public TileCommandBuilder setMode(TileCommandBuilderMode mode) {
@@ -70,6 +72,10 @@ public class TileCommandBuilder extends CommandBuilder {
 
     @Override
     public void issueCommand() {
+        if (simulation) {
+            // Command blocked due to simulation.
+            return;
+        }
         if (mode == TileCommandBuilderMode.DRAW) {
             Tile tile = BasicObjectBuilders.loadTile(x, y);
             int drawMode = 0;

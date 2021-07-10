@@ -39,6 +39,7 @@ public class SpecialEffect {
     }
 
     public void unitIsDamaged(ActorRef out, Unit unit) {
+        // Silverguard Knight: If your avatar is dealt damage this unit gains +2 attack.
         if (unit.isAvatar() && !knights.isEmpty() && unit.getPlayerID() == knights.get(0).getPlayerID()) {
             if (angryKnight == null) {
                 for (Unit knight : knights) {

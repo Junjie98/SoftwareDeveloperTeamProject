@@ -106,7 +106,9 @@ public class UnitMovementAndAttack {
         //////////////
         //provoke
         //Checks the tile of length 1.
+        try{
         ArrayList<Pair<Integer, Integer>> tiles = get1RAtkTiles(activeUnit.getFirst(), activeUnit.getSecond());
+        
         // ArrayList<Pair<Integer, Integer>> provokerTile;
         Boolean provokerNearYou = false;
         // for (Pair<Integer,Integer> pair : tiles) {
@@ -172,7 +174,10 @@ public class UnitMovementAndAttack {
         //     }
         // }   
         }
-    
+        }catch(NullPointerException e){
+            System.out.println("boom you fucked up"); //change to "" if needed
+
+        }
 
     }
 
@@ -220,6 +225,7 @@ public class UnitMovementAndAttack {
         return output;
     }
     public ArrayList<Pair<Integer, Integer>> get1RAtkTiles(int x, int y) {
+        if (activeUnit == null) { System.exit(1); }
         ArrayList<Pair<Integer, Integer>> output = parent.getMoveTiles(x, y, 1, 0);
         output.addAll(parent.getMoveTiles(x, y, 1, 1));
         return output;

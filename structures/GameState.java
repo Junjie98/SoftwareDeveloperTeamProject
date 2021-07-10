@@ -193,11 +193,13 @@ public class GameState {
             
             // For unit Planar Scout
         	if (current.getCardname().equals("Planar Scout")) {
-        		
-        		cardPlayed.setActiveCard(current, idx);
-        		unitMovementAndAttack.summonAnywhereHighlight(out);
+        	    if (currentHighlightedCard != null && currentHighlightedCard.getFirst().getCardname().equals("Planar Scout")) {
+                    highlighter.clearBoardHighlights(out);
+                } else {
+                    cardPlayed.setActiveCard(current, idx);
+                    unitMovementAndAttack.summonAnywhereHighlight(out);
+                }
         	}
-       
         	else if (card == null || card.getSecond() != idx) {
                 cardPlayed.setActiveCard(current, idx);
                 ArrayList<Pair<Integer, Integer>> friendlyUnits = getUnitsPosition(turn);

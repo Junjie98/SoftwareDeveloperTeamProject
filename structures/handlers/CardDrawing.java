@@ -50,8 +50,9 @@ public class CardDrawing {
         Card temp = (player == Players.PLAYER1) ? deck1.nextCard() : deck2.nextCard();
         current.add(temp);
 
-        if (current.size() >= MAX_CARD_COUNT_IN_HAND) {
-            current.remove(0);
+        if (current.size() > MAX_CARD_COUNT_IN_HAND) {
+            // Remove the last card drawn.
+            current.remove(current.size()-1);
         }
     }
     public void displayCardsOnScreenFor(ActorRef out, Players player) {

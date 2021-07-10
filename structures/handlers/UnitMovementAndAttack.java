@@ -670,7 +670,7 @@ public class UnitMovementAndAttack {
                 System.out.println(parent.getBoard().getTile(x,y).getUnit().getProvoked() + " Should be false here now.");
 
             }
-            }catch(NullPointerException e){
+            }catch(NullPointerException |ArrayIndexOutOfBoundsException e){
                 System.out.println("boom you fucked up"); //change to "" if needed
     
             }

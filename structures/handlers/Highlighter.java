@@ -227,49 +227,6 @@ public class Highlighter {
    // public ArrayList<Tile> getProvokeTile(){
     //    return highlightedTilesProv;
     //}
-
-
-    public void provokeHighlight(ActorRef out,int x, int y){ //or attack tile. 1 tiles away from unit
-        ArrayList<Pair<Integer, Integer>> enemyProvokerUnit = (parent.getTurn() == PLAYER1) ?
-                    parent.player2UnitsPosition : parent.player1UnitsPosition;
-                    
-                    for (Pair<Integer, Integer> position : enemyProvokerUnit) {
-                        Tile enemyLocation = parent.getBoard().getTile(position);
-                        if (!enemyLocation.getUnit().isAvatar()) {
-                            new TileCommandBuilder(out, parent.isSimulation())
-                                    .setTilePosition(position.getFirst(), position.getSecond())
-                                    .setState(States.RED)
-                                    .issueCommand();
-                            Tile tile = parent.getBoard().getTile(position);
-                            tile.setTileState(States.RED);
-                            //highlightedTilesProv.add(tile);
-                            //highlightedRedTiles.add(tile);
-                        }
-                    }
-
-            ArrayList<Pair<Integer, Integer>> initDir = parent.getMoveTiles(x, y, 1, 0);
-            ArrayList<Pair<Integer, Integer>> interDir = parent.getMoveTiles(x, y, 1, 1);
-            boolean[] initDirB = {true, true, true, true};
-
-            int count = 0;
-            for (Pair<Integer, Integer> is: initDir) {
-                initDirB[count] = parent.getHighlighter().checkTileHighlight(out, is);
-                count++;
-            }
-
-            if (initDirB[0] || initDirB[1]) {
-                checkTileHighlight(out, interDir.get(0));
-            }
-            if (initDirB[1] || initDirB[3]) {
-                checkTileHighlight(out, interDir.get(1));
-            }
-            if (initDirB[2] || initDirB[0]) {
-                checkTileHighlight(out, interDir.get(2));
-            }
-            if (initDirB[2] || initDirB[3]) {
-                checkTileHighlight(out, interDir.get(3));
-            }
-        }
     
 
     

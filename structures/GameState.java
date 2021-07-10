@@ -39,6 +39,7 @@ public class GameState {
     final private CardDrawing cardDrawing = new CardDrawing(this);
     final private CardPlayed cardPlayed = new CardPlayed(this);
     final private Highlighter highlighter = new Highlighter(this);
+    final private SpecialEffect specialEffect = new SpecialEffect(this);
 
 	// ===========================================================================
     // Game Initialisation
@@ -339,6 +340,8 @@ public class GameState {
     }
 
     public void unitDied(ActorRef out, Tile unitLocaltion, ArrayList<Pair<Integer, Integer>> pool) {
+        specialEffect.unitDidDie(out, unitLocaltion.getUnit());
+
         UnitCommandBuilder builder = new UnitCommandBuilder(out, isSimulation())
                 .setUnit(unitLocaltion.getUnit());
 

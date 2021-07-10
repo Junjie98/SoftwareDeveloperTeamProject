@@ -31,7 +31,12 @@ public class Board {
     }
 
     public Tile getTile(Pair<Integer, Integer> position) {
-        return getTile(position.getFirst(), position.getSecond());
+        if (position.getFirst() < 9 && position.getFirst() >= 0) {
+            if (position.getSecond() < 5 && position.getSecond() >= 0) {
+                return getTile(position.getFirst(), position.getSecond());
+            }
+        }
+        return null;
     }
     public void setUnitToTile(Unit unit, int x, int y) {
         board[x][y].setUnit(unit);

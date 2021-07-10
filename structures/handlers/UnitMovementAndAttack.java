@@ -13,6 +13,7 @@ import structures.memento.ActionType;
 import structures.memento.AttackInformation;
 import structures.memento.GameMemento;
 import structures.memento.MovementInformation;
+
 import java.util.ArrayList;
 
 public class UnitMovementAndAttack {
@@ -112,9 +113,14 @@ public class UnitMovementAndAttack {
             //basica attack highlight connected to normal movement highlight
             ArrayList<Pair<Integer, Integer>> atkTiles = getAllAtkTiles(x, y);
 
-
             for (Pair<Integer, Integer> pos : atkTiles) {
-                parent.getHighlighter().checkAttackHighlight(out, pos);
+                Pair<Integer,Integer> moveTile = getMoveTileForAttack(x, y, pos.getFirst(), pos.getSecond());
+                if (parent.getBoard().getTile(moveTile) != null) {
+                    if (!parent.getBoard().getTile(moveTile).hasUnit()) {
+                        parent.getHighlighter().checkAttackHighlight(out, pos);
+                    }
+                }
+
             }
         }
         //Checks the tile of length 1.
@@ -270,16 +276,18 @@ public class UnitMovementAndAttack {
 
             System.out.println("move valid : boolean = " + unitsCanMove); //debug //results found that within enemy tile range, the bool is set to true.
 
+            Unit unit = activatedTile.getUnit();
+
             new UnitCommandBuilder(out, parent.isSimulation())
                     .setMode(UnitCommandBuilderMode.MOVE)
                     .setTilePosition(x, y)
-                    .setUnit(activatedTile.getUnit())
+                    .setUnit(unit)
                     .issueCommand();
 
             Tile tile = parent.getBoard().getTile(x, y);
-            activatedTile.getUnit().setPositionByTile(tile);
+            unit.setPositionByTile(tile);
 
-            parent.memento.add(new GameMemento(parent.getTurn(), ActionType.MOVE, new MovementInformation(activatedTile.getUnit(), activeUnit, new Pair<>(x, y))));
+            parent.memento.add(new GameMemento(parent.getTurn(), ActionType.MOVE, new MovementInformation(unit, activeUnit, new Pair<>(x, y))));
             System.out.println(parent.memento.get(parent.memento.size() - 1));
 
             // Update the units position in the stored position lists.
@@ -287,16 +295,12 @@ public class UnitMovementAndAttack {
             parent.removeFromPool(pool, activeUnit);
             pool.add(new Pair<>(x, y));
 
-            destinationTile.setUnit(activatedTile.getUnit());
+            destinationTile.setUnit(unit);
             parent.getHighlighter().clearBoardHighlights(out);
 
-            //System.out.println("unit attacking should be flagged: " + activatedTile.getUnit());
-
             destinationTile.getUnit().setHasMoved(true);
-            moveAttackAndCounterAttack.add(activatedTile.getUnit());
             activatedTile.setUnit(null);
-
-
+            moveAttackAndCounterAttack.add(unit);
         } else {
             // RED should be redirected to attack so should be here.
             parent.getHighlighter().clearBoardHighlights(out);

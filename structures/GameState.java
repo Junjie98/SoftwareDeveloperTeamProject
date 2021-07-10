@@ -4,12 +4,7 @@ import java.util.ArrayList;
 import akka.actor.ActorRef;
 import commandbuilders.*;
 import commandbuilders.enums.*;
-<<<<<<< HEAD
-import commands.BasicCommands;
-import scala.Int;
 import structures.AI.AI;
-=======
->>>>>>> develop
 import structures.basic.Card;
 import structures.basic.Player;
 import structures.basic.Tile;
@@ -80,22 +75,8 @@ public class GameState {
     public void spawnAvatars(ActorRef out) {
         //Avatar1
         Unit human = new UnitFactory().generateUnit(UnitType.HUMAN);
-<<<<<<< HEAD
-        human.setIdentifier(1);
-        
-        Unit aiAvatar = new UnitFactory().generateUnit(UnitType.AI);
-        aiAvatar.setIdentifier(1);
-
-        new UnitCommandBuilder(out)
-                    .setMode(UnitCommandBuilderMode.DRAW)
-                    .setTilePosition(1, 2)
-                    .setPlayerID(Players.PLAYER1)
-                    .setUnit(human)
-                    .issueCommand();
-=======
         human.setAvatar(true);
         human.setName("Human Avatar");
->>>>>>> develop
 
         UnitCommandBuilder humanCommands = new UnitCommandBuilder(out, isSimulation())
                 .setUnit(human);
@@ -108,30 +89,7 @@ public class GameState {
         // setting health & attack to board. *They doesn't stack*
         // uses the health that has been initialised earlier with the player constructor
 
-<<<<<<< HEAD
-        //Avatar1
-        new UnitCommandBuilder(out)
-        	.setMode(UnitCommandBuilderMode.SET)
-        	.setUnit(human) 
-        	//uses the health that has been initialised earlier with the player constructor
-        	.setStats(UnitStats.HEALTH, player1.getHealth())
-        	.issueCommand();
-        
-        new UnitCommandBuilder(out)
-    	.setMode(UnitCommandBuilderMode.SET)
-    	.setUnit(human)
-    	.setStats(UnitStats.ATTACK, 2)
-    	.issueCommand();
-
-        new UnitCommandBuilder(out)
-                    .setMode(UnitCommandBuilderMode.DRAW)
-                    .setTilePosition(7, 2)
-                    .setPlayerID(Players.PLAYER2)
-                    .setUnit(aiAvatar)
-                    .issueCommand();
-=======
         try {Thread.sleep(30);} catch (InterruptedException e) {e.printStackTrace();}
->>>>>>> develop
 
         humanCommands.setMode(UnitCommandBuilderMode.SET)
                 .setStats(UnitStats.HEALTH, player1.getHealth())
@@ -148,20 +106,6 @@ public class GameState {
         try {Thread.sleep(30);} catch (InterruptedException e) {e.printStackTrace();}
 
         //Avatar2
-<<<<<<< HEAD
-        new UnitCommandBuilder(out)
-        	.setMode(UnitCommandBuilderMode.SET)
-        	.setUnit(aiAvatar) 
-        	//uses the health that has been initialised earlier with the player constructor
-        	.setStats(UnitStats.HEALTH, player2.getHealth())
-        	.issueCommand();
-        
-        new UnitCommandBuilder(out)
-    	.setMode(UnitCommandBuilderMode.SET)
-    	.setUnit(aiAvatar)
-    	.setStats(UnitStats.ATTACK, 2)
-    	.issueCommand();
-=======
         Unit aiAvatar = new UnitFactory().generateUnit(UnitType.AI);
         aiAvatar.setAvatar(true);
         aiAvatar.setName("AI Avatar");
@@ -191,7 +135,6 @@ public class GameState {
         try {Thread.sleep(30);} catch (InterruptedException e) {e.printStackTrace();}
 
         player2UnitsPosition.add(new Pair<>(7, 2));
->>>>>>> develop
 
         //Save the original health state to a hashmap. Used for calculations.
         cardPlayed.setUnitsOriginalHealth(human.getId(),player1.getHealth());
@@ -221,9 +164,11 @@ public class GameState {
         }
         cardDrawing.displayCardsOnScreenFor(out, turn);
         ++roundNumber; // Divide this by 2 when we are going to use this.
-<<<<<<< HEAD
-        
-        if(turn==PLAYER2)
+        if (turn == Players.PLAYER2) {
+            smartBoy.tester(out);
+        }
+
+        if(turn==Players.PLAYER2)
         {
             ai.TakeTurn(out, this);
         }
@@ -234,11 +179,7 @@ public class GameState {
     public void AiPulse(ActorRef out, GameState gs)
     {
         ai.moreUnitsToMoveAtk(out, gs);
-=======
-        if (turn == Players.PLAYER2) {
-            smartBoy.tester(out);
-        }
->>>>>>> develop
+
     }
 
     public void cardClicked(ActorRef out, int idx) {

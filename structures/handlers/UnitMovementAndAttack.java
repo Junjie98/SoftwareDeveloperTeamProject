@@ -278,9 +278,13 @@ public class UnitMovementAndAttack {
 
                 if(isRanged){
                     //do ranged attack
+                    enemyHealthAfterAttack = attack(out, attackerLocation, enemyLocation, isRanged);
+                    return;
                 }
-                else if(!attack1RCheck(x, y)){
-                    //if the unit is not within normal attack range 
+
+                if(!attack1RCheck(x, y)){
+                    System.out.println("Hola?");
+                    //if the unit is not within normal attack range
                     //move to a range then attack
                     Pair<Integer,Integer> moveTile = getMoveTileForAttack(attackerLocation.getTilex(), attackerLocation.getTiley(), x, y);
                     System.out.println(moveTile);
@@ -322,11 +326,11 @@ public class UnitMovementAndAttack {
                                     System.out.println(pair);
                                     attackerLocation =  parent.getBoard().getTile(pair);
                                     
-                                    enemyHealthAfterAttack = attack(out, attackerLocation, enemy, attacker, x, y, isRanged);
+                                    enemyHealthAfterAttack = attack(out, attackerLocation, enemyLocation, isRanged);
                                     
                                     // Attack twice: attack-attack
                                     if(attacker.getType().equals(UnitType.AZURITE_LION) || attacker.getType().equals(UnitType.SERPENTI))
-                                    	 enemyHealthAfterAttack = attack(out, attackerLocation, enemy, attacker, x, y, isRanged);
+                                    	 enemyHealthAfterAttack = attack(out, attackerLocation, enemyLocation, isRanged);
                                     
                                     System.out.println("found new pos using selective method");
                                     found = true;
@@ -343,17 +347,18 @@ public class UnitMovementAndAttack {
                         else {
                             return;
                         }
-                    }
-                    else {
+                    } else {
+                        // Within attack range
+
                         highlightedMoveTileClicked(out, moveTile.getFirst(), moveTile.getSecond());
                         try {Thread.sleep(3000);} catch (InterruptedException e) {e.printStackTrace();}
                         attackerLocation =  parent.getBoard().getTile(moveTile);
                         
-                        enemyHealthAfterAttack = attack(out, attackerLocation, enemy, attacker, x, y, isRanged);
+                        enemyHealthAfterAttack = attack(out, attackerLocation, enemyLocation, isRanged);
                         
                         // Attack twice: move-attack-attack
                         if(attacker.getType().equals(UnitType.AZURITE_LION) || attacker.getType().equals(UnitType.SERPENTI))
-                        	enemyHealthAfterAttack = attack(out, attackerLocation, enemy, attacker, x, y, isRanged);
+                        	enemyHealthAfterAttack = attack(out, attackerLocation, enemyLocation, isRanged);
                     }
                     
 
@@ -361,8 +366,8 @@ public class UnitMovementAndAttack {
                 else{
                 	   // Attack twice: attack-attack
                 	   if(attacker.getType().equals(UnitType.AZURITE_LION) || attacker.getType().equals(UnitType.SERPENTI))
-                		   enemyHealthAfterAttack = attack(out, attackerLocation, enemy, attacker, x, y, isRanged);
-                      enemyHealthAfterAttack = attack(out, attackerLocation, enemy, attacker, x, y, isRanged);
+                		   enemyHealthAfterAttack = attack(out, attackerLocation, enemyLocation, isRanged);
+                      enemyHealthAfterAttack = attack(out, attackerLocation, enemyLocation, isRanged);
                 }
                 parent.memento.add(new GameMemento(parent.getTurn(), ActionType.ATTACK, new AttackInformation(new Pair<>(attacker.getPosition().getTilex(), attacker.getPosition().getTiley()),
                         new Pair<>(x, y), attacker, enemy)));
@@ -373,7 +378,7 @@ public class UnitMovementAndAttack {
                 	int counterAttackResult;
                 	if (!isRanged) {
 	                    // Launch Counter Attack
-	                    counterAttackResult = attack(out, enemyLocation, attacker, enemy, attacker.getPosition().getTilex(), attacker.getPosition().getTiley(), isRanged);
+	                    counterAttackResult = attack(out, enemyLocation, attackerLocation, isRanged);
 	                    
 	                    if (counterAttackResult <= 0) {
 	                        // Handle unit died of counter attack
@@ -417,11 +422,13 @@ public class UnitMovementAndAttack {
         }
     }
 
-    
-
     // Ana: Counter attack, including ranged attack
-    public int attack(ActorRef out, Tile attackerLocation, Unit enemy, Unit attacker, int x, int y, boolean isRanged) {
+    public int attack(ActorRef out, Tile attackerLocation, Tile enemyLocation, boolean isRanged) {
+        Unit attacker = attackerLocation.getUnit();
+        Unit enemy = enemyLocation.getUnit();
+
         UnitCommandBuilder enemyCommandBuilder = new UnitCommandBuilder(out, parent.isSimulation()).setUnit(enemy);
+
         int enemyHealth = enemy.getHealth();
         int healthAfterDamage = enemyHealth - attacker.getDamage();
         if (healthAfterDamage < 0)
@@ -430,9 +437,9 @@ public class UnitMovementAndAttack {
         if(isRanged) {
 			System.err.println("Ranged attack incoming!");
 			new ProjectTileAnimationCommandBuilder(out, parent.isSimulation())
-			.setSource(attackerLocation)
-			.setDistination(parent.getBoard().getTile(x, y))
-			.issueCommand();
+                    .setSource(attackerLocation)
+                    .setDistination(enemyLocation)
+                    .issueCommand();
 		} else {
             System.out.println("Basic attack");
             new UnitCommandBuilder(out, parent.isSimulation()).setUnit(attacker)
@@ -490,10 +497,7 @@ public class UnitMovementAndAttack {
                 return true;
             }
         }
-   
-       
-            return false;
-        
+        return false;
     }
 
     public boolean attackCheck(int x, int y) {

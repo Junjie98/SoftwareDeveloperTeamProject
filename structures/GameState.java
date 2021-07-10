@@ -231,8 +231,10 @@ public class GameState {
             if (unitMovementAndAttack.getActiveUnit() == null) {
                 if (tile != null && tile.hasUnit()) {
                     // User clicked on a unit.
-                    if (tile.getUnit().getHasAttacked() && tile.getUnit().getHasMoved()) {
+                    System.out.println("Shouldnt move cos its tired?");
+                    if (tile.getUnit().getHasAttacked() || tile.getUnit().getHasMoved()) {
                         // Block hasAttacked -> hasMoved
+                        System.out.println("Shouldnt move cos its tired!!!!");
                         return;
                     } else if (tile.getUnit().getHasAttacked()) {
                         // Block hasAttacked

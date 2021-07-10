@@ -260,11 +260,6 @@ public class GameState {
                         System.out.println("Shouldnt move cos its tired A");
 
                         return;
-                    }else if (tile.getUnit().getHasMoved()) {
-                        // Block hasmoved
-                        System.out.println("Shouldnt move cos its tired M");
-
-                        return;
                     }
                     unitMovementAndAttack.unitClicked(out, x ,y);
                 }

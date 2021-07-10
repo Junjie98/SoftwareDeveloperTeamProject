@@ -180,8 +180,9 @@ public class GameState {
             
             // For unit Planar Scout
         	if (current.getCardname().equals("Planar Scout")) {
+        		
         		cardPlayed.setActiveCard(current, idx);
-        		unitMovementAndAttack.flyingOrRangedMoveHighlight(out);
+        		unitMovementAndAttack.summonAnywhereHighlight(out);
         	}
        
         	else if (card == null || card.getSecond() != idx) {

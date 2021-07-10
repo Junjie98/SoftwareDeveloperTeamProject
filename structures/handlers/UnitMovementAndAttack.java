@@ -5,8 +5,11 @@ import commandbuilders.PlayerSetCommandsBuilder;
 import commandbuilders.ProjectTileAnimationCommandBuilder;
 import commandbuilders.UnitCommandBuilder;
 import commandbuilders.enums.*;
+<<<<<<< HEAD
 import commands.BasicCommands;
 import structures.Board;
+=======
+>>>>>>> develop
 import structures.GameState;
 import structures.AI.AI;
 import structures.basic.Tile;
@@ -141,6 +144,14 @@ public class UnitMovementAndAttack {
             parent.getHighlighter().checkTileHighlight(out, bl);
         }
     }
+    
+    // To be used to highlight the tiles for units that can be summoned anywhere
+    public void summonAnywhereHighlight(ActorRef out) {
+	    for (Pair<Integer, Integer> ti : getFlyMoveTiles()) {
+	        //available tiles
+	        parent.getHighlighter().checkTileHighlight(out, ti);
+	    }
+    }
 
     public ArrayList<Pair<Integer, Integer>> getAllMoveTiles(int x, int y) {
         ArrayList<Pair<Integer, Integer>> output = parent.getMoveTiles(x, y, 1, 0);
@@ -234,7 +245,9 @@ public class UnitMovementAndAttack {
 
             parent.memento.add(new GameMemento(parent.getTurn(), ActionType.MOVE, new MovementInformation(activatedTile.getUnit(), activeUnit, new Pair<>(x, y))));
             System.out.println(parent.memento.get(parent.memento.size() - 1));
+
             // Update the units position in the stored position lists.
+<<<<<<< HEAD
             ArrayList<Pair<Integer, Integer>> pool = (parent.getTurn() == Players.PLAYER1) ?
                     parent.player1UnitsPosition : parent.player2UnitsPosition;
             for (Pair<Integer, Integer> position: pool) {
@@ -249,6 +262,10 @@ public class UnitMovementAndAttack {
                 
  
             }
+=======
+            ArrayList<Pair<Integer, Integer>> pool = parent.getUnitsPosition(parent.getTurn());
+            parent.removeFromPool(pool, activeUnit);
+>>>>>>> develop
             pool.add(new Pair<>(x, y));
 
             destinationTile.setUnit(activatedTile.getUnit());
@@ -280,7 +297,7 @@ public class UnitMovementAndAttack {
                 //System.err.println("attack check passed");
 
                 boolean isRanged = attacker.isRanged();
-                int enemyHealthAfterAttack =enemy.getHealth();
+                int enemyHealthAfterAttack = enemy.getHealth();
 
                 if(isRanged){
                     //do ranged attack
@@ -308,13 +325,13 @@ public class UnitMovementAndAttack {
 
                         if(goodMoves.size()>0)
                         {   //otherwise the first good move is fine
-                           boolean found =false;
+                           boolean found = false;
 
                             for (Pair<Integer,Integer> pair : goodMoves) { //mx =move x 
                                 
                                 if(!parent.getBoard().getTile(pair).hasUnit()){
-                                    int tx = pair.getFirst()- attackerLocation.getTilex();
-                                    int ty = pair.getSecond()- attackerLocation.getTiley();
+                                    int tx = pair.getFirst() - attackerLocation.getTilex();
+                                    int ty = pair.getSecond() - attackerLocation.getTiley();
                                     System.out.println(tx + " : " + ty);
 
                                     if(moveBlockCheck(attackerLocation.getTilex(), attackerLocation.getTiley(), tx, ty))
@@ -327,7 +344,13 @@ public class UnitMovementAndAttack {
 
                                     System.out.println(pair);
                                     attackerLocation =  parent.getBoard().getTile(pair);
+                                    
                                     enemyHealthAfterAttack = attack(out, attackerLocation, enemy, attacker, x, y, isRanged);
+                                    
+                                    // Attack twice: attack-attack
+                                    if(attacker.getType().equals(UnitType.AZURITE_LION) || attacker.getType().equals(UnitType.SERPENTI))
+                                    	 enemyHealthAfterAttack = attack(out, attackerLocation, enemy, attacker, x, y, isRanged);
+                                    
                                     System.out.println("found new pos using selective method");
                                     found = true;
                                 }
@@ -349,13 +372,21 @@ public class UnitMovementAndAttack {
                         try {Thread.sleep(3000);} catch (InterruptedException e) {e.printStackTrace();}
 
                         attackerLocation =  parent.getBoard().getTile(moveTile);
+                        
                         enemyHealthAfterAttack = attack(out, attackerLocation, enemy, attacker, x, y, isRanged);
+                        
+                        // Attack twice: move-attack-attack
+                        if(attacker.getType().equals(UnitType.AZURITE_LION) || attacker.getType().equals(UnitType.SERPENTI))
+                        	enemyHealthAfterAttack = attack(out, attackerLocation, enemy, attacker, x, y, isRanged);
                     }
                     
 
                 }
                 else{
-                    enemyHealthAfterAttack = attack(out, attackerLocation, enemy, attacker, x, y, isRanged);
+                	   // Attack twice: attack-attack
+                	   if(attacker.getType().equals(UnitType.AZURITE_LION) || attacker.getType().equals(UnitType.SERPENTI))
+                		   enemyHealthAfterAttack = attack(out, attackerLocation, enemy, attacker, x, y, isRanged);
+                      enemyHealthAfterAttack = attack(out, attackerLocation, enemy, attacker, x, y, isRanged);
                 }
                 parent.memento.add(new GameMemento(parent.getTurn(), ActionType.ATTACK, new AttackInformation(new Pair<>(attacker.getPosition().getTilex(), attacker.getPosition().getTiley()),
                         new Pair<>(x, y), attacker, enemy)));
@@ -370,45 +401,11 @@ public class UnitMovementAndAttack {
 	                    
 	                    if (counterAttackResult <= 0) {
 	                        // Handle unit died of counter attack
-	                    	BasicCommands.playUnitAnimation(out, attacker, UnitAnimationType.death);
-	            			try {Thread.sleep(3000);} catch (InterruptedException e) {e.printStackTrace();}
-	                    	
-	                    	new UnitCommandBuilder(out, parent.isSimulation())
-		                        .setMode(UnitCommandBuilderMode.DELETE)
-		                        .setUnit(attackerLocation.getUnit())
-		                        .issueCommand();
-	
-	                        attackerLocation.setUnit(null);
-	                        ArrayList<Pair<Integer, Integer>> pool = (parent.getTurn() == Players.PLAYER1) ?
-	                                parent.player1UnitsPosition : parent.player2UnitsPosition;
-	                        Pair<Integer, Integer> positionToRemove = new Pair<>(attackerLocation.getTilex(), attackerLocation.getTiley());
-	                        for (Pair<Integer, Integer> position: pool) {
-	                            if (position.equals(positionToRemove)) {
-	                                pool.remove(position);
-	                                break;
-	                            }
-	                        }
+                            parent.unitDied(out, attackerLocation, parent.getUnitsPosition(parent.getTurn()));
 	                    }
                 	}
                 } else {
-                	BasicCommands.playUnitAnimation(out, enemy, UnitAnimationType.death);
-        			try {Thread.sleep(3000);} catch (InterruptedException e) {e.printStackTrace();}
-                	
-                	new UnitCommandBuilder(out, parent.isSimulation())
-	                    .setMode(UnitCommandBuilderMode.DELETE)
-	                    .setUnit(enemyLocation.getUnit())
-	                    .issueCommand();
-
-                    enemyLocation.setUnit(null);
-                    ArrayList<Pair<Integer, Integer>> pool = (parent.getTurn() == Players.PLAYER1) ?
-                            parent.player2UnitsPosition : parent.player1UnitsPosition;
-                    Pair<Integer, Integer> positionToRemove = new Pair<>(x, y);
-                    for (Pair<Integer, Integer> position: pool) {
-                        if (position.equals(positionToRemove)) {
-                            pool.remove(position);
-                            break;
-                        }
-                    }
+                    parent.unitDied(out, enemyLocation, parent.getEnemyUnitsPosition(parent.getTurn()));
                 }
             }
         }
@@ -454,7 +451,7 @@ public class UnitMovementAndAttack {
         int healthAfterDamage = enemyHealth - attacker.getDamage();
         if (healthAfterDamage < 0)
             healthAfterDamage = 0;
-        
+
         if(isRanged) {
 			System.err.println("Ranged attack incoming!");
 			new ProjectTileAnimationCommandBuilder(out, parent.isSimulation())
@@ -463,7 +460,10 @@ public class UnitMovementAndAttack {
 			.issueCommand();
 		} else {
             System.out.println("Basic attack");
-        	BasicCommands.playUnitAnimation(out, attacker, UnitAnimationType.attack);
+            new UnitCommandBuilder(out, parent.isSimulation()).setUnit(attacker)
+                    .setMode(UnitCommandBuilderMode.ANIMATION)
+                    .setAnimationType(UnitAnimationType.attack)
+                    .issueCommand();
     		try {Thread.sleep(2000);} catch (InterruptedException e) {e.printStackTrace();}
         }
 
@@ -482,35 +482,16 @@ public class UnitMovementAndAttack {
         //restrict player to move after attack
         attacker.setHasAttacked(true);
         moveAttackAndCounterAttack.add(attacker);
-        
+
+        parent.getSpecialEffect().unitIsDamaged(out, enemy);
+
         //update avatar health to UI player health.
-        if(enemy.isAvatar() && enemy.getPlayerID() == Players.PLAYER1) {
-            parent.getPlayer(Players.PLAYER1).setHealth(enemy.getHealth());
+        if(enemy.isAvatar()) {
+            parent.getPlayer(enemy.getPlayerID()).setHealth(enemy.getHealth());
             new PlayerSetCommandsBuilder(out, parent.isSimulation())
-                    .setPlayer(Players.PLAYER1)
+                    .setPlayer(enemy.getPlayerID())
                     .setStats(PlayerStats.HEALTH)
-                    .setInstance(parent.getPlayer(Players.PLAYER1))
-                    .issueCommand();
-        } else if(enemy.isAvatar() && enemy.getPlayerID()== Players.PLAYER2) {
-            parent.getPlayer(Players.PLAYER2).setHealth(enemy.getHealth());
-            new PlayerSetCommandsBuilder(out, parent.isSimulation())
-                    .setPlayer(Players.PLAYER2)
-                    .setStats(PlayerStats.HEALTH)
-                    .setInstance(parent.getPlayer(Players.PLAYER2))
-                    .issueCommand();
-        } else if(attacker.isAvatar() && attacker.getPlayerID()== Players.PLAYER1) {
-            parent.getPlayer(Players.PLAYER1).setHealth(attacker.getHealth());
-            new PlayerSetCommandsBuilder(out, parent.isSimulation())
-                    .setPlayer(Players.PLAYER1)
-                    .setStats(PlayerStats.HEALTH)
-                    .setInstance(parent.getPlayer(Players.PLAYER1))
-                    .issueCommand();
-        } else if(attacker.isAvatar() && attacker.getPlayerID()== Players.PLAYER2) {
-            parent.getPlayer(Players.PLAYER2).setHealth(attacker.getHealth());
-            new PlayerSetCommandsBuilder(out, parent.isSimulation())
-                    .setPlayer(Players.PLAYER2)
-                    .setStats(PlayerStats.HEALTH)
-                    .setInstance(parent.getPlayer(Players.PLAYER2))
+                    .setInstance(parent.getPlayer(enemy.getPlayerID()))
                     .issueCommand();
         }
 

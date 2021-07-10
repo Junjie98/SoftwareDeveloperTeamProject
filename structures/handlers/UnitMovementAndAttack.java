@@ -1,5 +1,6 @@
 package structures.handlers;
 
+import akka.actor.Actor;
 import akka.actor.ActorRef;
 import commandbuilders.PlayerSetCommandsBuilder;
 import commandbuilders.ProjectTileAnimationCommandBuilder;
@@ -284,61 +285,11 @@ public class UnitMovementAndAttack {
                 boolean isRanged = attacker.isRanged();
                 int enemyHealthAfterAttack = enemy.getHealth();
 
-            if(enemy.getProvoker()&&attacker.getProvoked()){
-                enemyHealthAfterAttack = attack(out, attackerLocation, enemy, attacker, x, y, isRanged);
-                 System.out.println("Smack provoking thorfinn");
-
-                if (enemyHealthAfterAttack > 0) {
-                    // Launch Counter Attack
-                     int counterAttackResult = attack(out, enemyLocation, attacker, enemy, attacker.getPosition().getTilex(), attacker.getPosition().getTiley(), isRanged);
-        
-                    if (counterAttackResult <= 0) {
-                     // Handle unit died of counter attack
-                        BasicCommands.playUnitAnimation(out, attacker, UnitAnimationType.death);
-                        try {Thread.sleep(3000);} catch (InterruptedException e) {e.printStackTrace();}
-            
-                        new UnitCommandBuilder(out, parent.isSimulation())
-                        .setMode(UnitCommandBuilderMode.DELETE)
-                        .setUnit(attackerLocation.getUnit())
-                        .issueCommand();
-
-                        attackerLocation.setUnit(null);
-                        ArrayList<Pair<Integer, Integer>> pool = (parent.getTurn() == Players.PLAYER1) ?
-                        parent.player1UnitsPosition : parent.player2UnitsPosition;
-                        Pair<Integer, Integer> positionToRemove = new Pair<>(attackerLocation.getTilex(), attackerLocation.getTiley());
-                        for (Pair<Integer, Integer> position: pool) {
-                        if (position.equals(positionToRemove)) {
-                            pool.remove(position);
-                            break;
-                        }
-                    }
-                }
-            } else {
-                BasicCommands.playUnitAnimation(out, enemy, UnitAnimationType.death);
-                try {Thread.sleep(3000);} catch (InterruptedException e) {e.printStackTrace();}
-        
-                new UnitCommandBuilder(out, parent.isSimulation())
-                .setMode(UnitCommandBuilderMode.DELETE)
-                .setUnit(enemyLocation.getUnit())
-                .issueCommand();
-
-                enemyLocation.setUnit(null);
-                ArrayList<Pair<Integer, Integer>> pool = (parent.getTurn() == Players.PLAYER1) ?
-                parent.player2UnitsPosition : parent.player1UnitsPosition;
-                Pair<Integer, Integer> positionToRemove = new Pair<>(x, y);
-                for (Pair<Integer, Integer> position: pool) {
-                     if (position.equals(positionToRemove)) {
-                        pool.remove(position);
-                        break;
-                    }
-                }
+            if(enemy.getProvoker()&&attacker.getProvoked()) {
+                provokeAttack(out, attackerLocation, enemyLocation, isRanged);
+                return;
             }
-    
-        }else{
-            System.out.println("Attack Provoker only!");
-        
             if(!attacker.getProvoked()){
-
                 if(isRanged){
                     //do ranged attack
                 }
@@ -418,8 +369,6 @@ public class UnitMovementAndAttack {
                         if(attacker.getType().equals(UnitType.AZURITE_LION) || attacker.getType().equals(UnitType.SERPENTI))
                         	enemyHealthAfterAttack = attack(out, attackerLocation, enemy, attacker, x, y, isRanged);
                     }
-                    
-
                 }
                 else{
                 	   // Attack twice: attack-attack
@@ -446,7 +395,9 @@ public class UnitMovementAndAttack {
                 } else {
                     parent.unitDied(out, enemyLocation, parent.getEnemyUnitsPosition(parent.getTurn()));
                 }
-             }
+             } else {
+                System.out.println("Nonono, you are provoked!");
+            }
          }
         }
         //IS THIS NEEDED HERE? Having this activate per attack means that it always resets our bools instantly
@@ -584,7 +535,7 @@ public class UnitMovementAndAttack {
 
     ////////////////////////Provoke Method/////////////////////////////////
     
-    public void provokeFunc(ActorRef out, int x,int y){
+    public void provokeFunc(int x,int y){
         try{
             ArrayList<Pair<Integer, Integer>> tiles = get1RAtkTiles(activeUnit.getFirst(), activeUnit.getSecond());
             
@@ -647,6 +598,24 @@ public class UnitMovementAndAttack {
     
             }
     
+    }
+
+    private void provokeAttack(ActorRef out, Tile attackerLocation, Tile enemyLocation, boolean isRanged) {
+        Unit enemy = enemyLocation.getUnit();
+        Unit attacker = attackerLocation.getUnit();
+        int enemyHealthAfterAttack = attack(out, attackerLocation, enemy, attacker, enemy.getPosition().getTilex(), enemy.getPosition().getTiley(), isRanged);
+        System.out.println("Smack provoking thorfinn");
+
+        if (enemyHealthAfterAttack > 0) {
+            // Launch Counter Attack
+            int counterAttackResult = attack(out, enemyLocation, attacker, enemy, attacker.getPosition().getTilex(), attacker.getPosition().getTiley(), isRanged);
+
+            if (counterAttackResult <= 0) {
+                parent.unitDied(out, attackerLocation, parent.getUnitsPosition(parent.getTurn()));
+            }
+        } else {
+            parent.unitDied(out, enemyLocation, parent.getEnemyUnitsPosition(parent.getTurn()));
+        }
     }
 
     // ===========================================================================

@@ -379,6 +379,22 @@ public class GameState {
         return null;
     }
 
+    public ArrayList<Pair<Integer, Integer>> getUnitsPosition(Players player) {
+        switch (player) {
+            case PLAYER1: return player1UnitsPosition;
+            case PLAYER2: return player2UnitsPosition;
+        }
+        return null;
+    }
+
+    public ArrayList<Card> getCardsInHand(Players player) {
+        switch (player) {
+            case PLAYER1: return player1CardsInHand;
+            case PLAYER2: return player2CardsInHand;
+        }
+        return null;
+    }
+
     public int getRound() {
         // Increment on every turn change.
         // Just / 2 to get the correct turn number.

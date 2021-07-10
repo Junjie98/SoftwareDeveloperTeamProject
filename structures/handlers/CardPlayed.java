@@ -133,6 +133,8 @@ public class CardPlayed {
             // Ana: Ranged Attack
             unit.setRanged(cardname.equals("Pyromancer") || cardname.equals("Fire Spitter"));
 
+            //set to true
+            unit.setProvoker((cardname.equals("Silverguard Knight") || cardname.equals("Ironcliff Guardian") || cardname.equals("Rock Pulveriser")));
             parent.getSpecialEffect().unitIsSummoned(unit);
 
             UnitCommandBuilder builder = new UnitCommandBuilder(out, parent.isSimulation())

@@ -28,8 +28,7 @@ public class CardPlayed {
     // Move card to the Board and logic behind it.
     // ===========================================================================
     public void moveCardToBoard(ActorRef out, int x, int y) {
-        Card current = (parent.getTurn() == Players.PLAYER1) ?
-                parent.player1CardsInHand.get(activeCard.getSecond()) : parent.player2CardsInHand.get(activeCard.getSecond());
+        Card current = parent.getCardsInHand(parent.getTurn()).get(activeCard.getSecond());
         this.cardname = current.getCardname();
         System.out.println(cardname);
         int tempCardToDelete = activeCard.getSecond();      //Need that if we want to have beautiful effects, and not a bug
@@ -38,8 +37,7 @@ public class CardPlayed {
         if (current.isSpell()) {
         	
         	// Checking if enemy casted a spell for Pureblade Enforcer
-        	ArrayList<Pair<Integer, Integer>> enemyUnits = (parent.getTurn() == Players.PLAYER1) ?
-                    parent.player2UnitsPosition : parent.player1UnitsPosition;
+        	ArrayList<Pair<Integer, Integer>> enemyUnits = parent.getEnemyUnitsPosition(parent.getTurn());
 			for (Pair<Integer, Integer> position : enemyUnits) {
                 Tile enemyLocation = parent.getBoard().getTile(position);
               
@@ -160,11 +158,7 @@ public class CardPlayed {
             unitsOriginalHealth.put(unit.getId(),current.getBigCard().getHealth());
 //            System.out.println("the health of "+ unit +" is " + unitsOriginalHealth.get(unit.getId()));
 
-            if (parent.getTurn() == Players.PLAYER1) {
-                parent.player1UnitsPosition.add(new Pair<>(x, y));
-            } else {
-                parent.player2UnitsPosition.add(new Pair<>(x, y));
-            }
+            parent.getUnitsPosition(parent.getTurn()).add(new Pair<>(x, y));
 
             parent.memento.add(new GameMemento(parent.getTurn(), ActionType.SUMMON, new SummonInformation(new Pair<>(x, y), unit)));
         }
@@ -270,7 +264,7 @@ public class CardPlayed {
     // Delete Cards and Units
     // ===========================================================================
     public void deleteCardFromHand(ActorRef out, int pos) {
-        ArrayList<Card> current = (parent.getTurn() == Players.PLAYER1) ? parent.player1CardsInHand : parent.player2CardsInHand;
+        ArrayList<Card> current = parent.getCardsInHand(parent.getTurn());
         current.remove(pos);
         parent.getCardDrawing().displayCardsOnScreenFor(out, parent.getTurn());
     }
@@ -283,8 +277,7 @@ public class CardPlayed {
                 .setUnit(enemyLocation.getUnit())
                 .issueCommand();
         enemyLocation.setUnit(null);
-        ArrayList<Pair<Integer, Integer>> pool = (parent.getTurn() == Players.PLAYER1) ?
-                parent.player2UnitsPosition : parent.player1UnitsPosition;
+        ArrayList<Pair<Integer, Integer>> pool = parent.getEnemyUnitsPosition(parent.getTurn());
         Pair<Integer, Integer> positionToRemove = new Pair<>(x, y);
         for (Pair<Integer, Integer> position: pool) {
             if (position.equals(positionToRemove)) {

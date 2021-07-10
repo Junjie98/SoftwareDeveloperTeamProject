@@ -29,7 +29,7 @@ public class CardDrawing {
             // Block card drawing for simulation.
             return;
         }
-        ArrayList<Card> current = (player == Players.PLAYER1) ? parent.player1CardsInHand : parent.player2CardsInHand;
+        ArrayList<Card> current = parent.getCardsInHand(player);
         if (current.isEmpty()) {
             if (player == Players.PLAYER1 && deck1.isEmpty()) {
                 parent.endGame(out);
@@ -47,7 +47,7 @@ public class CardDrawing {
         if (parent.isSimulation()) {
             return;
         }
-        ArrayList<Card> currentCardInHand = (player == Players.PLAYER1) ? parent.player1CardsInHand : parent.player2CardsInHand;
+        ArrayList<Card> currentCardInHand = parent.getCardsInHand(player);
         for (int idx = 0; idx < MAX_CARD_COUNT_IN_HAND; idx++) {
             if (idx < currentCardInHand.size()) {
                 new CardInHandCommandBuilder(out, parent.isSimulation())

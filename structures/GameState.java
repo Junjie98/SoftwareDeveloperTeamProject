@@ -162,7 +162,7 @@ public class GameState {
     }
 
     public void cardClicked(ActorRef out, int idx) {
-        Card current = (turn == Players.PLAYER1) ? player1CardsInHand.get(idx) : player2CardsInHand.get(idx);
+        Card current = getCardsInHand(turn).get(idx);
         System.out.println("Card Clicked: " + current.getCardname());
         Pair<Card, Integer> card = cardPlayed.getActiveCard();
 
@@ -186,8 +186,7 @@ public class GameState {
        
         	else if (card == null || card.getSecond() != idx) {
                 cardPlayed.setActiveCard(current, idx);
-                ArrayList<Pair<Integer, Integer>> friendlyUnits =
-                        (turn == Players.PLAYER1) ? player1UnitsPosition : player2UnitsPosition;
+                ArrayList<Pair<Integer, Integer>> friendlyUnits = getUnitsPosition(turn);
                 for (Pair<Integer, Integer> position : friendlyUnits) {
                     highlighter.cardTileHighlight(out, position.getFirst(), position.getSecond());
                 }
@@ -383,6 +382,14 @@ public class GameState {
         switch (player) {
             case PLAYER1: return player1UnitsPosition;
             case PLAYER2: return player2UnitsPosition;
+        }
+        return null;
+    }
+
+    public ArrayList<Pair<Integer, Integer>> getEnemyUnitsPosition(Players player) {
+        switch (player) {
+            case PLAYER1: return player2UnitsPosition;
+            case PLAYER2: return player1UnitsPosition;
         }
         return null;
     }

@@ -225,8 +225,7 @@ public class UnitMovementAndAttack {
             parent.memento.add(new GameMemento(parent.getTurn(), ActionType.MOVE, new MovementInformation(activatedTile.getUnit(), activeUnit, new Pair<>(x, y))));
             System.out.println(parent.memento.get(parent.memento.size() - 1));
             // Update the units position in the stored position lists.
-            ArrayList<Pair<Integer, Integer>> pool = (parent.getTurn() == Players.PLAYER1) ?
-                    parent.player1UnitsPosition : parent.player2UnitsPosition;
+            ArrayList<Pair<Integer, Integer>> pool = parent.getUnitsPosition(parent.getTurn());
             for (Pair<Integer, Integer> position: pool) {
                 if (position.equals(activeUnit)) {
                     pool.remove(position);
@@ -363,8 +362,7 @@ public class UnitMovementAndAttack {
 		                        .issueCommand();
 	
 	                        attackerLocation.setUnit(null);
-	                        ArrayList<Pair<Integer, Integer>> pool = (parent.getTurn() == Players.PLAYER1) ?
-	                                parent.player1UnitsPosition : parent.player2UnitsPosition;
+	                        ArrayList<Pair<Integer, Integer>> pool = parent.getUnitsPosition(parent.getTurn());
 	                        Pair<Integer, Integer> positionToRemove = new Pair<>(attackerLocation.getTilex(), attackerLocation.getTiley());
 	                        for (Pair<Integer, Integer> position: pool) {
 	                            if (position.equals(positionToRemove)) {
@@ -384,8 +382,7 @@ public class UnitMovementAndAttack {
 	                    .issueCommand();
 
                     enemyLocation.setUnit(null);
-                    ArrayList<Pair<Integer, Integer>> pool = (parent.getTurn() == Players.PLAYER1) ?
-                            parent.player2UnitsPosition : parent.player1UnitsPosition;
+                    ArrayList<Pair<Integer, Integer>> pool = parent.getEnemyUnitsPosition(parent.getTurn());
                     Pair<Integer, Integer> positionToRemove = new Pair<>(x, y);
                     for (Pair<Integer, Integer> position: pool) {
                         if (position.equals(positionToRemove)) {

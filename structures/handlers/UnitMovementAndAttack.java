@@ -23,6 +23,7 @@ public class UnitMovementAndAttack {
     ArrayList<Unit> moveAttackAndCounterAttack = new ArrayList<>();
 
     boolean unitsCanMove = true;
+    int valueX = 0; int valueY = 0; //for flying and range unit provoke.
 
     public UnitMovementAndAttack(GameState parent) {
         this.parent = parent;
@@ -103,81 +104,8 @@ public class UnitMovementAndAttack {
             parent.getHighlighter().checkAttackHighlight(out, pos);
         }
 
-        //////////////
-        //provoke
         //Checks the tile of length 1.
-        try{
-        ArrayList<Pair<Integer, Integer>> tiles = get1RAtkTiles(activeUnit.getFirst(), activeUnit.getSecond());
-        
-        // ArrayList<Pair<Integer, Integer>> provokerTile;
-        Boolean provokerNearYou = false;
-        // for (Pair<Integer,Integer> pair : tiles) {
-        //     if(parent.getBoard().getTile(pair).getUnit()!=null && parent.getBoard().getTile(pair).getUnit().getPlayerID()!=parent.getTurn()){ //not my unit
-        //     System.out.println(parent.getBoard().getTile(pair).getUnit().getProvoker()+ " HELLLLLLLLLLLO IT IS TRUEEE>>>>><<<<");
-        //         if(parent.getBoard().getTile(pair).getUnit().getProvoker()){
-        //             provokerTile = tiles;
-        //         }
-                
-        //     }
-        
-        // }//^ Testing
-        
-        if(parent.getBoard().getTile(x,y).getUnit().getProvoker()){//provoker. Set highlight unit to not able to move.
-            for(Pair<Integer, Integer> tPair : tiles){
-                if (activeUnit == null) { return; }
-                if(parent.getBoard().getTile(tPair).getUnit()!=null && parent.getBoard().getTile(tPair).getUnit().getPlayerID()!=parent.getTurn()){
-                parent.getBoard().getTile(tPair).getUnit().setProvoked(true);
-                //setProvokedMove is a reuse code, just for better illustration on what's going on.
-                parent.getBoard().getTile(tPair).getUnit().setProvokedMove(true); //blocks it from moving. It can only attack.
-               // previousRedTileUnit.add(t);
-                System.out.println(parent.getBoard().getTile(tPair).getUnit().getProvoked() + " nearby unit has been provoked! ");//debug purpose
-                //provokerTile = tiles;
-                provokerNearYou=true;
-                }
-            }
-
-        }
-
-        if(!parent.getBoard().getTile(x,y).getUnit().getProvoker()){ //if current turn player is not the provoker
-            Unit nonProvokerUnit = parent.getBoard().getTile(x,y).getUnit();
-            System.out.println("Not provoker unit");
-            for(Pair<Integer,Integer> tPair : tiles){
-                if (activeUnit == null) { return; }
-                if(parent.getBoard().getTile(tPair).getUnit()!=null && parent.getBoard().getTile(tPair).getUnit().getPlayerID()!=parent.getTurn()
-                && parent.getBoard().getTile(tPair).getUnit().getProvoker()){ //tile not empty, not my unit, & is provoker
-                //boolean provokerExist = parent.getHighlighter().getRedTile().get(i).getUnit().getProvoker();
-                //System.out.println("PROVOKER EXIST? : " + provokerExist);
-                Unit provokerUnit = parent.getBoard().getTile(tPair).getUnit();
-                //if(provokerExist){
-                    nonProvokerUnit.setProvoked(true);
-                    nonProvokerUnit.setProvokedMove(true); //blocks it from moving. It can only attack.
-                    nonProvokerUnit.setUnitProvoked(provokerUnit);
-                    System.out.println(parent.getBoard().getTile(x,y).getUnit().getProvoked());//debug purpose
-                    //provokerTile = tiles;
-                    provokerNearYou=true;
-                //}
-
-                }
-            }
-        }
-        
-        if(parent.getBoard().getTile(x,y).getUnit().getProvoked() && !provokerNearYou){ //check if unit can be resetted.
-            parent.getBoard().getTile(x,y).getUnit().setProvoked(false);
-            parent.getBoard().getTile(x,y).getUnit().setProvokedMove(false);
-            System.out.println(parent.getBoard().getTile(x,y).getUnit().getProvoked() + " Should be false here now.");
-        // for(Pair<Integer,Integer> tPair : tiles){
-        //     if(!provokerNearYou && !parent.getBoard().getTile(tPair).getUnit().getProvoker()
-        //     && parent.getBoard().getTile(tPair).getUnit().getPlayerID()!=parent.getTurn()){// && !parent.getBoard().getTile(tPair).getUnit().getProvoked()){ //if my unit tile is all empty, no longer provoked. (Reset)
-        //         parent.getBoard().getTile(x,y).getUnit().setProvoked(false);
-        //         parent.getBoard().getTile(x,y).getUnit().setProvokedMove(false);
-        //         System.out.println(parent.getBoard().getTile(x,y).getUnit().getProvoked() + " Should be false here now.");//debug purpose
-        //     }
-        // }   
-        }
-        }catch(NullPointerException e){
-            System.out.println("boom you fucked up"); //change to "" if needed
-
-        }
+        provokeFunc(out,x,y);
 
     }
 
@@ -187,6 +115,8 @@ public class UnitMovementAndAttack {
             if(temp.isFlying() || temp.isRanged()) {
                 System.err.println("flyhighlight");
                 flyingOrRangedMoveHighlight(out);
+                valueX = x; valueY = y;
+
             } else {
                 basicMoveHighlight(out, x, y);
             }
@@ -198,7 +128,7 @@ public class UnitMovementAndAttack {
             //available tiles
             parent.getHighlighter().checkTileHighlight(out, ti);
         }
-
+        provokeFunc(out,valueX,valueY);
         ArrayList<Pair<Integer, Integer>> units = new ArrayList<>();
         units.addAll(parent.player1UnitsPosition);
         units.addAll(parent.player2UnitsPosition);
@@ -207,6 +137,8 @@ public class UnitMovementAndAttack {
             //Blocked tiles
             parent.getHighlighter().checkTileHighlight(out, bl);
         }
+        
+
     }
 
     public ArrayList<Pair<Integer, Integer>> getAllMoveTiles(int x, int y) {
@@ -340,64 +272,63 @@ public class UnitMovementAndAttack {
             
             if(attackCheck(x, y) || attacker.isRanged()) {
                 System.err.println("attack check passed");
-
                 boolean isRanged = attacker.isRanged();
                 int enemyHealthAfterAttack =enemy.getHealth();
-//////
-if(enemy.getProvoker()&&attacker.getProvoked()){
-     enemyHealthAfterAttack = attack(out, attackerLocation, enemy, attacker, x, y, isRanged);
-    System.out.println("Smack provoking thorfinn");
 
-    if (enemyHealthAfterAttack > 0) {
-        // Launch Counter Attack
-        int counterAttackResult = attack(out, enemyLocation, attacker, enemy, attacker.getPosition().getTilex(), attacker.getPosition().getTiley(), isRanged);
+            if(enemy.getProvoker()&&attacker.getProvoked()){
+                enemyHealthAfterAttack = attack(out, attackerLocation, enemy, attacker, x, y, isRanged);
+                 System.out.println("Smack provoking thorfinn");
+
+                if (enemyHealthAfterAttack > 0) {
+                    // Launch Counter Attack
+                     int counterAttackResult = attack(out, enemyLocation, attacker, enemy, attacker.getPosition().getTilex(), attacker.getPosition().getTiley(), isRanged);
         
-        if (counterAttackResult <= 0) {
-            // Handle unit died of counter attack
-            BasicCommands.playUnitAnimation(out, attacker, UnitAnimationType.death);
-            try {Thread.sleep(3000);} catch (InterruptedException e) {e.printStackTrace();}
+                    if (counterAttackResult <= 0) {
+                     // Handle unit died of counter attack
+                        BasicCommands.playUnitAnimation(out, attacker, UnitAnimationType.death);
+                        try {Thread.sleep(3000);} catch (InterruptedException e) {e.printStackTrace();}
             
-            new UnitCommandBuilder(out, parent.isSimulation())
+                        new UnitCommandBuilder(out, parent.isSimulation())
+                        .setMode(UnitCommandBuilderMode.DELETE)
+                        .setUnit(attackerLocation.getUnit())
+                        .issueCommand();
+
+                        attackerLocation.setUnit(null);
+                        ArrayList<Pair<Integer, Integer>> pool = (parent.getTurn() == Players.PLAYER1) ?
+                        parent.player1UnitsPosition : parent.player2UnitsPosition;
+                        Pair<Integer, Integer> positionToRemove = new Pair<>(attackerLocation.getTilex(), attackerLocation.getTiley());
+                        for (Pair<Integer, Integer> position: pool) {
+                        if (position.equals(positionToRemove)) {
+                            pool.remove(position);
+                            break;
+                        }
+                    }
+                }
+            } else {
+                BasicCommands.playUnitAnimation(out, enemy, UnitAnimationType.death);
+                try {Thread.sleep(3000);} catch (InterruptedException e) {e.printStackTrace();}
+        
+                new UnitCommandBuilder(out, parent.isSimulation())
                 .setMode(UnitCommandBuilderMode.DELETE)
-                .setUnit(attackerLocation.getUnit())
+                .setUnit(enemyLocation.getUnit())
                 .issueCommand();
 
-            attackerLocation.setUnit(null);
-            ArrayList<Pair<Integer, Integer>> pool = (parent.getTurn() == Players.PLAYER1) ?
-                    parent.player1UnitsPosition : parent.player2UnitsPosition;
-            Pair<Integer, Integer> positionToRemove = new Pair<>(attackerLocation.getTilex(), attackerLocation.getTiley());
-            for (Pair<Integer, Integer> position: pool) {
-                if (position.equals(positionToRemove)) {
-                    pool.remove(position);
-                    break;
+                enemyLocation.setUnit(null);
+                ArrayList<Pair<Integer, Integer>> pool = (parent.getTurn() == Players.PLAYER1) ?
+                parent.player2UnitsPosition : parent.player1UnitsPosition;
+                Pair<Integer, Integer> positionToRemove = new Pair<>(x, y);
+                for (Pair<Integer, Integer> position: pool) {
+                     if (position.equals(positionToRemove)) {
+                        pool.remove(position);
+                        break;
+                    }
                 }
             }
-        }
-    } else {
-        BasicCommands.playUnitAnimation(out, enemy, UnitAnimationType.death);
-        try {Thread.sleep(3000);} catch (InterruptedException e) {e.printStackTrace();}
-        
-        new UnitCommandBuilder(out, parent.isSimulation())
-            .setMode(UnitCommandBuilderMode.DELETE)
-            .setUnit(enemyLocation.getUnit())
-            .issueCommand();
-
-        enemyLocation.setUnit(null);
-        ArrayList<Pair<Integer, Integer>> pool = (parent.getTurn() == Players.PLAYER1) ?
-                parent.player2UnitsPosition : parent.player1UnitsPosition;
-        Pair<Integer, Integer> positionToRemove = new Pair<>(x, y);
-        for (Pair<Integer, Integer> position: pool) {
-            if (position.equals(positionToRemove)) {
-                pool.remove(position);
-                break;
-            }
-        }
-    }
     
-    }else{
-        System.out.println("Attack Provoker only!");
+        }else{
+            System.out.println("Attack Provoker only!");
         
-        if(!attacker.getProvoked()){
+            if(!attacker.getProvoked()){
 
                 if(isRanged){
                     //do ranged attack
@@ -676,6 +607,74 @@ if(enemy.getProvoker()&&attacker.getProvoked()){
             }
         }
         return false;
+    }
+
+
+    ////////////////////////Provoke Method/////////////////////////////////
+    
+    public void provokeFunc(ActorRef out, int x,int y){
+        try{
+            ArrayList<Pair<Integer, Integer>> tiles = get1RAtkTiles(activeUnit.getFirst(), activeUnit.getSecond());
+            
+            // ArrayList<Pair<Integer, Integer>> provokerTile;
+            Boolean provokerNearYou = false;
+            // for (Pair<Integer,Integer> pair : tiles) {
+            //     if(parent.getBoard().getTile(pair).getUnit()!=null && parent.getBoard().getTile(pair).getUnit().getPlayerID()!=parent.getTurn()){ //not my unit
+            //     System.out.println(parent.getBoard().getTile(pair).getUnit().getProvoker()+ " HELLLLLLLLLLLO IT IS TRUEEE>>>>><<<<");
+            //         if(parent.getBoard().getTile(pair).getUnit().getProvoker()){
+            //             provokerTile = tiles;
+            //         }
+            //     }
+            // }//^ Testing or debugging
+            
+            if(parent.getBoard().getTile(x,y).getUnit().getProvoker()){//provoker. Set highlight unit to not able to move.
+                for(Pair<Integer, Integer> tPair : tiles){
+                    if(parent.getBoard().getTile(tPair).getUnit()!=null && parent.getBoard().getTile(tPair).getUnit().getPlayerID()!=parent.getTurn()){
+                    parent.getBoard().getTile(tPair).getUnit().setProvoked(true);
+                    //setProvokedMove is a reuse code, just for better illustration on what's going on.
+                    parent.getBoard().getTile(tPair).getUnit().setProvokedMove(true); //blocks it from moving. It can only attack.
+                   // previousRedTileUnit.add(t);
+                    System.out.println(parent.getBoard().getTile(tPair).getUnit().getProvoked() + " nearby unit has been provoked! ");//debug purpose
+                    //provokerTile = tiles;
+                    provokerNearYou=true;
+                    }
+                }
+    
+            }
+    
+            if(!parent.getBoard().getTile(x,y).getUnit().getProvoker()){ //if current turn player is not the provoker
+                Unit nonProvokerUnit = parent.getBoard().getTile(x,y).getUnit();
+                System.out.println("Not provoker unit");
+                for(Pair<Integer,Integer> tPair : tiles){
+                    if(parent.getBoard().getTile(tPair).getUnit()!=null && parent.getBoard().getTile(tPair).getUnit().getPlayerID()!=parent.getTurn()
+                    && parent.getBoard().getTile(tPair).getUnit().getProvoker()){ //tile not empty, not my unit, & is provoker
+                    //boolean provokerExist = parent.getHighlighter().getRedTile().get(i).getUnit().getProvoker();
+                    //System.out.println("PROVOKER EXIST? : " + provokerExist);
+                    Unit provokerUnit = parent.getBoard().getTile(tPair).getUnit();
+                    //if(provokerExist){
+                        nonProvokerUnit.setProvoked(true);
+                        nonProvokerUnit.setProvokedMove(true); //blocks it from moving. It can only attack.
+                        nonProvokerUnit.setUnitProvoked(provokerUnit);
+                        System.out.println(parent.getBoard().getTile(x,y).getUnit().getProvoked());//debug purpose
+                        //provokerTile = tiles;
+                        provokerNearYou=true;
+                    //}
+    
+                    }
+                }
+            }
+            
+            if(parent.getBoard().getTile(x,y).getUnit().getProvoked() && !provokerNearYou){ //check if unit can be resetted.
+                parent.getBoard().getTile(x,y).getUnit().setProvoked(false);
+                parent.getBoard().getTile(x,y).getUnit().setProvokedMove(false);
+                System.out.println(parent.getBoard().getTile(x,y).getUnit().getProvoked() + " Should be false here now.");
+
+            }
+            }catch(NullPointerException e){
+                System.out.println("boom you fucked up"); //change to "" if needed
+    
+            }
+    
     }
 
     // ===========================================================================

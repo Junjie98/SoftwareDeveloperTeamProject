@@ -14,8 +14,8 @@ import static commandbuilders.enums.Players.PLAYER1;
 public class Highlighter {
     private ArrayList<Tile> highlightedTiles = new ArrayList<>();
     private final GameState parent;
-    private ArrayList<Tile> highlightedRedTiles = new ArrayList<>();//added back in conflic.
-    private ArrayList<Tile> highlightedTilesProv = new ArrayList<>();
+    //private ArrayList<Tile> highlightedRedTiles = new ArrayList<>();//added back in conflic.
+    //private ArrayList<Tile> highlightedTilesProv = new ArrayList<>();
 
     public Highlighter(GameState parent) {
         this.parent = parent;
@@ -99,7 +99,7 @@ public class Highlighter {
                         .setState(States.RED)
                         .issueCommand();
                 highlightedTiles.add(tile);
-                highlightedRedTiles.add(tile);
+                //highlightedRedTiles.add(tile);
                 tile.setTileState(States.RED);
 
 
@@ -111,7 +111,7 @@ public class Highlighter {
                         .setState(States.NORMAL)
                         .issueCommand();
                 tile.setTileState(States.NORMAL);
-                System.out.println("YOGOOD");
+                System.out.println("Friendly Unit Nearby");
             }
             return false;
 
@@ -216,17 +216,17 @@ public class Highlighter {
             tile.setTileState(States.NORMAL);
         }
         highlightedTiles.clear();
-        highlightedRedTiles.clear();
+        //highlightedRedTiles.clear();
 
     }
 
-    public ArrayList<Tile> getRedTile(){
-        return highlightedRedTiles;
-    }
+    //public ArrayList<Tile> getRedTile(){
+    //    return highlightedRedTiles;
+    //}
 
-    public ArrayList<Tile> getProvokeTile(){
-        return highlightedTilesProv;
-    }
+   // public ArrayList<Tile> getProvokeTile(){
+    //    return highlightedTilesProv;
+    //}
 
 
     public void provokeHighlight(ActorRef out,int x, int y){ //or attack tile. 1 tiles away from unit
@@ -242,8 +242,8 @@ public class Highlighter {
                                     .issueCommand();
                             Tile tile = parent.getBoard().getTile(position);
                             tile.setTileState(States.RED);
-                            highlightedTilesProv.add(tile);
-                            highlightedRedTiles.add(tile);
+                            //highlightedTilesProv.add(tile);
+                            //highlightedRedTiles.add(tile);
                         }
                     }
 

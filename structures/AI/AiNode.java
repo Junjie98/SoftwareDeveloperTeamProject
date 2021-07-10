@@ -24,7 +24,7 @@ public class AiNode {
     AiNode(AiNode parent, GameState gs, int depth)
     {
         this.parent = parent;
-        this.depth = ++depth;
+        this.depth = depth;
 
         gameState = new SmartBoy(gs).getExtractedGameState();
         goodness = evaulate();
@@ -37,6 +37,7 @@ public class AiNode {
 
     public int evaulate()
     {
+        
         final int UnitCost = 100;
         final int cardCost = 50;
         
@@ -80,8 +81,11 @@ public class AiNode {
         }
 
         for (Pair<Integer,Integer> unit : friendlies) {
-            System.out.println(unit);
-            
+
+            System.out.println("Ainode at depth: " + depth);
+            //System.out.println("ainode parent: " + parent.depth);
+            System.out.println("Evaulating at unit: " + unit);
+
             totalScore+=gameState.getBoard().getTile(unit).getUnit().getHealth();
             totalScore+=UnitCost;
         }        

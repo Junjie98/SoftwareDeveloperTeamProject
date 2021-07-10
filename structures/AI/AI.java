@@ -76,6 +76,9 @@ public class AI
 
     public void generateMoves(ActorRef out, ArrayList<AiNode> nodes, int depth, int limit)
     {
+        System.out.println("AI depth: "+depth);
+        System.out.println("number of nodes created: "+nodes.size());
+
         if(depth>=limit)
         {
             return;
@@ -144,7 +147,7 @@ public class AI
         
         //Move Logic
         ExtractedGameState moveState = temp_sBoy.getExtractedGameState();
-        moveState.setSimulation(true);
+        //moveState.setSimulation(true);
         ArrayList<Pair<Integer,Integer>> movers = moveState.canStillMove();
 
         if(movers.size()>0){

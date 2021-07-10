@@ -4,10 +4,7 @@ import java.util.ArrayList;
 import akka.actor.ActorRef;
 import commandbuilders.*;
 import commandbuilders.enums.*;
-import structures.basic.Card;
-import structures.basic.Player;
-import structures.basic.Tile;
-import structures.basic.Unit;
+import structures.basic.*;
 import structures.extractor.GameStateExtractor;
 import structures.handlers.*;
 import structures.memento.GameMemento;
@@ -330,7 +327,7 @@ public class GameState {
     }
 
     // ===========================================================================
-    // Shared Highlighting Functions
+    // Shared Functions
     // ===========================================================================
     public ArrayList<Pair<Integer, Integer>> getMoveTiles(int x, int y, int depth, int diag) {
         ArrayList<Pair<Integer, Integer>> output = new ArrayList<>();
@@ -339,6 +336,34 @@ public class GameState {
         output.add(new Pair<>(x+depth, y-diag));
         output.add(new Pair<>(x+diag, y+depth));
         return output;
+    }
+
+    public void unitDied(ActorRef out, Tile unitLocaltion, ArrayList<Pair<Integer, Integer>> pool) {
+        UnitCommandBuilder builder = new UnitCommandBuilder(out, isSimulation())
+                .setUnit(unitLocaltion.getUnit());
+
+        builder.setMode(UnitCommandBuilderMode.ANIMATION)
+                .setAnimationType(UnitAnimationType.death)
+                .issueCommand();
+
+        try {Thread.sleep(3000);} catch (InterruptedException e) {e.printStackTrace();}
+
+        builder.setMode(UnitCommandBuilderMode.DELETE)
+                .issueCommand();
+
+        unitLocaltion.setUnit(null);
+
+        Pair<Integer, Integer> item = unitLocaltion.getLocationPair();
+        removeFromPool(pool, item);
+    }
+
+    public void removeFromPool(ArrayList<Pair<Integer, Integer>> pool, Pair<Integer, Integer> item) {
+        for (Pair<Integer, Integer> position: pool) {
+            if (position.equals(item)) {
+                pool.remove(position);
+                break;
+            }
+        }
     }
     
     // Highlighting the clicked card at hand

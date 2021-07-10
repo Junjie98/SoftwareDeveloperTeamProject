@@ -184,7 +184,7 @@ public class CardPlayed {
 
             // delete unit if health <=0
             if (healthAfterDamage == 0) {
-                deleteUnit(out, x, y, targetLocation);
+                parent.unitDied(out, targetLocation, parent.getEnemyUnitsPosition(parent.getTurn()));
             }
         }else if (cardname.equals("Staff of Y'Kir'")){      //Avatar gains +2 Attack
             int enemyAvatarAttack = target.getDamage();
@@ -267,24 +267,6 @@ public class CardPlayed {
         ArrayList<Card> current = parent.getCardsInHand(parent.getTurn());
         current.remove(pos);
         parent.getCardDrawing().displayCardsOnScreenFor(out, parent.getTurn());
-    }
-
-    public void deleteUnit(ActorRef out, int x, int y, Tile enemyLocation) {
-        //Delete the enemy unit if dies
-        try {Thread.sleep(1000);} catch (InterruptedException e) {e.printStackTrace();} // Unit will disappear with effect
-        new UnitCommandBuilder(out, parent.isSimulation())
-                .setMode(UnitCommandBuilderMode.DELETE)
-                .setUnit(enemyLocation.getUnit())
-                .issueCommand();
-        enemyLocation.setUnit(null);
-        ArrayList<Pair<Integer, Integer>> pool = parent.getEnemyUnitsPosition(parent.getTurn());
-        Pair<Integer, Integer> positionToRemove = new Pair<>(x, y);
-        for (Pair<Integer, Integer> position: pool) {
-            if (position.equals(positionToRemove)) {
-                pool.remove(position);
-                break;
-            }
-        }
     }
 
     // ===========================================================================

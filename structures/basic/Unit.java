@@ -5,6 +5,7 @@ import commandbuilders.enums.UnitType;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import structures.handlers.Pair;
 
 /**
  * This is a representation of a Unit on the game board.
@@ -215,5 +216,9 @@ public class Unit {
 
 	public void setType(UnitType type) {
 		this.type = type;
+	}
+
+	public Pair<Integer, Integer> getLocationPair() {
+		return new Pair<>(position.tilex, position.tiley);
 	}
 }

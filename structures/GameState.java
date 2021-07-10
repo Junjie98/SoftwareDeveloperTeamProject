@@ -22,7 +22,7 @@ public class GameState {
     private Players turn = Players.PLAYER1;
     protected Player player1, player2;
     protected Unit human, aiAvatar;
-    private Pair<Card, Integer> currentHighlightedCard;
+    public Pair<Card, Integer> currentHighlightedCard;
     public ArrayList<Card> player1CardsInHand = new ArrayList<>();
     public ArrayList<Card> player2CardsInHand = new ArrayList<>();
     public ArrayList<Pair<Integer, Integer>> player1UnitsPosition = new ArrayList<>();

@@ -238,6 +238,7 @@ public class CardPlayed {
         ArrayList<Card> current = parent.getCardsInHand(parent.getTurn());
         current.remove(pos);
         parent.getCardDrawing().displayCardsOnScreenFor(out, parent.getTurn());
+        parent.currentHighlightedCard = null;
     }
 
     // ===========================================================================

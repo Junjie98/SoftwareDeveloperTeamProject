@@ -237,11 +237,19 @@ public class UnitMovementAndAttack {
             parent.removeFromPool(pool, activeUnit);
             pool.add(new Pair<>(x, y));
 
+
+          
             destinationTile.setUnit(activatedTile.getUnit());
             parent.getHighlighter().clearBoardHighlights(out);
-            activatedTile.getUnit().setHasMoved(true);
+
+            //System.out.println("unit attacking should be flagged: " + activatedTile.getUnit());
+
+            destinationTile.getUnit().setHasMoved(true);
+            destinationTile.getUnit().setHasAttacked(true);
             moveAttackAndCounterAttack.add(activatedTile.getUnit());
             activatedTile.setUnit(null);
+
+
         } else {
             // RED should be redirected to attack so should be here.
             parent.getHighlighter().clearBoardHighlights(out);
@@ -339,7 +347,6 @@ public class UnitMovementAndAttack {
                     else {
                         highlightedMoveTileClicked(out, moveTile.getFirst(), moveTile.getSecond());
                         try {Thread.sleep(3000);} catch (InterruptedException e) {e.printStackTrace();}
-
                         attackerLocation =  parent.getBoard().getTile(moveTile);
                         
                         enemyHealthAfterAttack = attack(out, attackerLocation, enemy, attacker, x, y, isRanged);
@@ -378,7 +385,8 @@ public class UnitMovementAndAttack {
                 }
             }
         }
-        resetMoveAttackAndCounterAttack(out);
+        //IS THIS NEEDED HERE? Having this activate per attack means that it always resets our bools instantly
+        //resetMoveAttackAndCounterAttack(out);
     }
 
     public boolean moveBlockCheck(int x, int y, int movex, int movey)

@@ -232,12 +232,21 @@ public class GameState {
                 if (tile != null && tile.hasUnit()) {
                     // User clicked on a unit.
                     System.out.println("Shouldnt move cos its tired?");
-                    if (tile.getUnit().getHasAttacked() || tile.getUnit().getHasMoved()) {
+                    System.out.println("attacked: " + tile.getUnit().getHasAttacked());
+                    System.out.println("moved: " + tile.getUnit().getHasMoved());
+                    if (tile.getUnit().getHasAttacked() && tile.getUnit().getHasMoved()) {
                         // Block hasAttacked -> hasMoved
-                        System.out.println("Shouldnt move cos its tired!!!!");
+                        System.out.println("Shouldnt move cos its tired A+M");
                         return;
                     } else if (tile.getUnit().getHasAttacked()) {
                         // Block hasAttacked
+                        System.out.println("Shouldnt move cos its tired A");
+
+                        return;
+                    }else if (tile.getUnit().getHasMoved()) {
+                        // Block hasmoved
+                        System.out.println("Shouldnt move cos its tired M");
+
                         return;
                     }
                     unitMovementAndAttack.unitClicked(out, x ,y);

@@ -5,7 +5,6 @@ import commandbuilders.PlayerSetCommandsBuilder;
 import commandbuilders.ProjectTileAnimationCommandBuilder;
 import commandbuilders.UnitCommandBuilder;
 import commandbuilders.enums.*;
-import commands.BasicCommands;
 import structures.GameState;
 import structures.basic.Tile;
 import structures.basic.Unit;
@@ -406,7 +405,10 @@ public class UnitMovementAndAttack {
 			.issueCommand();
 		} else {
             System.out.println("Basic attack");
-        	BasicCommands.playUnitAnimation(out, attacker, UnitAnimationType.attack);
+            new UnitCommandBuilder(out, parent.isSimulation()).setUnit(attacker)
+                    .setMode(UnitCommandBuilderMode.ANIMATION)
+                    .setAnimationType(UnitAnimationType.attack)
+                    .issueCommand();
     		try {Thread.sleep(2000);} catch (InterruptedException e) {e.printStackTrace();}
         }
 

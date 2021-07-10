@@ -4,7 +4,6 @@ import akka.actor.ActorRef;
 
 import commandbuilders.*;
 import commandbuilders.enums.*;
-import structures.Board;
 import structures.GameState;
 import structures.basic.Card;
 import structures.basic.Tile;

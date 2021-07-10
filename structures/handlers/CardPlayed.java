@@ -130,6 +130,9 @@ public class CardPlayed {
             unit.setRanged(cardname.equals("Pyromancer") || cardname.equals("Fire Spitter"));
             // set to true
             unit.setProvoker((cardname.equals("Silverguard Knight") || cardname.equals("Ironcliff Guardian") || cardname.equals("Rock Pulveriser")));
+            if (unit.getType() == UnitType.AZURITE_LION || unit.getType().equals(UnitType.SERPENTI))
+                unit.setAttackLimit(2);
+
             unit.setPlayerID(parent.getTurn());
             tile.setUnit(unit);
             unit.setPositionByTile(tile);

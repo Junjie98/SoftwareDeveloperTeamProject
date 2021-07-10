@@ -349,7 +349,6 @@ public class UnitMovementAndAttack {
                 }
 
                 if(!attack1RCheck(x, y)){
-                    System.out.println("Hola?");
                     //if the unit is not within normal attack range
                     //move to a range then attack
                     Pair<Integer,Integer> moveTile = getMoveTileForAttack(attackerLocation.getTilex(), attackerLocation.getTiley(), x, y);
@@ -393,11 +392,7 @@ public class UnitMovementAndAttack {
                                     attackerLocation =  parent.getBoard().getTile(pair);
                                     
                                     enemyHealthAfterAttack = attack(out, attackerLocation, enemyLocation, isRanged);
-                                    
-                                    // Attack twice: attack-attack
-                                    if(attacker.getType().equals(UnitType.AZURITE_LION) || attacker.getType().equals(UnitType.SERPENTI))
-                                    	 enemyHealthAfterAttack = attack(out, attackerLocation, enemyLocation, isRanged);
-                                    
+
                                     System.out.println("found new pos using selective method");
                                     found = true;
                                 }
@@ -421,17 +416,10 @@ public class UnitMovementAndAttack {
                         attackerLocation =  parent.getBoard().getTile(moveTile);
                         
                         enemyHealthAfterAttack = attack(out, attackerLocation, enemyLocation, isRanged);
-                        
-                        // Attack twice: move-attack-attack
-                        if(attacker.getType().equals(UnitType.AZURITE_LION) || attacker.getType().equals(UnitType.SERPENTI))
-                        	enemyHealthAfterAttack = attack(out, attackerLocation, enemyLocation, isRanged);
                     }
                 }
                 else{
-                	   // Attack twice: attack-attack
-                	   if(attacker.getType().equals(UnitType.AZURITE_LION) || attacker.getType().equals(UnitType.SERPENTI))
-                		   enemyHealthAfterAttack = attack(out, attackerLocation, enemyLocation, isRanged);
-                      enemyHealthAfterAttack = attack(out, attackerLocation, enemyLocation, isRanged);
+                    enemyHealthAfterAttack = attack(out, attackerLocation, enemyLocation, isRanged);
                 }
                 parent.memento.add(new GameMemento(parent.getTurn(), ActionType.ATTACK, new AttackInformation(new Pair<>(attacker.getPosition().getTilex(), attacker.getPosition().getTiley()),
                         new Pair<>(x, y), attacker, enemy)));
@@ -530,7 +518,7 @@ public class UnitMovementAndAttack {
         moveAttackAndCounterAttack.add(enemy);
 
         //restrict player to move after attack
-        attacker.setHasAttacked(true);
+        attacker.setHasAttacked();
         moveAttackAndCounterAttack.add(attacker);
 
         parent.getSpecialAbilities().unitIsDamaged(out, enemy);
@@ -681,7 +669,7 @@ public class UnitMovementAndAttack {
     public void resetMoveAttackAndCounterAttack(ActorRef out) {
         for (Unit unit: moveAttackAndCounterAttack) {
             unit.setHasMoved(false);
-            unit.setHasAttacked(false);
+            unit.resetAttackCount();
             unit.clearAttackers();
 
             try {Thread.sleep(30);} catch (InterruptedException e) {e.printStackTrace();}

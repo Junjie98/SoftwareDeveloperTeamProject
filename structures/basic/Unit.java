@@ -51,7 +51,10 @@ public class Unit {
 	boolean isRanged = false;
 	//JJ: for attack logic. If attacked without move, it forfeits the move ability
 	boolean hasMoved = false; //moved this for visibility
-	boolean hasAttacked = false;
+
+	int attackCount = 0;
+	int attackLimit = 1;
+
 	public Unit() {}
 	
 	public Unit(int id, UnitAnimationSet animations, ImageCorrection correction) {
@@ -207,12 +210,11 @@ public class Unit {
 	{
 		return this.owningPlayer;
 	}
-	public void setHasAttacked(boolean hasAttacked) {
-		//System.out.println("set unit attack: " + hasAttacked);
-		this.hasAttacked = hasAttacked;
+	public void setHasAttacked() {
+		attackCount++;
 	}
 	public boolean getHasAttacked() {
-		return hasAttacked;
+		return attackCount >= attackLimit;
 	}
     public void setFlying(boolean bool) {
 		isFlying = bool;
@@ -264,5 +266,13 @@ public class Unit {
 
 	public void clearAttackers() {
 		attackedBy.clear();
+	}
+
+	public void resetAttackCount() {
+		attackCount = 0;
+	}
+
+	public void setAttackLimit(int value) {
+		attackLimit = value;
 	}
 }

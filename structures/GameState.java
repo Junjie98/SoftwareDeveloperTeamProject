@@ -4,10 +4,7 @@ import java.util.ArrayList;
 import akka.actor.ActorRef;
 import commandbuilders.*;
 import commandbuilders.enums.*;
-import structures.basic.Card;
-import structures.basic.Player;
-import structures.basic.Tile;
-import structures.basic.Unit;
+import structures.basic.*;
 import structures.extractor.GameStateExtractor;
 import structures.handlers.*;
 import structures.memento.GameMemento;
@@ -42,6 +39,7 @@ public class GameState {
     final private CardDrawing cardDrawing = new CardDrawing(this);
     final private CardPlayed cardPlayed = new CardPlayed(this);
     final private Highlighter highlighter = new Highlighter(this);
+    final private SpecialEffect specialEffect = new SpecialEffect(this);
 
 	// ===========================================================================
     // Game Initialisation
@@ -155,6 +153,7 @@ public class GameState {
             cardDrawing.drawNewCardFor(out, turn);
         }
         cardDrawing.displayCardsOnScreenFor(out, turn);
+        specialEffect.turnDidEnd(out);
         ++roundNumber; // Divide this by 2 when we are going to use this.
         if (turn == Players.PLAYER2) {
             smartBoy.tester(out);
@@ -162,7 +161,7 @@ public class GameState {
     }
 
     public void cardClicked(ActorRef out, int idx) {
-        Card current = (turn == Players.PLAYER1) ? player1CardsInHand.get(idx) : player2CardsInHand.get(idx);
+        Card current = getCardsInHand(turn).get(idx);
         System.out.println("Card Clicked: " + current.getCardname());
         Pair<Card, Integer> card = cardPlayed.getActiveCard();
 
@@ -180,14 +179,14 @@ public class GameState {
             
             // For unit Planar Scout
         	if (current.getCardname().equals("Planar Scout")) {
+        		
         		cardPlayed.setActiveCard(current, idx);
-        		unitMovementAndAttack.flyingOrRangedMoveHighlight(out);
+        		unitMovementAndAttack.summonAnywhereHighlight(out);
         	}
        
         	else if (card == null || card.getSecond() != idx) {
                 cardPlayed.setActiveCard(current, idx);
-                ArrayList<Pair<Integer, Integer>> friendlyUnits =
-                        (turn == Players.PLAYER1) ? player1UnitsPosition : player2UnitsPosition;
+                ArrayList<Pair<Integer, Integer>> friendlyUnits = getUnitsPosition(turn);
                 for (Pair<Integer, Integer> position : friendlyUnits) {
                     highlighter.cardTileHighlight(out, position.getFirst(), position.getSecond());
                 }
@@ -232,11 +231,22 @@ public class GameState {
             if (unitMovementAndAttack.getActiveUnit() == null) {
                 if (tile != null && tile.hasUnit()) {
                     // User clicked on a unit.
+                    System.out.println("Shouldnt move cos its tired?");
+                    System.out.println("attacked: " + tile.getUnit().getHasAttacked());
+                    System.out.println("moved: " + tile.getUnit().getHasMoved());
                     if (tile.getUnit().getHasAttacked() && tile.getUnit().getHasMoved()) {
                         // Block hasAttacked -> hasMoved
+                        System.out.println("Shouldnt move cos its tired A+M");
                         return;
                     } else if (tile.getUnit().getHasAttacked()) {
                         // Block hasAttacked
+                        System.out.println("Shouldnt move cos its tired A");
+
+                        return;
+                    }else if (tile.getUnit().getHasMoved()) {
+                        // Block hasmoved
+                        System.out.println("Shouldnt move cos its tired M");
+
                         return;
                     }
                     unitMovementAndAttack.unitClicked(out, x ,y);
@@ -262,16 +272,19 @@ public class GameState {
     public void endGame(ActorRef out) {
         Player winner = null;
         // Win condition: should be moved to a method where we are checking player's health
-        // If any of the decks run out of card, the player loses.
+
         if (player1.getHealth() < 1) {
             winner = player1;
         } else if (player2.getHealth() < 1) {
             winner = player2;
-        } else if (cardDrawing.isDeckOneEmpty()) {
-            winner = player2;
-        } else if (cardDrawing.isDeckTwoEmpty()) {
-            winner = player1;
+
         }
+        // If any of the decks run out of card, the player loses. (May not be true)
+        //} else if (cardDrawing.isDeckOneEmpty()) {
+        //    winner = player2;
+        //} else if (cardDrawing.isDeckTwoEmpty()) {
+        //    winner = player1;
+        //}
         if (winner != null) {
             String message = (winner == player1) ? "Player 1 won!" : "Player 2 won!" ;
             new PlayerNotificationCommandBuilder(out, isSimulation())
@@ -328,7 +341,7 @@ public class GameState {
     }
 
     // ===========================================================================
-    // Shared Highlighting Functions
+    // Shared Functions
     // ===========================================================================
     public ArrayList<Pair<Integer, Integer>> getMoveTiles(int x, int y, int depth, int diag) {
         ArrayList<Pair<Integer, Integer>> output = new ArrayList<>();
@@ -337,6 +350,36 @@ public class GameState {
         output.add(new Pair<>(x+depth, y-diag));
         output.add(new Pair<>(x+diag, y+depth));
         return output;
+    }
+
+    public void unitDied(ActorRef out, Tile unitLocaltion, ArrayList<Pair<Integer, Integer>> pool) {
+        specialEffect.unitDidDie(out, unitLocaltion.getUnit());
+
+        UnitCommandBuilder builder = new UnitCommandBuilder(out, isSimulation())
+                .setUnit(unitLocaltion.getUnit());
+
+        builder.setMode(UnitCommandBuilderMode.ANIMATION)
+                .setAnimationType(UnitAnimationType.death)
+                .issueCommand();
+
+        try {Thread.sleep(3000);} catch (InterruptedException e) {e.printStackTrace();}
+
+        builder.setMode(UnitCommandBuilderMode.DELETE)
+                .issueCommand();
+
+        unitLocaltion.setUnit(null);
+
+        Pair<Integer, Integer> item = unitLocaltion.getLocationPair();
+        removeFromPool(pool, item);
+    }
+
+    public void removeFromPool(ArrayList<Pair<Integer, Integer>> pool, Pair<Integer, Integer> item) {
+        for (Pair<Integer, Integer> position: pool) {
+            if (position.equals(item)) {
+                pool.remove(position);
+                break;
+            }
+        }
     }
     
     // Highlighting the clicked card at hand
@@ -359,6 +402,10 @@ public class GameState {
         return unitMovementAndAttack;
     }
 
+    public SpecialEffect getSpecialEffect() {
+        return specialEffect;
+    }
+
     public CardDrawing getCardDrawing() {
         return cardDrawing;
     }
@@ -375,6 +422,30 @@ public class GameState {
         switch (player) {
             case PLAYER1: return player1;
             case PLAYER2: return player2;
+        }
+        return null;
+    }
+
+    public ArrayList<Pair<Integer, Integer>> getUnitsPosition(Players player) {
+        switch (player) {
+            case PLAYER1: return player1UnitsPosition;
+            case PLAYER2: return player2UnitsPosition;
+        }
+        return null;
+    }
+
+    public ArrayList<Pair<Integer, Integer>> getEnemyUnitsPosition(Players player) {
+        switch (player) {
+            case PLAYER1: return player2UnitsPosition;
+            case PLAYER2: return player1UnitsPosition;
+        }
+        return null;
+    }
+
+    public ArrayList<Card> getCardsInHand(Players player) {
+        switch (player) {
+            case PLAYER1: return player1CardsInHand;
+            case PLAYER2: return player2CardsInHand;
         }
         return null;
     }

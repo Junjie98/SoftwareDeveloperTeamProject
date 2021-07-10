@@ -5,6 +5,7 @@ import commandbuilders.enums.UnitType;
 import java.util.ArrayList;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import structures.handlers.Pair;
 
 /**
  * This is a representation of a Unit on the game board.
@@ -208,9 +209,12 @@ public class Unit {
 		return hasGotAttacked;
 	}
 	public void setHasGotAttacked(boolean hasGotAttacked) {
+		//System.out.println("set unit move: " + hasMoved);
+
 		this.hasGotAttacked = hasGotAttacked;
 	}
 	public void setHasAttacked(boolean hasAttacked) {
+		//System.out.println("set unit attack: " + hasAttacked);
 		this.hasAttacked = hasAttacked;
 	}
 	public boolean getHasAttacked() {
@@ -241,5 +245,9 @@ public class Unit {
 
 	public void setType(UnitType type) {
 		this.type = type;
+	}
+
+	public Pair<Integer, Integer> getLocationPair() {
+		return new Pair<>(position.tilex, position.tiley);
 	}
 }

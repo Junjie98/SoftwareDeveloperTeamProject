@@ -4,7 +4,6 @@ import akka.actor.ActorRef;
 
 import commandbuilders.*;
 import commandbuilders.enums.*;
-import structures.Board;
 import structures.GameState;
 import structures.basic.Card;
 import structures.basic.Tile;
@@ -28,8 +27,7 @@ public class CardPlayed {
     // Move card to the Board and logic behind it.
     // ===========================================================================
     public void moveCardToBoard(ActorRef out, int x, int y) {
-        Card current = (parent.getTurn() == Players.PLAYER1) ?
-                parent.player1CardsInHand.get(activeCard.getSecond()) : parent.player2CardsInHand.get(activeCard.getSecond());
+        Card current = parent.getCardsInHand(parent.getTurn()).get(activeCard.getSecond());
         this.cardname = current.getCardname();
         System.out.println(cardname);
         int tempCardToDelete = activeCard.getSecond();      //Need that if we want to have beautiful effects, and not a bug
@@ -38,13 +36,11 @@ public class CardPlayed {
         if (current.isSpell()) {
         	
         	// Checking if enemy casted a spell for Pureblade Enforcer
-        	ArrayList<Pair<Integer, Integer>> enemyUnits = (parent.getTurn() == Players.PLAYER1) ?
-                    parent.player2UnitsPosition : parent.player1UnitsPosition;
+        	ArrayList<Pair<Integer, Integer>> enemyUnits = parent.getEnemyUnitsPosition(parent.getTurn());
 			for (Pair<Integer, Integer> position : enemyUnits) {
                 Tile enemyLocation = parent.getBoard().getTile(position);
               
                 if(enemyLocation.getUnit().getType() == UnitType.PUREBLADE_ENFORCER) {
-                	System.out.println("bleh");
                 	int newHealth = enemyLocation.getUnit().getHealth() + 1;
                 	int newDamage = enemyLocation.getUnit().getDamage() + 1;
                 	enemyLocation.getUnit().setHealth(enemyLocation.getUnit().getHealth() + 1);
@@ -113,6 +109,7 @@ public class CardPlayed {
             parent.memento.add(new GameMemento(parent.getTurn(), ActionType.SPELL, new SpellInformation(targetUnit, new Pair<>(x, y), current)));
         // If normal Unit
         } else {
+            // TODO: Would you like to move this to the SpecialEffect class's isSummoned?
         	if (current.isSpecialCard())
         		specialAction(out, current, x, y);
         	
@@ -138,6 +135,7 @@ public class CardPlayed {
 
             //set to true
             unit.setProvoker((cardname.equals("Silverguard Knight") || cardname.equals("Ironcliff Guardian") || cardname.equals("Rock Pulveriser")));
+            parent.getSpecialEffect().unitIsSummoned(unit);
 
             UnitCommandBuilder builder = new UnitCommandBuilder(out, parent.isSimulation())
                     .setUnit(unit);
@@ -163,11 +161,7 @@ public class CardPlayed {
             unitsOriginalHealth.put(unit.getId(),current.getBigCard().getHealth());
 //            System.out.println("the health of "+ unit +" is " + unitsOriginalHealth.get(unit.getId()));
 
-            if (parent.getTurn() == Players.PLAYER1) {
-                parent.player1UnitsPosition.add(new Pair<>(x, y));
-            } else {
-                parent.player2UnitsPosition.add(new Pair<>(x, y));
-            }
+            parent.getUnitsPosition(parent.getTurn()).add(new Pair<>(x, y));
 
             parent.memento.add(new GameMemento(parent.getTurn(), ActionType.SUMMON, new SummonInformation(new Pair<>(x, y), unit)));
         }
@@ -193,7 +187,7 @@ public class CardPlayed {
 
             // delete unit if health <=0
             if (healthAfterDamage == 0) {
-                deleteUnit(out, x, y, targetLocation);
+                parent.unitDied(out, targetLocation, parent.getEnemyUnitsPosition(parent.getTurn()));
             }
         }else if (cardname.equals("Staff of Y'Kir'")){      //Avatar gains +2 Attack
             int enemyAvatarAttack = target.getDamage();
@@ -273,28 +267,9 @@ public class CardPlayed {
     // Delete Cards and Units
     // ===========================================================================
     public void deleteCardFromHand(ActorRef out, int pos) {
-        ArrayList<Card> current = (parent.getTurn() == Players.PLAYER1) ? parent.player1CardsInHand : parent.player2CardsInHand;
+        ArrayList<Card> current = parent.getCardsInHand(parent.getTurn());
         current.remove(pos);
         parent.getCardDrawing().displayCardsOnScreenFor(out, parent.getTurn());
-    }
-
-    public void deleteUnit(ActorRef out, int x, int y, Tile enemyLocation) {
-        //Delete the enemy unit if dies
-        try {Thread.sleep(1000);} catch (InterruptedException e) {e.printStackTrace();} // Unit will disappear with effect
-        new UnitCommandBuilder(out, parent.isSimulation())
-                .setMode(UnitCommandBuilderMode.DELETE)
-                .setUnit(enemyLocation.getUnit())
-                .issueCommand();
-        enemyLocation.setUnit(null);
-        ArrayList<Pair<Integer, Integer>> pool = (parent.getTurn() == Players.PLAYER1) ?
-                parent.player2UnitsPosition : parent.player1UnitsPosition;
-        Pair<Integer, Integer> positionToRemove = new Pair<>(x, y);
-        for (Pair<Integer, Integer> position: pool) {
-            if (position.equals(positionToRemove)) {
-                pool.remove(position);
-                break;
-            }
-        }
     }
 
     // ===========================================================================

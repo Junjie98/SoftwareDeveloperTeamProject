@@ -111,6 +111,7 @@ public class CardPlayed {
             parent.memento.add(new GameMemento(parent.getTurn(), ActionType.SPELL, new SpellInformation(targetUnit, new Pair<>(x, y), current)));
         // If normal Unit
         } else {
+            // TODO: Would you like to move this to the SpecialEffect class's isSummoned?
         	if (current.isSpecialCard())
         		specialAction(out, current, x, y);
         	
@@ -133,6 +134,8 @@ public class CardPlayed {
             unit.setFlying(cardname.equals("WindShrike"));
             // Ana: Ranged Attack
             unit.setRanged(cardname.equals("Pyromancer") || cardname.equals("Fire Spitter"));
+
+            parent.getSpecialEffect().unitIsSummoned(unit);
 
             UnitCommandBuilder builder = new UnitCommandBuilder(out, parent.isSimulation())
                     .setUnit(unit);

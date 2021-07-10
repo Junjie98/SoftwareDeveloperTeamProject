@@ -153,6 +153,7 @@ public class GameState {
             cardDrawing.drawNewCardFor(out, turn);
         }
         cardDrawing.displayCardsOnScreenFor(out, turn);
+        specialEffect.turnDidEnd(out);
         ++roundNumber; // Divide this by 2 when we are going to use this.
         if (turn == Players.PLAYER2) {
             smartBoy.tester(out);
@@ -387,6 +388,10 @@ public class GameState {
     // ===========================================================================
     public UnitMovementAndAttack getUnitMovementAndAttack() {
         return unitMovementAndAttack;
+    }
+
+    public SpecialEffect getSpecialEffect() {
+        return specialEffect;
     }
 
     public CardDrawing getCardDrawing() {

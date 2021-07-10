@@ -397,7 +397,7 @@ public class UnitMovementAndAttack {
         int healthAfterDamage = enemyHealth - attacker.getDamage();
         if (healthAfterDamage < 0)
             healthAfterDamage = 0;
-        
+
         if(isRanged) {
 			System.err.println("Ranged attack incoming!");
 			new ProjectTileAnimationCommandBuilder(out, parent.isSimulation())
@@ -425,35 +425,16 @@ public class UnitMovementAndAttack {
         //restrict player to move after attack
         attacker.setHasAttacked(true);
         moveAttackAndCounterAttack.add(attacker);
-        
+
+        parent.getSpecialEffect().unitIsDamaged(out, enemy);
+
         //update avatar health to UI player health.
-        if(enemy.isAvatar() && enemy.getPlayerID() == Players.PLAYER1) {
-            parent.getPlayer(Players.PLAYER1).setHealth(enemy.getHealth());
+        if(enemy.isAvatar()) {
+            parent.getPlayer(enemy.getPlayerID()).setHealth(enemy.getHealth());
             new PlayerSetCommandsBuilder(out, parent.isSimulation())
-                    .setPlayer(Players.PLAYER1)
+                    .setPlayer(enemy.getPlayerID())
                     .setStats(PlayerStats.HEALTH)
-                    .setInstance(parent.getPlayer(Players.PLAYER1))
-                    .issueCommand();
-        } else if(enemy.isAvatar() && enemy.getPlayerID()== Players.PLAYER2) {
-            parent.getPlayer(Players.PLAYER2).setHealth(enemy.getHealth());
-            new PlayerSetCommandsBuilder(out, parent.isSimulation())
-                    .setPlayer(Players.PLAYER2)
-                    .setStats(PlayerStats.HEALTH)
-                    .setInstance(parent.getPlayer(Players.PLAYER2))
-                    .issueCommand();
-        } else if(attacker.isAvatar() && attacker.getPlayerID()== Players.PLAYER1) {
-            parent.getPlayer(Players.PLAYER1).setHealth(attacker.getHealth());
-            new PlayerSetCommandsBuilder(out, parent.isSimulation())
-                    .setPlayer(Players.PLAYER1)
-                    .setStats(PlayerStats.HEALTH)
-                    .setInstance(parent.getPlayer(Players.PLAYER1))
-                    .issueCommand();
-        } else if(attacker.isAvatar() && attacker.getPlayerID()== Players.PLAYER2) {
-            parent.getPlayer(Players.PLAYER2).setHealth(attacker.getHealth());
-            new PlayerSetCommandsBuilder(out, parent.isSimulation())
-                    .setPlayer(Players.PLAYER2)
-                    .setStats(PlayerStats.HEALTH)
-                    .setInstance(parent.getPlayer(Players.PLAYER2))
+                    .setInstance(parent.getPlayer(enemy.getPlayerID()))
                     .issueCommand();
         }
 

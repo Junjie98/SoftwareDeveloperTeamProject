@@ -5,11 +5,8 @@ import commandbuilders.PlayerSetCommandsBuilder;
 import commandbuilders.ProjectTileAnimationCommandBuilder;
 import commandbuilders.UnitCommandBuilder;
 import commandbuilders.enums.*;
-<<<<<<< HEAD
 import commands.BasicCommands;
 import structures.Board;
-=======
->>>>>>> develop
 import structures.GameState;
 import structures.AI.AI;
 import structures.basic.Tile;
@@ -247,25 +244,8 @@ public class UnitMovementAndAttack {
             System.out.println(parent.memento.get(parent.memento.size() - 1));
 
             // Update the units position in the stored position lists.
-<<<<<<< HEAD
-            ArrayList<Pair<Integer, Integer>> pool = (parent.getTurn() == Players.PLAYER1) ?
-                    parent.player1UnitsPosition : parent.player2UnitsPosition;
-            for (Pair<Integer, Integer> position: pool) {
-
-               //System.err.println("a unit in the pool" + position);
-                    if (position.equals(activeUnit)) {
-                        //System.err.println("REMOVING UNIT!");
-                        pool.remove(position);
-                        break;
-                    }
-               
-                
- 
-            }
-=======
             ArrayList<Pair<Integer, Integer>> pool = parent.getUnitsPosition(parent.getTurn());
             parent.removeFromPool(pool, activeUnit);
->>>>>>> develop
             pool.add(new Pair<>(x, y));
 
             destinationTile.setUnit(activatedTile.getUnit());

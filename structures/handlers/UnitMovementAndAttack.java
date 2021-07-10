@@ -43,13 +43,25 @@ public class UnitMovementAndAttack {
 
             if (previousUnitLocation != tile) {
                 // A new unit is clicked
-                moveHighlight(out, x, y);
                 activeUnit = new Pair<>(x, y);
+                if(parent.getBoard().getTile(activeUnit).getUnit().getHasMoved())
+                {
+                    movedButCanAttackHighlight(out, x, y);
+                }
+                else{
+                    moveHighlight(out, x, y);
+                }
             }
         } else if (unitsCanMove) {
             parent.getHighlighter().clearBoardHighlights(out);
             activeUnit = new Pair<>(x, y);
-            moveHighlight(out, x, y);
+            if(parent.getBoard().getTile(activeUnit).getUnit().getHasMoved())
+            {
+                movedButCanAttackHighlight(out, x, y);
+            }
+            else{
+                moveHighlight(out, x, y);
+            }
         } else {
             System.err.println("Unit movement locked due to other units moving.");
         }
@@ -104,6 +116,24 @@ public class UnitMovementAndAttack {
 
     }
 
+    //angry at nelson for amking me name something so ugly >=(
+    public void movedButCanAttackHighlight(ActorRef out, int x, int y)
+    {
+        if(parent.getBoard().getTile(x,y) != null)
+        {
+            Unit temp = parent.getBoard().getTile(x, y).getUnit();
+            if(temp.isRanged()) {
+                flyingOrRangedMoveHighlight(out);
+            }
+            else{
+                ArrayList<Pair<Integer,Integer>> tiles = get1RAtkTiles(x, y);
+                for (Pair<Integer,Integer> pair : tiles) {
+                    parent.getHighlighter().checkAttackHighlight(out, pair);
+                }
+            }
+
+        }
+    }
     public void moveHighlight(ActorRef out, int x, int y) {
         if (parent.getBoard().getTile(x, y) != null) {
             Unit temp = parent.getBoard().getTile(x, y).getUnit();
@@ -245,7 +275,6 @@ public class UnitMovementAndAttack {
             //System.out.println("unit attacking should be flagged: " + activatedTile.getUnit());
 
             destinationTile.getUnit().setHasMoved(true);
-            destinationTile.getUnit().setHasAttacked(true);
             moveAttackAndCounterAttack.add(activatedTile.getUnit());
             activatedTile.setUnit(null);
 

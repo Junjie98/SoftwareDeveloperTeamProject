@@ -29,25 +29,36 @@ public class CardDrawing {
             // Block card drawing for simulation.
             return;
         }
-        ArrayList<Card> current = (player == Players.PLAYER1) ? parent.player1CardsInHand : parent.player2CardsInHand;
-        if (current.isEmpty()) {
-            if (player == Players.PLAYER1 && deck1.isEmpty()) {
-                parent.endGame(out);
-            }
-            if (player == Players.PLAYER2 && deck2.isEmpty()) {
-                parent.endGame(out);
-            }
+        ArrayList<Card> current = parent.getCardsInHand(player);
+
+        // if (current.isEmpty()) {
+        //     if (player == Players.PLAYER1 && deck1.isEmpty()) {
+        //         parent.endGame(out);
+        //     }
+        //     if (player == Players.PLAYER2 && deck2.isEmpty()) {
+        //        parent.endGame(out);
+        //     }
+        // }
+
+        // Protect the program so it will not throw exception if deck has no more card.
+        if (player == Players.PLAYER1 && deck1.isEmpty()) {
+            return;
+        } else if (player == Players.PLAYER2 && deck2.isEmpty()) {
+            return;
         }
-        if (current.size() < MAX_CARD_COUNT_IN_HAND) {
-            Card temp = (player == Players.PLAYER1) ? deck1.nextCard() : deck2.nextCard();
-            current.add(temp);
+
+        Card temp = (player == Players.PLAYER1) ? deck1.nextCard() : deck2.nextCard();
+        current.add(temp);
+
+        if (current.size() >= MAX_CARD_COUNT_IN_HAND) {
+            current.remove(0);
         }
     }
     public void displayCardsOnScreenFor(ActorRef out, Players player) {
         if (parent.isSimulation()) {
             return;
         }
-        ArrayList<Card> currentCardInHand = (player == Players.PLAYER1) ? parent.player1CardsInHand : parent.player2CardsInHand;
+        ArrayList<Card> currentCardInHand = parent.getCardsInHand(player);
         for (int idx = 0; idx < MAX_CARD_COUNT_IN_HAND; idx++) {
             if (idx < currentCardInHand.size()) {
                 new CardInHandCommandBuilder(out, parent.isSimulation())

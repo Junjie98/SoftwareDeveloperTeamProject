@@ -162,7 +162,7 @@ public class GameState {
     }
 
     public void cardClicked(ActorRef out, int idx) {
-        Card current = (turn == Players.PLAYER1) ? player1CardsInHand.get(idx) : player2CardsInHand.get(idx);
+        Card current = getCardsInHand(turn).get(idx);
         System.out.println("Card Clicked: " + current.getCardname());
         Pair<Card, Integer> card = cardPlayed.getActiveCard();
 
@@ -187,8 +187,7 @@ public class GameState {
        
         	else if (card == null || card.getSecond() != idx) {
                 cardPlayed.setActiveCard(current, idx);
-                ArrayList<Pair<Integer, Integer>> friendlyUnits =
-                        (turn == Players.PLAYER1) ? player1UnitsPosition : player2UnitsPosition;
+                ArrayList<Pair<Integer, Integer>> friendlyUnits = getUnitsPosition(turn);
                 for (Pair<Integer, Integer> position : friendlyUnits) {
                     highlighter.cardTileHighlight(out, position.getFirst(), position.getSecond());
                 }
@@ -263,16 +262,19 @@ public class GameState {
     public void endGame(ActorRef out) {
         Player winner = null;
         // Win condition: should be moved to a method where we are checking player's health
-        // If any of the decks run out of card, the player loses.
+
         if (player1.getHealth() < 1) {
             winner = player1;
         } else if (player2.getHealth() < 1) {
             winner = player2;
-        } else if (cardDrawing.isDeckOneEmpty()) {
-            winner = player2;
-        } else if (cardDrawing.isDeckTwoEmpty()) {
-            winner = player1;
+
         }
+        // If any of the decks run out of card, the player loses. (May not be true)
+        //} else if (cardDrawing.isDeckOneEmpty()) {
+        //    winner = player2;
+        //} else if (cardDrawing.isDeckTwoEmpty()) {
+        //    winner = player1;
+        //}
         if (winner != null) {
             String message = (winner == player1) ? "Player 1 won!" : "Player 2 won!" ;
             new PlayerNotificationCommandBuilder(out, isSimulation())
@@ -376,6 +378,30 @@ public class GameState {
         switch (player) {
             case PLAYER1: return player1;
             case PLAYER2: return player2;
+        }
+        return null;
+    }
+
+    public ArrayList<Pair<Integer, Integer>> getUnitsPosition(Players player) {
+        switch (player) {
+            case PLAYER1: return player1UnitsPosition;
+            case PLAYER2: return player2UnitsPosition;
+        }
+        return null;
+    }
+
+    public ArrayList<Pair<Integer, Integer>> getEnemyUnitsPosition(Players player) {
+        switch (player) {
+            case PLAYER1: return player2UnitsPosition;
+            case PLAYER2: return player1UnitsPosition;
+        }
+        return null;
+    }
+
+    public ArrayList<Card> getCardsInHand(Players player) {
+        switch (player) {
+            case PLAYER1: return player1CardsInHand;
+            case PLAYER2: return player2CardsInHand;
         }
         return null;
     }

@@ -49,6 +49,7 @@ public class UnitMovementAndAttack {
                 if(parent.getBoard().getTile(activeUnit).getUnit().getHasMoved())
                 {
                     movedButCanAttackHighlight(out, x, y);
+                    
                 }
                 else{
                     moveHighlight(out, x, y);
@@ -129,11 +130,13 @@ public class UnitMovementAndAttack {
             Unit temp = parent.getBoard().getTile(x, y).getUnit();
             if(temp.isRanged()) {
                 flyingOrRangedMoveHighlight(out);
+                provokeFunc(x, y);
             }
             else{
                 ArrayList<Pair<Integer,Integer>> tiles = get1RAtkTiles(x, y);
                 for (Pair<Integer,Integer> pair : tiles) {
                     parent.getHighlighter().checkAttackHighlight(out, pair);
+                    provokeFunc(x, y);
                 }
             }
 

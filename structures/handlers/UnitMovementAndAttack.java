@@ -71,7 +71,7 @@ public class UnitMovementAndAttack {
         }
     }
 
-    public void basicMoveHighlight(ActorRef out, int x, int y, boolean redOnly) {
+    public void basicMoveHighlight(ActorRef out, int x, int y, boolean redOnly, boolean whiteOnly) {
         ArrayList<Pair<Integer, Integer>> initDir = parent.getMoveTiles(x, y, 1, 0);
         ArrayList<Pair<Integer, Integer>> secondDir = parent.getMoveTiles(x, y,2, 0);
         ArrayList<Pair<Integer, Integer>> interDir = parent.getMoveTiles(x, y, 1, 1);
@@ -108,8 +108,7 @@ public class UnitMovementAndAttack {
         if(initDirB[2] || initDirB[3]) {
             parent.getHighlighter().checkTileHighlight(out, interDir.get(3), false, redOnly);
         }
-
-        if (!redOnly) {
+        if (!whiteOnly && !redOnly) {
             //basica attack highlight connected to normal movement highlight
             ArrayList<Pair<Integer, Integer>> atkTiles = getAllAtkTiles(x, y);
 
@@ -120,12 +119,10 @@ public class UnitMovementAndAttack {
                         parent.getHighlighter().checkAttackHighlight(out, pos);
                     }
                 }
-
             }
         }
         //Checks the tile of length 1.
         provokeFunc(x,y);
-
     }
 
     //angry at nelson for amking me name something so ugly >=(
@@ -156,7 +153,7 @@ public class UnitMovementAndAttack {
                 flyingOrRangedMoveHighlight(out, temp);
                 valueX = x; valueY = y;
             } else {
-                basicMoveHighlight(out, x, y, false);
+                basicMoveHighlight(out, x, y, false, false);
             }
         }
     }
@@ -167,11 +164,13 @@ public class UnitMovementAndAttack {
                 //available tiles
                 parent.getHighlighter().checkTileHighlight(out, ti, false, false);
             }
+        } else {
+            basicMoveHighlight(out, unit.getPosition().getTilex(), unit.getPosition().getTiley(), false, true);
         }
         provokeFunc(valueX,valueY);
 
         if (!unit.isRanged()) {
-            basicMoveHighlight(out, unit.getPosition().getTilex(), unit.getPosition().getTiley(), true);
+            basicMoveHighlight(out, unit.getPosition().getTilex(), unit.getPosition().getTiley(), true, false);
         } else {
             ArrayList<Pair<Integer, Integer>> units = new ArrayList<>();
             units.addAll(parent.player1UnitsPosition);

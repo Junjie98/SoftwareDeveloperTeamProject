@@ -147,11 +147,13 @@ public class AI
         
         //Move Logic
         ExtractedGameState moveState = temp_sBoy.getExtractedGameState();
-        //moveState.setSimulation(true);
+        moveState.setSimulation(true);
         ArrayList<Pair<Integer,Integer>> movers = moveState.canStillMove();
 
         if(movers.size()>0){
+            System.out.println("mover at: " + moveState.getMyAvatarPosition());
             Pair<Integer,Integer> target = findEnemyTarget(moveState);
+            System.out.println("enemy at: " + target);
             ArrayList<GameMemento> moves = new ArrayList<>();
 
             for (Pair<Integer,Integer> unitPos : movers) {
@@ -178,6 +180,14 @@ public class AI
         else{
             System.out.println("no movers available AI depth: " + ldepth);
         }
+
+
+        System.out.println("mover at: " + moveState.getMyAvatarPosition());
+        Pair<Integer,Integer> ttarget = findEnemyTarget(moveState);
+        System.out.println("enemy at: " + ttarget);
+        ArrayList<GameMemento> moves = new ArrayList<>();
+
+
 
 
         //Summon Logic

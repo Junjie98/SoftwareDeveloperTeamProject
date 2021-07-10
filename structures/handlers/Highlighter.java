@@ -66,7 +66,7 @@ public class Highlighter {
         }
     }
 
-    public boolean checkTileHighlight(ActorRef out, Pair<Integer, Integer> pos)  {
+    public boolean checkTileHighlight(ActorRef out, Pair<Integer, Integer> pos, boolean summon)  {
         int x = pos.getFirst();
         int y = pos.getSecond();
 
@@ -94,16 +94,15 @@ public class Highlighter {
         } else {
             if(parent.getBoard().getTile(pos.getFirst(), pos.getSecond()).getUnit().getPlayerID() != parent.getTurn()) {
                 // Tile has enemy
-                new TileCommandBuilder(out, parent.isSimulation())
-                        .setTilePosition(x, y)
-                        .setState(States.RED)
-                        .issueCommand();
-                highlightedTiles.add(tile);
-                //highlightedRedTiles.add(tile);
-                tile.setTileState(States.RED);
-
-
-
+                if (!summon) {
+                    new TileCommandBuilder(out, parent.isSimulation())
+                            .setTilePosition(x, y)
+                            .setState(States.RED)
+                            .issueCommand();
+                    highlightedTiles.add(tile);
+                    //highlightedRedTiles.add(tile);
+                    tile.setTileState(States.RED);
+                }
             } else {
                 // Tile has friendly
                 new TileCommandBuilder(out, parent.isSimulation())
@@ -181,21 +180,21 @@ public class Highlighter {
 
             int count = 0;
             for (Pair<Integer, Integer> is: initDir) {
-                initDirB[count] = parent.getHighlighter().checkTileHighlight(out, is);
+                initDirB[count] = parent.getHighlighter().checkTileHighlight(out, is, true);
                 count++;
             }
 
             if (initDirB[0] || initDirB[1]) {
-                checkTileHighlight(out, interDir.get(0));
+                checkTileHighlight(out, interDir.get(0), true);
             }
             if (initDirB[1] || initDirB[3]) {
-                checkTileHighlight(out, interDir.get(1));
+                checkTileHighlight(out, interDir.get(1), true);
             }
             if (initDirB[2] || initDirB[0]) {
-                checkTileHighlight(out, interDir.get(2));
+                checkTileHighlight(out, interDir.get(2), true);
             }
             if (initDirB[2] || initDirB[3]) {
-                checkTileHighlight(out, interDir.get(3));
+                checkTileHighlight(out, interDir.get(3), true);
             }
         }
     }

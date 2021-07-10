@@ -80,7 +80,7 @@ public class UnitMovementAndAttack {
         int count = 0;
         for (Pair<Integer, Integer> is: initDir) {
             //for the initial directions you can move
-            initDirB[count] = parent.getHighlighter().checkTileHighlight(out, is);       //if they are blocked record this
+            initDirB[count] = parent.getHighlighter().checkTileHighlight(out, is, false);       //if they are blocked record this
             count++;
         }
 
@@ -89,23 +89,23 @@ public class UnitMovementAndAttack {
             //for the next tiles
             if(initDirB[count]) {
                 //if the previous one is clear
-                parent.getHighlighter().checkTileHighlight(out, sd);                  //check for units then highlight
+                parent.getHighlighter().checkTileHighlight(out, sd, false);                  //check for units then highlight
             }
             count++;
         }
 
         //for the inter tiles do some logic
         if(initDirB[0] || initDirB[1]) {
-            parent.getHighlighter().checkTileHighlight(out, interDir.get(0));
+            parent.getHighlighter().checkTileHighlight(out, interDir.get(0), false);
         }
         if(initDirB[1] || initDirB[3]) {
-            parent.getHighlighter().checkTileHighlight(out, interDir.get(1));
+            parent.getHighlighter().checkTileHighlight(out, interDir.get(1), false);
         }
         if(initDirB[2] || initDirB[0]) {
-            parent.getHighlighter().checkTileHighlight(out, interDir.get(2));
+            parent.getHighlighter().checkTileHighlight(out, interDir.get(2), false);
         }
         if(initDirB[2] || initDirB[3]) {
-            parent.getHighlighter().checkTileHighlight(out, interDir.get(3));
+            parent.getHighlighter().checkTileHighlight(out, interDir.get(3), false);
         }
 
 
@@ -158,7 +158,7 @@ public class UnitMovementAndAttack {
     public void flyingOrRangedMoveHighlight(ActorRef out) {
         for (Pair<Integer, Integer> ti : getFlyMoveTiles()) {
             //available tiles
-            parent.getHighlighter().checkTileHighlight(out, ti);
+            parent.getHighlighter().checkTileHighlight(out, ti, false);
         }
         provokeFunc(valueX,valueY);
         ArrayList<Pair<Integer, Integer>> units = new ArrayList<>();
@@ -167,7 +167,7 @@ public class UnitMovementAndAttack {
 
         for (Pair<Integer, Integer> bl : units) {
             //Blocked tiles
-            parent.getHighlighter().checkTileHighlight(out, bl);
+            parent.getHighlighter().checkTileHighlight(out, bl, false);
         }
         
 
@@ -177,7 +177,7 @@ public class UnitMovementAndAttack {
     public void summonAnywhereHighlight(ActorRef out) {
 	    for (Pair<Integer, Integer> ti : getFlyMoveTiles()) {
 	        //available tiles
-	        parent.getHighlighter().checkTileHighlight(out, ti);
+	        parent.getHighlighter().checkTileHighlight(out, ti, false);
 	    }
     }
 

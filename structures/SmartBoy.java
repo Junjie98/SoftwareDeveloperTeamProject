@@ -16,22 +16,11 @@ public class SmartBoy {
         this.parent = parent;
     }
 
-    public ExtractedGameState tester(ActorRef out) {
+    public void tester(ActorRef out) {
         ExtractedGameState information = getExtractedGameState();
         information.setSimulation(true);
 
-        if(information.canStillMove())
-        {
-            Pair<Integer,Integer> avatarPos = information.getMyAvatarPosition();
-            ArrayList<Pair<Integer,Integer>> flyingUnitsPos = information.getAllFlyingUnits();
-            ArrayList<Pair<Integer,Integer>> rangedUnitsPos = information.getAllRangedUnits();
-            ArrayList<Pair<Integer,Integer>> otherUnitsPos = information.getAllOtherUnits();
     
-            Pair<Integer,Integer> target = AI.findEnemyTarget(information);
-    
-    
-
-        }
         
      
 

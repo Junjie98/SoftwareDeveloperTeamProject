@@ -127,7 +127,7 @@ public class ExtractedGameState extends GameState {
     public ArrayList<Pair<Integer, Card>> canStillSummon(){
         ArrayList<Pair<Integer, Card>> out = new ArrayList<>();
         int totalMana = getPlayer(getTurn()).getMana();
-        ArrayList<Card> hand = (getTurn()==Players.PLAYER2) ? player2CardsInHand : player1CardsInHand);
+        ArrayList<Card> hand = (getTurn()==Players.PLAYER2) ? player2CardsInHand : player1CardsInHand;
         for (int i=0; i < hand.size(); i++) {
             if(!hand.get(i).isSpell() && hand.get(i).getManacost()<=totalMana){
                 out.add(new Pair<>(i,hand.get(i)));
@@ -139,7 +139,7 @@ public class ExtractedGameState extends GameState {
     public ArrayList<Pair<Integer, Card>> canStillCast(){
         ArrayList<Pair<Integer, Card>> out = new ArrayList<>();
         int totalMana = getPlayer(getTurn()).getMana();
-        ArrayList<Card> hand = (getTurn()==Players.PLAYER2) ? player2CardsInHand : player1CardsInHand);
+        ArrayList<Card> hand = (getTurn()==Players.PLAYER2) ? player2CardsInHand : player1CardsInHand;
         for (int i=0; i < hand.size(); i++) {
             if(hand.get(i).isSpell() && hand.get(i).getManacost()<=totalMana){
                 out.add(new Pair<>(i,hand.get(i)));

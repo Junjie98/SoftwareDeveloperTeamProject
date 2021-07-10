@@ -80,6 +80,8 @@ public class AiNode {
         }
 
         for (Pair<Integer,Integer> unit : friendlies) {
+            System.out.println(unit);
+            
             totalScore+=gameState.getBoard().getTile(unit).getUnit().getHealth();
             totalScore+=UnitCost;
         }        

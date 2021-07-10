@@ -43,12 +43,13 @@ public class AI
 
         
         System.out.println("AI Started");
-        moveInit(out, gs);
-        castInit(out, gs);
+        findBestMoves(out, gs);
+        //moveInit(out, gs);
+        //castInit(out, gs);
     }
 
     
-    public List<GameMemento> findBestMoves(ActorRef out, GameState gameState)
+    public void findBestMoves(ActorRef out, GameState gameState)
     {
         //Get simstate from gameState, this will act as the root state.
         //Find all possible moves to be made initally in the root state
@@ -61,23 +62,33 @@ public class AI
         //trace the info path back to find the inital action from the root state.
         //use this as the optimum action, return as list of game mementos
 
-        List<AiNode> nodes = new ArrayList<>();
+        ArrayList<AiNode> nodes = new ArrayList<>();
         SmartBoy sBoy = new SmartBoy(gameState);
 
         ExtractedGameState rootState = sBoy.getExtractedGameState();
         int depth = 0;
         nodes.add(new AiNode(null, rootState, depth));
 
+        generateMoves(out, nodes, depth, 5);
+        System.out.println("number of nodes created: "+nodes.size());
+
+    }
+
+    public void generateMoves(ActorRef out, ArrayList<AiNode> nodes, int depth, int limit)
+    {
+        if(depth>=limit)
+        {
+            return;
+        }
         for (AiNode aiNode : nodes){
             if(aiNode.depth == depth){
                 generateMovesForNode(out, nodes, aiNode, depth);
             }
         }
-
-
+        generateMoves(out, nodes, ++depth, limit);
     }
 
-    public void generateMovesForNode(ActorRef out, List<AiNode> nodes, AiNode aiNode, int depth)
+    public void generateMovesForNode(ActorRef out, ArrayList<AiNode> nodes, AiNode aiNode, int depth)
     {
 
         //set depth for this iteration
@@ -122,6 +133,8 @@ public class AI
             //current parent child map this is the mechanism that gives us the tree structure
             output.put(attacks, newNode);
             aiNode.updateMap(output);
+            nodes.add(newNode);
+
         }
         else{
             //there were no attackers available
@@ -156,7 +169,8 @@ public class AI
             AiNode newNode = new AiNode(aiNode, moveState, ldepth);
             output.put(moves, newNode);
             aiNode.updateMap(output);
-            
+            nodes.add(newNode);
+
         }
         else{
             System.out.println("no movers available AI depth: " + ldepth);
@@ -248,7 +262,8 @@ public class AI
             AiNode newNode = new AiNode(aiNode, summonState, ldepth);
             output.put(summonActions, newNode);
             aiNode.updateMap(output);
-            
+            nodes.add(newNode);
+
         }
         else{
             System.out.println("no summons available AI depth: " + ldepth);
@@ -264,7 +279,7 @@ public class AI
         if(casts.size()>0){
             ArrayList<GameMemento> castActions = new ArrayList<>();
 
-            Card cardSelected;
+            Card cardSelected = new Card();
             int indexOfHighManaCard = 0;
             int highCost = 0;
             if(casts.size()>1)
@@ -283,8 +298,9 @@ public class AI
                 indexOfHighManaCard = 0;
             }
 
-            Pair<Integer,Integer> target;
-            String cardName = cardSelected.getCardname();
+            Pair<Integer,Integer> target= new Pair<Integer,Integer>(0,0);
+            String cardName = "";
+            cardName =cardSelected.getCardname();
             if(cardName.equals("Staff of Y'Kir"))
             {
                 //+2 attack to avatar
@@ -299,7 +315,7 @@ public class AI
                 //reduce any unit bar avatar to 0HP
                 ArrayList<Pair<Integer,Integer>> enemies = castState.getAllEnemiesBarAvatar();
                 int maxHealth = 0;
-                Pair<Integer,Integer> posOfMax ;
+                Pair<Integer,Integer> posOfMax  = new Pair<Integer,Integer>(0,0);
                 if(!enemies.isEmpty())
                 {
                     for(int i = 0; i < enemies.size(); i++)
@@ -376,7 +392,8 @@ public class AI
             AiNode newNode = new AiNode(aiNode, castState, ldepth);
             output.put(castActions, newNode);
             aiNode.updateMap(output);
-            
+            nodes.add(newNode);
+
         }
         else{
             System.out.println("no summons available AI depth: " + ldepth);
@@ -423,7 +440,7 @@ public class AI
         if(moveIndex < (gs.getTurn()==Players.PLAYER2? gs.player2UnitsPosition:gs.player1UnitsPosition).size())
         {
             System.out.print("more moving to happen");
-            move(out, gs);
+            //move(out, gs);
         }
     }
 
@@ -526,7 +543,7 @@ public class AI
         //enemyTarget = findEnemyTarget(gs);
         //enemyXRange = enemyTarget.getFirst() + (gs.getTurn() == Players.PLAYER2 ? 2 : -2);    //add two for move and attack range
         moveIndex = 0;
-        move(out, gs);
+        //move(out, gs);
 
     }
 
@@ -606,150 +623,151 @@ public class AI
         return null;
 
     }
-    public void autoMove(ActorRef out, GameState gs)
-    {
-        if(friendlies == null)
-        {   //cant move if everything is dead
-            return;
-        }
+    // public void autoMove(ActorRef out, GameState gs)
+    // {
+    //     if(friendlies == null)
+    //     {   //cant move if everything is dead
+    //         return;
+    //     }
 
-        int friendliesNum = friendlies.size();
-        // for (Pair<Integer,Integer> pair : friendlies) {
-        //     if(Board.getInstance().getTile(pair).getUnit().getDoubleAttack())
-        //     {
-        //         friendliesNum = friendlies.size() + 1;
-        //     }
-        // }
+    //     int friendliesNum = friendlies.size();
+    //     // for (Pair<Integer,Integer> pair : friendlies) {
+    //     //     if(Board.getInstance().getTile(pair).getUnit().getDoubleAttack())
+    //     //     {
+    //     //         friendliesNum = friendlies.size() + 1;
+    //     //     }
+    //     // }
 
-        if(moveIndex >= friendliesNum)
-        {   //If we've moved more than we have units big nope
-            return;
-        }
+    //     if(moveIndex >= friendliesNum)
+    //     {   //If we've moved more than we have units big nope
+    //         return;
+    //     }
         
 
-        Pair<Integer,Integer> unitPos = new Pair<>(friendlies.get(0).getFirst(),friendlies.get(0).getSecond());
+    //     Pair<Integer,Integer> unitPos = new Pair<>(friendlies.get(0).getFirst(),friendlies.get(0).getSecond());
 
-        Unit temp = Board.getInstance().getTile(unitPos).getUnit();
+    //     Unit temp = Board.getInstance().getTile(unitPos).getUnit();
 
-        if(temp.getHasAttacked() || temp.getHasMoved())
-        {
-            return;
-        }
+    //     if(temp.getHasAttacked() || temp.getHasMoved())
+    //     {
+    //         return;
+    //     }
 
-        if(temp.isFlying()){
-            //do flying stuff
-        }
+    //     if(temp.isFlying()){
+    //         //do flying stuff
+    //     }
 
-        boolean moved = false;
-        targPos = enemyTarget;
-        System.out.println("init targ pos: " + targPos);
+    //     boolean moved = false;
+    //     targPos = enemyTarget;
+    //     System.out.println("init targ pos: " + targPos);
 
-        if(Board.getInstance().getTile(unitPos).getUnit().isRanged())
-        {
-            if(gs.getUnitMovementAndAttack().getFlyMoveTiles().contains(targPos)
-                && Board.getInstance().getTile(targPos).hasUnit())
-            {
-                moved = true; 
+    //     if(Board.getInstance().getTile(unitPos).getUnit().isRanged())
+    //     {
+    //         if(gs.getUnitMovementAndAttack().getFlyMoveTiles().contains(targPos)
+    //             && Board.getInstance().getTile(targPos).hasUnit())
+    //         {
+    //             moved = true; 
 
-                moveIndex++;
-                AI_AtkUnit(out, gs, unitPos, targPos);
-                System.out.println("Attack from range AI using move-to-attack");
-            }
-        }
-        else if(gs.getUnitMovementAndAttack().getAllAtkTiles(unitPos.getFirst(), unitPos.getSecond()).contains(targPos)
-            && Board.getInstance().getTile(targPos).hasUnit())
-        {   //if we can attack and move then go for it and let that logic take care of itself
-            moved = true; 
+    //             moveIndex++;
+    //             AI_AtkUnit(out, gs, unitPos, targPos);
+    //             System.out.println("Attack from range AI using move-to-attack");
+    //         }
+    //     }
+    //     else if(gs.getUnitMovementAndAttack().getAllAtkTiles(unitPos.getFirst(), unitPos.getSecond()).contains(targPos)
+    //         && Board.getInstance().getTile(targPos).hasUnit())
+    //     {   //if we can attack and move then go for it and let that logic take care of itself
+    //         moved = true; 
 
-            moveIndex++;
-            AI_AtkUnit(out, gs, unitPos, targPos);
-            System.out.println("Attack from range AI using move-to-attack");
-        }
+    //         moveIndex++;
+    //         AI_AtkUnit(out, gs, unitPos, targPos);
+    //         System.out.println("Attack from range AI using move-to-attack");
+    //     }
         
-        if(moved ==false)
-        {
-            //if we cant directly attack it then we need to find a new tile to move to that helps us
+    //     if(moved ==false)
+    //     {
+    //         //if we cant directly attack it then we need to find a new tile to move to that helps us
                 
-            int xMove = enemyTarget.getFirst() - unitPos.getFirst();
-            int yMove = enemyTarget.getSecond() - unitPos.getSecond();
+    //         int xMove = enemyTarget.getFirst() - unitPos.getFirst();
+    //         int yMove = enemyTarget.getSecond() - unitPos.getSecond();
 
-            //Prioritise vertical movement - safer
-            if(Math.abs(yMove) >= 2){
-                yMove = yMove > 0 ? 2 : -2;
-                xMove = 0;
-            }
-            else if(Math.abs(xMove) >= 2){
-                xMove = xMove > 0 ? 2 : -2;
-                yMove = 0;
-            }
+    //         //Prioritise vertical movement - safer
+    //         if(Math.abs(yMove) >= 2){
+    //             yMove = yMove > 0 ? 2 : -2;
+    //             xMove = 0;
+    //         }
+    //         else if(Math.abs(xMove) >= 2){
+    //             xMove = xMove > 0 ? 2 : -2;
+    //             yMove = 0;
+    //         }
 
-            if(gs.getUnitMovementAndAttack().moveBlockCheck(unitPos.getFirst(), unitPos.getSecond(), xMove, yMove)){
-                if(Math.abs(yMove) >= 2 || Math.abs(xMove) >= 2){
-                    if(gs.getUnitMovementAndAttack().moveBlockCheck(unitPos.getFirst(), unitPos.getSecond(), xMove/2, yMove/2)){
-                        System.out.println("Tile prior blocked2");
-                        return;
-                    }
-                    else{
-                        targPos = new Pair<>(unitPos.getFirst() + xMove/2, unitPos.getSecond() + yMove/2);
-                    }
+    //         if(gs.getUnitMovementAndAttack().moveBlockCheck(unitPos.getFirst(), unitPos.getSecond(), xMove, yMove)){
+    //             if(Math.abs(yMove) >= 2 || Math.abs(xMove) >= 2){
+    //                 if(gs.getUnitMovementAndAttack().moveBlockCheck(unitPos.getFirst(), unitPos.getSecond(), xMove/2, yMove/2)){
+    //                     System.out.println("Tile prior blocked2");
+    //                     return;
+    //                 }
+    //                 else{
+    //                     targPos = new Pair<>(unitPos.getFirst() + xMove/2, unitPos.getSecond() + yMove/2);
+    //                 }
 
-                }
-                else{
-                    System.out.println("Tile prior blocked1");
+    //             }
+    //             else{
+    //                 System.out.println("Tile prior blocked1");
 
-                    return;
-                }
+    //                 return;
+    //             }
 
-            }
-            else{
-                targPos = new Pair<>(unitPos.getFirst() + xMove, unitPos.getSecond() + yMove);
+    //         }
+    //         else{
+    //             targPos = new Pair<>(unitPos.getFirst() + xMove, unitPos.getSecond() + yMove);
 
-            }
+    //         }
 
 
-            System.err.println("Tiles selected by ai: ");
-            System.err.println(unitPos);
-            System.err.println(targPos);
+    //         System.err.println("Tiles selected by ai: ");
+    //         System.err.println(unitPos);
+    //         System.err.println(targPos);
 
-            System.err.println("enemy targ pos: ");
-            System.err.println(enemyTarget);
+    //         System.err.println("enemy targ pos: ");
+    //         System.err.println(enemyTarget);
 
-            moveIndex++;
+    //         moveIndex++;
 
-            AI_MoveUnit(out, gs, unitPos, targPos);
-        }
+    //         AI_MoveUnit(out, gs, unitPos, targPos);
+    //     }
       
             
 
 
     
 
-    //    if(targPos == enemyTarget)
-    //    {
-    //        //we are attacking
-    //        move(out, gs);
-    //    }
+    // //    if(targPos == enemyTarget)
+    // //    {
+    // //        //we are attacking
+    // //        move(out, gs);
+    // //    }
  
-    }
+    // }
 
 
-    // ===========================================================================
-    // Helper Methods
-    // ===========================================================================
+    // // ===========================================================================
+    // // Helper Methods
+    // // ===========================================================================
 
-    public void moveCheck(ActorRef out, GameState gs)
-    {
-        System.err.println("recieve pulse");
-        if(moveIndex < (gs.getTurn()==Players.PLAYER2? gs.player2UnitsPosition:gs.player1UnitsPosition).size())
-        {
-            move(out, gs);
-        }
-    }
+    // public void moveCheck(ActorRef out, GameState gs)
+    // {
+    //     System.err.println("recieve pulse");
+    //     if(moveIndex < (gs.getTurn()==Players.PLAYER2? gs.player2UnitsPosition:gs.player1UnitsPosition).size())
+    //     {
+    //         move(out, gs);
+    //     }
+    // }
 
     public static Pair<Integer, Integer> findEnemyTarget( GameState gs)
     {
         ArrayList<Pair<Integer,Integer>> enemyUnits = new ArrayList<>();
         int x;
+        Pair<Integer,Integer> enemyTarget= new Pair<Integer,Integer>(0,0);
 
         if(gs.getTurn()==Players.PLAYER2){
             enemyUnits = gs.player1UnitsPosition;

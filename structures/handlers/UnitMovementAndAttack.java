@@ -1,6 +1,5 @@
 package structures.handlers;
 
-import akka.actor.Actor;
 import akka.actor.ActorRef;
 import commandbuilders.PlayerSetCommandsBuilder;
 import commandbuilders.ProjectTileAnimationCommandBuilder;
@@ -280,7 +279,7 @@ public class UnitMovementAndAttack {
             Unit enemy = enemyLocation.getUnit();
             Unit attacker = attackerLocation.getUnit();
             
-            if(attackCheck(x, y) || attacker.isRanged()) {
+            if(attackCheck(x, y, attacker) || attacker.isRanged()) {
                 System.err.println("attack check passed");
                 boolean isRanged = attacker.isRanged();
                 int enemyHealthAfterAttack = enemy.getHealth();
@@ -405,8 +404,7 @@ public class UnitMovementAndAttack {
             }
          }
         }
-        //IS THIS NEEDED HERE? Having this activate per attack means that it always resets our bools instantly
-        //resetMoveAttackAndCounterAttack(out);
+        resetAnimations(out);
     }
 
     public boolean moveBlockCheck(int x, int y, int movex, int movey)
@@ -473,7 +471,7 @@ public class UnitMovementAndAttack {
         parent.getHighlighter().clearBoardHighlights(out);
 
         //restrict human player to attack again
-        enemy.setHasGotAttacked(true);
+        enemy.addAttacker(attacker);
         moveAttackAndCounterAttack.add(enemy);
 
         //restrict player to move after attack
@@ -515,7 +513,7 @@ public class UnitMovementAndAttack {
         return false;
     }
 
-    public boolean attackCheck(int x, int y) {
+    public boolean attackCheck(int x, int y, Unit attacker) {
         if (activeUnit == null) { return false; }
 
         int[] acPos = {x, y};
@@ -523,7 +521,7 @@ public class UnitMovementAndAttack {
         tileActive.addAll(getAllAtkTiles(activeUnit.getFirst(), activeUnit.getSecond()));
 
         //Ana: for counter attack
-        if (parent.getBoard().getTile(x, y).getUnit() != null && parent.getBoard().getTile(x, y).getUnit().getHasGotAttacked())
+        if (parent.getBoard().getTile(x, y).getUnit() != null && parent.getBoard().getTile(x, y).getUnit().hasBeenAttackedBy(attacker))
             return false;
 
         for (Pair<Integer, Integer> ip: tileActive) {
@@ -607,12 +605,12 @@ public class UnitMovementAndAttack {
     private void provokeAttack(ActorRef out, Tile attackerLocation, Tile enemyLocation, boolean isRanged) {
         Unit enemy = enemyLocation.getUnit();
         Unit attacker = attackerLocation.getUnit();
-        int enemyHealthAfterAttack = attack(out, attackerLocation, enemy, attacker, enemy.getPosition().getTilex(), enemy.getPosition().getTiley(), isRanged);
+        int enemyHealthAfterAttack = attack(out, attackerLocation, enemyLocation, isRanged);
         System.out.println("Smack provoking thorfinn");
 
         if (enemyHealthAfterAttack > 0) {
             // Launch Counter Attack
-            int counterAttackResult = attack(out, enemyLocation, attacker, enemy, attacker.getPosition().getTilex(), attacker.getPosition().getTiley(), isRanged);
+            int counterAttackResult = attack(out, enemyLocation, attackerLocation, isRanged);
 
             if (counterAttackResult <= 0) {
                 parent.unitDied(out, attackerLocation, parent.getUnitsPosition(parent.getTurn()));
@@ -629,8 +627,8 @@ public class UnitMovementAndAttack {
         for (Unit unit: moveAttackAndCounterAttack) {
             unit.setHasMoved(false);
             unit.setHasAttacked(false);
-            unit.setHasGotAttacked(false);
-            
+            unit.clearAttackers();
+
             try {Thread.sleep(30);} catch (InterruptedException e) {e.printStackTrace();}
             
             new UnitCommandBuilder(out, parent.isSimulation())
@@ -640,6 +638,16 @@ public class UnitMovementAndAttack {
 	            .issueCommand();
         }
         moveAttackAndCounterAttack.clear();
+    }
+
+    public void resetAnimations(ActorRef out) {
+        for (Unit unit: moveAttackAndCounterAttack) {
+            new UnitCommandBuilder(out, parent.isSimulation())
+                    .setUnit(unit)
+                    .setMode(UnitCommandBuilderMode.ANIMATION)
+                    .setAnimationType(UnitAnimationType.idle)
+                    .issueCommand();
+        }
     }
 
     public Pair<Integer, Integer> getActiveUnit() {

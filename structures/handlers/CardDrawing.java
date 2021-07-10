@@ -30,13 +30,15 @@ public class CardDrawing {
             return;
         }
         ArrayList<Card> current = parent.getCardsInHand(player);
-        if (current.isEmpty()) {
-            if (player == Players.PLAYER1 && deck1.isEmpty()) {
-                parent.endGame(out);
-            }
-            if (player == Players.PLAYER2 && deck2.isEmpty()) {
-                parent.endGame(out);
-            }
+
+        // if (current.isEmpty()) {
+        //     if (player == Players.PLAYER1 && deck1.isEmpty()) {
+        //         parent.endGame(out);
+        //     }
+        //     if (player == Players.PLAYER2 && deck2.isEmpty()) {
+        //        parent.endGame(out);
+        //     }
+        // }
 
         // Protect the program so it will not throw exception if deck has no more card.
         if (player == Players.PLAYER1 && deck1.isEmpty()) {

@@ -261,16 +261,19 @@ public class GameState {
     public void endGame(ActorRef out) {
         Player winner = null;
         // Win condition: should be moved to a method where we are checking player's health
-        // If any of the decks run out of card, the player loses.
+
         if (player1.getHealth() < 1) {
             winner = player1;
         } else if (player2.getHealth() < 1) {
             winner = player2;
-        } else if (cardDrawing.isDeckOneEmpty()) {
-            winner = player2;
-        } else if (cardDrawing.isDeckTwoEmpty()) {
-            winner = player1;
+
         }
+        // If any of the decks run out of card, the player loses. (May not be true)
+        //} else if (cardDrawing.isDeckOneEmpty()) {
+        //    winner = player2;
+        //} else if (cardDrawing.isDeckTwoEmpty()) {
+        //    winner = player1;
+        //}
         if (winner != null) {
             String message = (winner == player1) ? "Player 1 won!" : "Player 2 won!" ;
             new PlayerNotificationCommandBuilder(out, isSimulation())

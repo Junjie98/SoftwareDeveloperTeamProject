@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import commandbuilders.enums.Players;
 import commandbuilders.enums.States;
+import structures.handlers.Pair;
 
 /**
  * A basic representation of a tile on the game board. Tiles have both a pixel position
@@ -139,5 +140,7 @@ public class Tile {
 	public Unit getUnit() {
 		return this.unit;
 	}
-
+	public Pair<Integer, Integer> getLocationPair() {
+		return new Pair<>(tilex, tiley);
+	}
 }

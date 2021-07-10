@@ -232,14 +232,10 @@ public class UnitMovementAndAttack {
 
             parent.memento.add(new GameMemento(parent.getTurn(), ActionType.MOVE, new MovementInformation(activatedTile.getUnit(), activeUnit, new Pair<>(x, y))));
             System.out.println(parent.memento.get(parent.memento.size() - 1));
+
             // Update the units position in the stored position lists.
             ArrayList<Pair<Integer, Integer>> pool = parent.getUnitsPosition(parent.getTurn());
-            for (Pair<Integer, Integer> position: pool) {
-                if (position.equals(activeUnit)) {
-                    pool.remove(position);
-                    break;
-                }
-            }
+            parent.removeFromPool(pool, activeUnit);
             pool.add(new Pair<>(x, y));
 
             destinationTile.setUnit(activatedTile.getUnit());
@@ -375,43 +371,11 @@ public class UnitMovementAndAttack {
 	                    
 	                    if (counterAttackResult <= 0) {
 	                        // Handle unit died of counter attack
-	                    	BasicCommands.playUnitAnimation(out, attacker, UnitAnimationType.death);
-	            			try {Thread.sleep(3000);} catch (InterruptedException e) {e.printStackTrace();}
-	                    	
-	                    	new UnitCommandBuilder(out, parent.isSimulation())
-		                        .setMode(UnitCommandBuilderMode.DELETE)
-		                        .setUnit(attackerLocation.getUnit())
-		                        .issueCommand();
-	
-	                        attackerLocation.setUnit(null);
-	                        ArrayList<Pair<Integer, Integer>> pool = parent.getUnitsPosition(parent.getTurn());
-	                        Pair<Integer, Integer> positionToRemove = new Pair<>(attackerLocation.getTilex(), attackerLocation.getTiley());
-	                        for (Pair<Integer, Integer> position: pool) {
-	                            if (position.equals(positionToRemove)) {
-	                                pool.remove(position);
-	                                break;
-	                            }
-	                        }
+                            parent.unitDied(out, attackerLocation, parent.getUnitsPosition(parent.getTurn()));
 	                    }
                 	}
                 } else {
-                	BasicCommands.playUnitAnimation(out, enemy, UnitAnimationType.death);
-        			try {Thread.sleep(3000);} catch (InterruptedException e) {e.printStackTrace();}
-                	
-                	new UnitCommandBuilder(out, parent.isSimulation())
-	                    .setMode(UnitCommandBuilderMode.DELETE)
-	                    .setUnit(enemyLocation.getUnit())
-	                    .issueCommand();
-
-                    enemyLocation.setUnit(null);
-                    ArrayList<Pair<Integer, Integer>> pool = parent.getEnemyUnitsPosition(parent.getTurn());
-                    Pair<Integer, Integer> positionToRemove = new Pair<>(x, y);
-                    for (Pair<Integer, Integer> position: pool) {
-                        if (position.equals(positionToRemove)) {
-                            pool.remove(position);
-                            break;
-                        }
-                    }
+                    parent.unitDied(out, enemyLocation, parent.getEnemyUnitsPosition(parent.getTurn()));
                 }
             }
         }

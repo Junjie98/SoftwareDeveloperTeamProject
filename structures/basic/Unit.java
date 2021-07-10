@@ -1,8 +1,9 @@
 package structures.basic;
-import commandbuilders.UnitFactory;
+
 import commandbuilders.enums.Players;
 import commandbuilders.enums.UnitType;
 import java.util.ArrayList;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import structures.handlers.Pair;
@@ -44,12 +45,16 @@ public class Unit {
 	boolean isFlying = false;
 	boolean isAvatar = false;
 	//Ana: for counter attack
-	boolean hasGotAttacked = false;
+	ArrayList<Unit> attackedBy = new ArrayList<>();
+
 	//Ana : For ranged
 	boolean isRanged = false;
 	//JJ: for attack logic. If attacked without move, it forfeits the move ability
 	boolean hasMoved = false; //moved this for visibility
-	boolean hasAttacked = false;
+
+	int attackCount = 0;
+	int attackLimit = 1;
+
 	public Unit() {}
 	
 	public Unit(int id, UnitAnimationSet animations, ImageCorrection correction) {
@@ -205,20 +210,11 @@ public class Unit {
 	{
 		return this.owningPlayer;
 	}
-	public boolean getHasGotAttacked() {
-		return hasGotAttacked;
-	}
-	public void setHasGotAttacked(boolean hasGotAttacked) {
-		//System.out.println("set unit move: " + hasMoved);
-
-		this.hasGotAttacked = hasGotAttacked;
-	}
-	public void setHasAttacked(boolean hasAttacked) {
-		//System.out.println("set unit attack: " + hasAttacked);
-		this.hasAttacked = hasAttacked;
+	public void setHasAttacked() {
+		attackCount++;
 	}
 	public boolean getHasAttacked() {
-		return hasAttacked;
+		return attackCount >= attackLimit;
 	}
     public void setFlying(boolean bool) {
 		isFlying = bool;
@@ -249,5 +245,34 @@ public class Unit {
 
 	public Pair<Integer, Integer> getLocationPair() {
 		return new Pair<>(position.tilex, position.tiley);
+	}
+
+	public void addAttacker(Unit attacker) {
+		attackedBy.add(attacker);
+	}
+
+	public boolean hasBeenAttackedBy(Unit attacker) {
+		if (attacker.type == UnitType.AZURITE_LION || attacker.type == UnitType.SERPENTI) {
+			int counter = 0;
+			for (Unit unit: attackedBy) {
+				if (unit == attacker) {
+					counter++;
+				}
+			}
+			return counter >= 2;
+		}
+		return attackedBy.contains(attacker);
+	}
+
+	public void clearAttackers() {
+		attackedBy.clear();
+	}
+
+	public void resetAttackCount() {
+		attackCount = 0;
+	}
+
+	public void setAttackLimit(int value) {
+		attackLimit = value;
 	}
 }

@@ -21,6 +21,7 @@ public class GameState {
     protected int roundNumber = 3;
     private Players turn = Players.PLAYER1;
     protected Player player1, player2;
+    protected Unit human, aiAvatar;
     private Card currentHighlightedCard;
     public ArrayList<Card> player1CardsInHand = new ArrayList<>();
     public ArrayList<Card> player2CardsInHand = new ArrayList<>();
@@ -39,7 +40,7 @@ public class GameState {
     final private CardDrawing cardDrawing = new CardDrawing(this);
     final private CardPlayed cardPlayed = new CardPlayed(this);
     final private Highlighter highlighter = new Highlighter(this);
-    final private SpecialEffect specialEffect = new SpecialEffect(this);
+    final private SpecialAbilities specialAbilities = new SpecialAbilities(this);
 
 	// ===========================================================================
     // Game Initialisation
@@ -64,9 +65,17 @@ public class GameState {
     //Spawns Avatars in starting positions at init
     public void spawnAvatars(ActorRef out) {
         //Avatar1
-        Unit human = new UnitFactory().generateUnit(UnitType.HUMAN);
+        human = new UnitFactory().generateUnit(UnitType.HUMAN);
         human.setAvatar(true);
         human.setName("Human Avatar");
+        human.setPlayerID(Players.PLAYER1);
+
+        human.setDamage(2);
+        human.setHealth(player1.getHealth());
+
+        Tile tile = getBoard().getTile(1, 2);
+        tile.setUnit(human);
+        human.setPositionByTile(tile);
 
         UnitCommandBuilder humanCommands = new UnitCommandBuilder(out, isSimulation())
                 .setUnit(human);
@@ -96,9 +105,17 @@ public class GameState {
         try {Thread.sleep(30);} catch (InterruptedException e) {e.printStackTrace();}
 
         //Avatar2
-        Unit aiAvatar = new UnitFactory().generateUnit(UnitType.AI);
+        aiAvatar = new UnitFactory().generateUnit(UnitType.AI);
         aiAvatar.setAvatar(true);
         aiAvatar.setName("AI Avatar");
+        aiAvatar.setPlayerID(Players.PLAYER2);
+
+        aiAvatar.setDamage(2);
+        aiAvatar.setHealth(player2.getHealth());
+
+        Tile tile2 = getBoard().getTile(7, 2);
+        tile2.setUnit(aiAvatar);
+        aiAvatar.setPositionByTile(tile2);
 
         UnitCommandBuilder aiCommands = new UnitCommandBuilder(out, isSimulation())
                 .setUnit(aiAvatar);
@@ -153,7 +170,7 @@ public class GameState {
             cardDrawing.drawNewCardFor(out, turn);
         }
         cardDrawing.displayCardsOnScreenFor(out, turn);
-        specialEffect.turnDidEnd(out);
+        specialAbilities.turnDidEnd(out);
         ++roundNumber; // Divide this by 2 when we are going to use this.
         if (turn == Players.PLAYER2) {
             smartBoy.tester(out);
@@ -353,7 +370,7 @@ public class GameState {
     }
 
     public void unitDied(ActorRef out, Tile unitLocaltion, ArrayList<Pair<Integer, Integer>> pool) {
-        specialEffect.unitDidDie(out, unitLocaltion.getUnit());
+        specialAbilities.unitDidDie(out, unitLocaltion.getUnit());
 
         UnitCommandBuilder builder = new UnitCommandBuilder(out, isSimulation())
                 .setUnit(unitLocaltion.getUnit());
@@ -402,8 +419,8 @@ public class GameState {
         return unitMovementAndAttack;
     }
 
-    public SpecialEffect getSpecialEffect() {
-        return specialEffect;
+    public SpecialAbilities getSpecialAbilities() {
+        return specialAbilities;
     }
 
     public CardDrawing getCardDrawing() {
@@ -438,6 +455,14 @@ public class GameState {
         switch (player) {
             case PLAYER1: return player2UnitsPosition;
             case PLAYER2: return player1UnitsPosition;
+        }
+        return null;
+    }
+
+    public Unit getAvatar(Players player) {
+        switch (player) {
+            case PLAYER1: return human;
+            case PLAYER2: return aiAvatar;
         }
         return null;
     }

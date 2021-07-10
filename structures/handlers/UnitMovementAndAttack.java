@@ -35,6 +35,7 @@ public class UnitMovementAndAttack {
         Tile tile = parent.getBoard().getTile(x, y);
         if (tile.getUnit().getPlayerID() != parent.getTurn()) {
             // This is not your unit.
+            System.out.println(tile.getUnit().getPlayerID());
             return;
         }
         if(activeUnit != null) {
@@ -115,7 +116,6 @@ public class UnitMovementAndAttack {
                 System.err.println("flyhighlight");
                 flyingOrRangedMoveHighlight(out);
                 valueX = x; valueY = y;
-
             } else {
                 basicMoveHighlight(out, x, y);
             }
@@ -238,6 +238,9 @@ public class UnitMovementAndAttack {
                     .setUnit(activatedTile.getUnit())
                     .issueCommand();
 
+            Tile tile = parent.getBoard().getTile(x, y);
+            activatedTile.getUnit().setPositionByTile(tile);
+
             parent.memento.add(new GameMemento(parent.getTurn(), ActionType.MOVE, new MovementInformation(activatedTile.getUnit(), activeUnit, new Pair<>(x, y))));
             System.out.println(parent.memento.get(parent.memento.size() - 1));
 
@@ -246,8 +249,6 @@ public class UnitMovementAndAttack {
             parent.removeFromPool(pool, activeUnit);
             pool.add(new Pair<>(x, y));
 
-
-          
             destinationTile.setUnit(activatedTile.getUnit());
             parent.getHighlighter().clearBoardHighlights(out);
 
@@ -467,6 +468,8 @@ public class UnitMovementAndAttack {
             .setStats(UnitStats.HEALTH, healthAfterDamage)
             .issueCommand();
 
+        enemy.setHealth(healthAfterDamage);
+
         //unhighlight all the tiles
         parent.getHighlighter().clearBoardHighlights(out);
 
@@ -478,7 +481,7 @@ public class UnitMovementAndAttack {
         attacker.setHasAttacked(true);
         moveAttackAndCounterAttack.add(attacker);
 
-        parent.getSpecialEffect().unitIsDamaged(out, enemy);
+        parent.getSpecialAbilities().unitIsDamaged(out, enemy);
 
         //update avatar health to UI player health.
         if(enemy.isAvatar()) {

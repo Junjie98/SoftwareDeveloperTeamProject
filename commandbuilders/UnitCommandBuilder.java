@@ -119,22 +119,16 @@ public class UnitCommandBuilder extends CommandBuilder{
         }
         if (mode == UnitCommandBuilderMode.DRAW) {
             Tile tile = Board.getInstance().getTile(tileX, tileY);
-            tile.setUnit(unit);
-            unit.setPositionByTile(tile);
-            unit.setPlayerID(this.player);
             BasicCommands.drawUnit(reference, unit, tile);
         } else if (mode == UnitCommandBuilderMode.MOVE) {
             Tile tile = Board.getInstance().getTile(tileX, tileY);
-            unit.setPositionByTile(tile);
             boolean dir = (direction == MoveDirection.VERTICAL);
             BasicCommands.moveUnitToTile(reference, unit, tile, dir);
         } else if (mode == UnitCommandBuilderMode.SET) {
             if (stats == UnitStats.ATTACK) {
                 BasicCommands.setUnitAttack(reference, unit, value);
-                unit.setDamage(value);
             } else {
                 BasicCommands.setUnitHealth(reference, unit, value);
-                unit.setHealth(value);
             }
         } else if (mode == UnitCommandBuilderMode.DELETE) {
             BasicCommands.deleteUnit(reference, unit);

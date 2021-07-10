@@ -198,7 +198,7 @@ public class UnitMovementAndAttack {
         return output;
     }
     public ArrayList<Pair<Integer, Integer>> get1RAtkTiles(int x, int y) {
-        if (activeUnit == null) { System.exit(1); }
+        if (activeUnit == null) { return new ArrayList<>(); }
         ArrayList<Pair<Integer, Integer>> output = parent.getMoveTiles(x, y, 1, 0);
         output.addAll(parent.getMoveTiles(x, y, 1, 1));
         return output;
@@ -625,7 +625,7 @@ public class UnitMovementAndAttack {
                 System.out.println(parent.getBoard().getTile(x,y).getUnit().getProvoked() + " Should be false here now.");
 
             }
-            }catch(NullPointerException |ArrayIndexOutOfBoundsException e){
+            }catch(NullPointerException|ArrayIndexOutOfBoundsException e){
                 System.out.println("boom you fucked up"); //change to "" if needed
     
             }

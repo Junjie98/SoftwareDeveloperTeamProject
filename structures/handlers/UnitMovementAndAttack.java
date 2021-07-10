@@ -105,7 +105,7 @@ public class UnitMovementAndAttack {
         }
 
         //Checks the tile of length 1.
-        provokeFunc(out,x,y);
+        provokeFunc(x,y);
 
     }
 
@@ -128,7 +128,7 @@ public class UnitMovementAndAttack {
             //available tiles
             parent.getHighlighter().checkTileHighlight(out, ti);
         }
-        provokeFunc(out,valueX,valueY);
+        provokeFunc(valueX,valueY);
         ArrayList<Pair<Integer, Integer>> units = new ArrayList<>();
         units.addAll(parent.player1UnitsPosition);
         units.addAll(parent.player2UnitsPosition);

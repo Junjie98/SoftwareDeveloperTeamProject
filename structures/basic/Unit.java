@@ -2,7 +2,7 @@ package structures.basic;
 import commandbuilders.UnitFactory;
 import commandbuilders.enums.Players;
 import commandbuilders.enums.UnitType;
-
+import java.util.ArrayList;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import structures.handlers.Pair;
@@ -33,6 +33,10 @@ public class Unit {
 	int unitHealth = 0;
 	int unitDamage =  0;
 	UnitType type = null;
+
+	boolean provoked = false;
+	boolean provoker =false;
+	ArrayList<Unit> unitProvoked = new ArrayList<>();
 
 	String configFile = ""; // For copies
 	String name = ""; // For memento
@@ -109,6 +113,28 @@ public class Unit {
 	}
 	public void setHasMoved(boolean newValue) {
 		hasMoved = newValue;
+	}
+	
+	public void setProvoker(boolean value){
+		this.provoker = value;
+	}
+	public boolean getProvoker(){
+		return this.provoker;
+	}
+	public void setProvoked(boolean value) {
+		this.provoked = value;
+	}
+	public boolean getProvoked() {
+		return this.provoked;
+	}
+	public void setProvokedMove(boolean value){
+		hasMoved = value;
+	}
+	public void setUnitProvoked(Unit value){
+		unitProvoked.add(value);
+	}
+	public ArrayList<Unit> getUnitProvoked(){
+		return unitProvoked;
 	}
 
 	public int getId() {

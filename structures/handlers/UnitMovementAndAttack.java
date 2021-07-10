@@ -16,6 +16,7 @@ import structures.memento.GameMemento;
 import structures.memento.MovementInformation;
 import java.util.ArrayList;
 
+
 public class UnitMovementAndAttack {
     Pair<Integer, Integer> activeUnit = null;
     private final GameState parent;
@@ -329,7 +330,7 @@ public class UnitMovementAndAttack {
                     //if the unit is not within normal attack range 
                     //move to a range then attack
                     Pair<Integer,Integer> moveTile = getMoveTileForAttack(attackerLocation.getTilex(), attackerLocation.getTiley(), x, y);
-                    System.out.println(moveTile);
+                    System.out.println("move and attack activated");
 
                     if(parent.getBoard().getTile(moveTile).hasUnit()){
                         //if this tile is blocked then we need to see if any other tiles in the atk range are within our move range
@@ -392,14 +393,62 @@ public class UnitMovementAndAttack {
                     }
                     else {
                         highlightedMoveTileClicked(out, moveTile.getFirst(), moveTile.getSecond());
-                        try {Thread.sleep(3000);} catch (InterruptedException e) {e.printStackTrace();}
+                        System.out.println("move tile: " + moveTile);
+                        //try {Thread.sleep(2000);} catch (InterruptedException e) {e.printStackTrace();}
                         attackerLocation =  parent.getBoard().getTile(moveTile);
+                        System.out.println("New location selected");
+                        ArrayList<Pair<Integer,Integer>> provokers = new ArrayList<>();
+                        ArrayList<Pair<Integer,Integer>> provokerEffectTiles = new ArrayList<>();
+                        Pair<Integer,Integer> provokerPos = null;
+                        for (Pair<Integer,Integer> pos : parent.getEnemyUnitsPosition(parent.getTurn()))
+                        {
+                            if(parent.getBoard().getTile(pos).getUnit().getProvoker())
+                            {
+                                System.out.println("found provoker");
+                                provokers.add(pos);
+                            }
+                        }
+                        if(provokers.size()>0)
+                        {   ///CRASHES AROUND HERE SOMEWHERE
+                            System.out.println("there is more than none provokers");
+                            for (Pair<Integer,Integer> provoker : provokers) {
+                                provokerEffectTiles.addAll(get1RAtkTiles(provoker.getFirst(), provoker.getSecond()));
+                            }
+                            System.out.println("Lets check the move tile");
+                            if(provokerEffectTiles.contains(moveTile))
+                            {   //This tile is no good it is within a provoke range.
+                                System.out.println("There has been a provoke mid move-attack!");
+                                // for (Pair<Integer,Integer> pos : get1RAtkTiles(moveTile.getFirst(), moveTile.getSecond())) {
+                                //     if(parent.getBoard().getTile(pos).getUnit().getProvoker() && parent.getBoard().getTile(pos).getUnit().getPlayerID() != parent.getTurn())
+                                //     {
+                                //         provokerPos = pos;
+                                //     }
+                                // }
+                                // Unit newTargetUnit = parent.getBoard().getTile(provokerPos).getUnit();
+                                // enemyHealthAfterAttack = attack(out, attackerLocation, newTargetUnit, attacker, provokerPos.getFirst(), provokerPos.getSecond(), isRanged);
                         
-                        enemyHealthAfterAttack = attack(out, attackerLocation, enemy, attacker, x, y, isRanged);
+                                // // Attack twice: move-attack-attack
+                                // if(attacker.getType().equals(UnitType.AZURITE_LION) || attacker.getType().equals(UnitType.SERPENTI))
+                                //     enemyHealthAfterAttack = attack(out, attackerLocation, newTargetUnit, attacker, provokerPos.getFirst(), provokerPos.getSecond(), isRanged);
+                            }
+                            else{
+                                // enemyHealthAfterAttack = attack(out, attackerLocation, enemy, attacker, x, y, isRanged);
                         
-                        // Attack twice: move-attack-attack
-                        if(attacker.getType().equals(UnitType.AZURITE_LION) || attacker.getType().equals(UnitType.SERPENTI))
-                        	enemyHealthAfterAttack = attack(out, attackerLocation, enemy, attacker, x, y, isRanged);
+                                // // Attack twice: move-attack-attack
+                                // if(attacker.getType().equals(UnitType.AZURITE_LION) || attacker.getType().equals(UnitType.SERPENTI))
+                                //     enemyHealthAfterAttack = attack(out, attackerLocation, enemy, attacker, x, y, isRanged);
+                            }
+                        }
+                        else{
+                            enemyHealthAfterAttack = attack(out, attackerLocation, enemy, attacker, x, y, isRanged);
+                        
+                            // Attack twice: move-attack-attack
+                            if(attacker.getType().equals(UnitType.AZURITE_LION) || attacker.getType().equals(UnitType.SERPENTI))
+                                enemyHealthAfterAttack = attack(out, attackerLocation, enemy, attacker, x, y, isRanged);
+                        }
+                        
+                        
+ 
                     }
                 }
                 else{

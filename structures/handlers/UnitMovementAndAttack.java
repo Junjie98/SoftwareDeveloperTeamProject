@@ -70,7 +70,7 @@ public class UnitMovementAndAttack {
         }
     }
 
-    public void basicMoveHighlight(ActorRef out, int x, int y) {
+    public void basicMoveHighlight(ActorRef out, int x, int y, boolean redOnly) {
         ArrayList<Pair<Integer, Integer>> initDir = parent.getMoveTiles(x, y, 1, 0);
         ArrayList<Pair<Integer, Integer>> secondDir = parent.getMoveTiles(x, y,2, 0);
         ArrayList<Pair<Integer, Integer>> interDir = parent.getMoveTiles(x, y, 1, 1);
@@ -80,7 +80,7 @@ public class UnitMovementAndAttack {
         int count = 0;
         for (Pair<Integer, Integer> is: initDir) {
             //for the initial directions you can move
-            initDirB[count] = parent.getHighlighter().checkTileHighlight(out, is, false);       //if they are blocked record this
+            initDirB[count] = parent.getHighlighter().checkTileHighlight(out, is, false, redOnly);       //if they are blocked record this
             count++;
         }
 
@@ -89,34 +89,34 @@ public class UnitMovementAndAttack {
             //for the next tiles
             if(initDirB[count]) {
                 //if the previous one is clear
-                parent.getHighlighter().checkTileHighlight(out, sd, false);                  //check for units then highlight
+                parent.getHighlighter().checkTileHighlight(out, sd, false, redOnly);                  //check for units then highlight
             }
             count++;
         }
 
         //for the inter tiles do some logic
         if(initDirB[0] || initDirB[1]) {
-            parent.getHighlighter().checkTileHighlight(out, interDir.get(0), false);
+            parent.getHighlighter().checkTileHighlight(out, interDir.get(0), false, redOnly);
         }
         if(initDirB[1] || initDirB[3]) {
-            parent.getHighlighter().checkTileHighlight(out, interDir.get(1), false);
+            parent.getHighlighter().checkTileHighlight(out, interDir.get(1), false, redOnly);
         }
         if(initDirB[2] || initDirB[0]) {
-            parent.getHighlighter().checkTileHighlight(out, interDir.get(2), false);
+            parent.getHighlighter().checkTileHighlight(out, interDir.get(2), false, redOnly);
         }
         if(initDirB[2] || initDirB[3]) {
-            parent.getHighlighter().checkTileHighlight(out, interDir.get(3), false);
+            parent.getHighlighter().checkTileHighlight(out, interDir.get(3), false, redOnly);
         }
 
+        if (!redOnly) {
+            //basica attack highlight connected to normal movement highlight
+            ArrayList<Pair<Integer, Integer>> atkTiles = getAllAtkTiles(x, y);
 
-        //basica attack highlight connected to normal movement highlight
-        ArrayList<Pair<Integer, Integer>> atkTiles = getAllAtkTiles(x, y);
-        
 
-        for (Pair<Integer, Integer> pos : atkTiles) {
-            parent.getHighlighter().checkAttackHighlight(out, pos);
+            for (Pair<Integer, Integer> pos : atkTiles) {
+                parent.getHighlighter().checkAttackHighlight(out, pos);
+            }
         }
-
         //Checks the tile of length 1.
         provokeFunc(x,y);
 
@@ -129,7 +129,7 @@ public class UnitMovementAndAttack {
         {
             Unit temp = parent.getBoard().getTile(x, y).getUnit();
             if(temp.isRanged()) {
-                flyingOrRangedMoveHighlight(out);
+                flyingOrRangedMoveHighlight(out, temp);
                 provokeFunc(x, y);
             }
             else{
@@ -147,37 +147,42 @@ public class UnitMovementAndAttack {
             Unit temp = parent.getBoard().getTile(x, y).getUnit();
             if(temp.isFlying() || temp.isRanged()) {
                 System.err.println("flyhighlight");
-                flyingOrRangedMoveHighlight(out);
+                flyingOrRangedMoveHighlight(out, temp);
                 valueX = x; valueY = y;
             } else {
-                basicMoveHighlight(out, x, y);
+                basicMoveHighlight(out, x, y, false);
             }
         }
     }
 
-    public void flyingOrRangedMoveHighlight(ActorRef out) {
-        for (Pair<Integer, Integer> ti : getFlyMoveTiles()) {
-            //available tiles
-            parent.getHighlighter().checkTileHighlight(out, ti, false);
+    public void flyingOrRangedMoveHighlight(ActorRef out, Unit unit) {
+        if (unit.isFlying()) {
+            for (Pair<Integer, Integer> ti : getFlyMoveTiles()) {
+                //available tiles
+                parent.getHighlighter().checkTileHighlight(out, ti, false, false);
+            }
         }
         provokeFunc(valueX,valueY);
-        ArrayList<Pair<Integer, Integer>> units = new ArrayList<>();
-        units.addAll(parent.player1UnitsPosition);
-        units.addAll(parent.player2UnitsPosition);
 
-        for (Pair<Integer, Integer> bl : units) {
-            //Blocked tiles
-            parent.getHighlighter().checkTileHighlight(out, bl, false);
+        if (!unit.isRanged()) {
+            basicMoveHighlight(out, unit.getPosition().getTilex(), unit.getPosition().getTiley(), true);
+        } else {
+            ArrayList<Pair<Integer, Integer>> units = new ArrayList<>();
+            units.addAll(parent.player1UnitsPosition);
+            units.addAll(parent.player2UnitsPosition);
+
+            for (Pair<Integer, Integer> bl : units) {
+                //Blocked tiles
+                parent.getHighlighter().checkTileHighlight(out, bl, false, false);
+            }
         }
-        
-
     }
     
     // To be used to highlight the tiles for units that can be summoned anywhere
     public void summonAnywhereHighlight(ActorRef out) {
 	    for (Pair<Integer, Integer> ti : getFlyMoveTiles()) {
 	        //available tiles
-	        parent.getHighlighter().checkTileHighlight(out, ti, false);
+	        parent.getHighlighter().checkTileHighlight(out, ti, true, false);
 	    }
     }
 
@@ -325,6 +330,18 @@ public class UnitMovementAndAttack {
                 if(isRanged){
                     //do ranged attack
                     enemyHealthAfterAttack = attack(out, attackerLocation, enemyLocation, isRanged);
+
+                    if (enemyHealthAfterAttack > 0) {
+                        if (enemy.isRanged()) {
+                            int counter = attack(out, enemyLocation, attackerLocation, isRanged);
+                            if (counter <= 0) {
+                                parent.unitDied(out, attackerLocation, parent.getUnitsPosition(parent.getTurn()));
+                            }
+                        }
+                    } else {
+                        parent.unitDied(out, enemyLocation, parent.getEnemyUnitsPosition(parent.getTurn()));
+                    }
+                    resetAnimations(out);
                     return;
                 }
 

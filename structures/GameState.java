@@ -22,7 +22,7 @@ public class GameState {
     private Players turn = Players.PLAYER1;
     protected Player player1, player2;
     protected Unit human, aiAvatar;
-    private Card currentHighlightedCard;
+    private Pair<Card, Integer> currentHighlightedCard;
     public ArrayList<Card> player1CardsInHand = new ArrayList<>();
     public ArrayList<Card> player2CardsInHand = new ArrayList<>();
     public ArrayList<Pair<Integer, Integer>> player1UnitsPosition = new ArrayList<>();
@@ -187,9 +187,6 @@ public class GameState {
         int playersMana = (turn == Players.PLAYER1) ? player1.getMana() : player2.getMana();
         boolean enoughMana = playersMana >= manaCost;   //if enough mana then true
 
-        // Redraw cards at hand at every card click
-        cardDrawing.displayCardsOnScreenFor(out, turn);
-        
         // if enough mana, then highlight and play the card, else drop a notification
         if(enoughMana) {
             highlighter.clearBoardHighlights(out);
@@ -209,18 +206,20 @@ public class GameState {
                 }
             }
         } else {
+            highlighter.clearBoardHighlights(out);
             new PlayerNotificationCommandBuilder(out, isSimulation())
                     .setMessage("Insufficient Mana")
                     .setPlayer(Players.PLAYER1)
                     .setDisplaySeconds(2)
                     .issueCommand();
         }
-        
+
         // Highlight clicked card and unhighlight when clicked again
-        if (currentHighlightedCard == null || currentHighlightedCard != current)
-        	highlightCard(out, current, idx);
-        else
-        	currentHighlightedCard = null;
+        if (enoughMana && (currentHighlightedCard == null || currentHighlightedCard.getFirst() != current)) {
+            highlightCard(out, current, idx);
+        } else {
+            dehighlightCard(out);
+        }
     }
 
     public void tileClicked(ActorRef out, int x, int y) {
@@ -396,6 +395,9 @@ public class GameState {
     
     // Highlighting the clicked card at hand
     public void highlightCard(ActorRef out, Card current, int idx) {
+
+        dehighlightCard(out);
+
     	// Highlight clicked card
         new CardInHandCommandBuilder(out, isSimulation())
 	        .setCommandMode(CardInHandCommandMode.DRAW)
@@ -404,8 +406,20 @@ public class GameState {
 	        .setState(States.HIGHLIGHTED)
 	        .issueCommand();
         
-        currentHighlightedCard = current;
+        currentHighlightedCard = new Pair<>(current, idx);
     }
+
+    private void dehighlightCard(ActorRef out) {
+        if (currentHighlightedCard == null) { return; }
+        new CardInHandCommandBuilder(out, isSimulation())
+                .setCommandMode(CardInHandCommandMode.DRAW)
+                .setCard(currentHighlightedCard.getFirst())
+                .setPosition(currentHighlightedCard.getSecond())
+                .setState(States.NORMAL)
+                .issueCommand();
+        currentHighlightedCard = null;
+    }
+
 
     // ===========================================================================
     // Getters & Setters

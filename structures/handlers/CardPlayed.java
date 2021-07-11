@@ -29,7 +29,7 @@ public class CardPlayed {
     public void moveCardToBoard(ActorRef out, int x, int y) {
         Card current = parent.getCardsInHand(parent.getTurn()).get(activeCard.getSecond());
         this.cardname = current.getCardname();
-        System.out.println(cardname);
+        System.out.println("Card's name is " + cardname);
         int tempCardToDelete = activeCard.getSecond();      //Need that if we want to have beautiful effects, and not a bug
         parent.getHighlighter().clearBoardHighlights(out);  // which decrease mana and deletes a card even when clicked at red tile
 
@@ -197,7 +197,6 @@ public class CardPlayed {
             }
         }else if (cardname.equals("Staff of Y'Kir'")){      //Avatar gains +2 Attack
             int friendlyAvatarAttack = target.getDamage();
-            System.out.println(friendlyAvatarAttack);
             int attackAfterSpell = friendlyAvatarAttack + strengthOfSpell;
 
             targetCommandBuilder

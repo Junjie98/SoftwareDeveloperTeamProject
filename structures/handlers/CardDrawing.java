@@ -82,4 +82,12 @@ public class CardDrawing {
     public boolean isDeckTwoEmpty() {
         return deck2.isEmpty();
     }
+
+    public int getDeck1Size() {
+        return deck1.getSize();
+    }
+
+    public int getDeck2Size() {
+        return deck2.getSize();
+    }
 }

@@ -205,7 +205,7 @@ public class CardPlayed {
                     .setStats(UnitStats.ATTACK, attackAfterSpell)
                     .issueCommand();
 
-            target.setDamage(friendlyAvatarAttack);
+            target.setDamage(attackAfterSpell);
         }
 
         // update avatar health to UI player health.

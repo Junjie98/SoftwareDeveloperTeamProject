@@ -196,16 +196,16 @@ public class CardPlayed {
                 parent.unitDied(out, targetLocation, parent.getEnemyUnitsPosition(parent.getTurn()));
             }
         }else if (cardname.equals("Staff of Y'Kir'")){      //Avatar gains +2 Attack
-            int enemyAvatarAttack = target.getDamage();
-            System.out.println(enemyAvatarAttack);
-            int attackAfterSpell = enemyAvatarAttack + strengthOfSpell;
-
-            target.setDamage(enemyAvatarAttack);
+            int friendlyAvatarAttack = target.getDamage();
+            System.out.println(friendlyAvatarAttack);
+            int attackAfterSpell = friendlyAvatarAttack + strengthOfSpell;
 
             targetCommandBuilder
                     .setMode(UnitCommandBuilderMode.SET)
                     .setStats(UnitStats.ATTACK, attackAfterSpell)
                     .issueCommand();
+
+            target.setDamage(attackAfterSpell);
         }
 
         // update avatar health to UI player health.

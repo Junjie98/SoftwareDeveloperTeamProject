@@ -25,20 +25,14 @@ public class CardDrawing {
     }
 
     public void drawNewCardFor(ActorRef out, Players player) {
-        if (parent.isSimulation()) {
-            // Block card drawing for simulation.
-            return;
+        if (out != null) {  // Block simulation check for tests
+            if (parent.isSimulation()) {
+                // Block card drawing for simulation.
+                return;
+            }
         }
-        ArrayList<Card> current = parent.getCardsInHand(player);
 
-        // if (current.isEmpty()) {
-        //     if (player == Players.PLAYER1 && deck1.isEmpty()) {
-        //         parent.endGame(out);
-        //     }
-        //     if (player == Players.PLAYER2 && deck2.isEmpty()) {
-        //        parent.endGame(out);
-        //     }
-        // }
+        ArrayList<Card> current = parent.getCardsInHand(player);
 
         // Protect the program so it will not throw exception if deck has no more card.
         if (player == Players.PLAYER1 && deck1.isEmpty()) {

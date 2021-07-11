@@ -66,7 +66,7 @@ public class UnitFactory {
                 conf = StaticConfFiles.u_silverguard_knight;
                 break;
         }
-        Unit loadedUnit =  BasicObjectBuilders.loadUnit(conf, counter++, Unit.class);
+        Unit loadedUnit = BasicObjectBuilders.loadUnit(conf, counter++, Unit.class);
         loadedUnit.setType(type);
         
         return loadedUnit;
@@ -121,18 +121,11 @@ public class UnitFactory {
             unit = this.generateUnit(UnitType.ROCK_PULVERISER);
         } else if(cardname.equals("Serpenti")){
             unit = this.generateUnit(UnitType.SERPENTI);
-        } else if(cardname.equals("Windshrike")){
+        } else if (cardname.equals("WindShrike")) {
             unit = this.generateUnit(UnitType.WINDSHRIKE);
-        } else if(cardname.equals("Staff Of Ykir")) {
-            unit = this.generateUnit(UnitType.STAFF_OF_YKIR);
-        } else if(cardname.equals("Entropic Decay")) {
-            unit = this.generateUnit(UnitType.ENTROPIC_DECAY);
-        } else if(cardname.equals("Sundrop Elixer")){
-            unit = this.generateUnit(UnitType.SUNDROP_ELIXIR);
-        }  else if(cardname.equals("Truestrike")) {
-            unit = this.generateUnit(UnitType.TRUESTRIKE);
-        }else {
-            unit = this.generateUnit(UnitType.WINDSHRIKE);
+        } else {
+            System.err.println("Warning! Warning! You are using it wrong!");
+            return null;    // Shouldn't happen though
         }
         unit.setName(cardname);
         return unit;

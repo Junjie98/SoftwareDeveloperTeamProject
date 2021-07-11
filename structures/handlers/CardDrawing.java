@@ -54,6 +54,10 @@ public class CardDrawing {
             // Remove the last card drawn.
             current.remove(current.size()-1);
         }
+
+        //Print the size of deck of cards
+        int deckSize = (player == Players.PLAYER1) ? deck1.getSize() : deck2.getSize();
+        System.out.println(player + " has another " + deckSize + " cards.");
     }
     public void displayCardsOnScreenFor(ActorRef out, Players player) {
         if (parent.isSimulation()) {

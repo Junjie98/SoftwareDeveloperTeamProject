@@ -173,7 +173,7 @@ public class GameState {
         specialAbilities.turnDidEnd(out);
         ++roundNumber; // Divide this by 2 when we are going to use this.
         if (turn == Players.PLAYER2) {
-            smartBoy.tester(out);
+            smartBoy.react(out);
         }
     }
 

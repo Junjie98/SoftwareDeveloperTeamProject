@@ -44,12 +44,15 @@ public class AI
         //think method that runs sim returns list of actions with info in order for this turn
         //act on the methods return info
 
-        
-        System.out.println("AI Started");
-        findBestMoves(out, gs);
-        //moveInit(out, gs);
-        //castInit(out, gs);
-        gs.endTurnClicked(out);
+        if(gs.getTurn()==Players.PLAYER2)
+        {
+            System.out.println("AI Started");
+            findBestMoves(out, gs);
+            //moveInit(out, gs);
+            //castInit(out, gs);
+            gs.endTurnClicked(out);
+        }
+
     }
 
     
@@ -244,8 +247,7 @@ public class AI
 
             int indexOfHigh = 0;
             int highCost = 0;
-            if(summons.size()>1)
-            {   //lets prioritise summons and do them first since game pieces are more efficient than spells
+            if(summons.size()>1){   //lets prioritise summons and do them first since game pieces are more efficient than spells
                 for(Pair<Integer, Card> info : summons){
                     if(info.getSecond().getManacost()> highCost)
                     {   //lets find the index of the highest cost card for efficiency 
@@ -265,11 +267,9 @@ public class AI
             ArrayList<Card> hand = new ArrayList<>();
             System.out.println("Found card summon spots");
 
-            if(summonTiles.size()>0)
-            {   //if there are spaces to summon
+            if(summonTiles.size()>0){   //if there are spaces to summon
                 int range;
-                if(summonState.getTurn()==Players.PLAYER2)
-                {
+                if(summonState.getTurn()==Players.PLAYER2){
                     hand = summonState.player2CardsInHand;
                     range = target.getFirst()+3;
                     //check to see if they are out of range of the enemy front line
@@ -294,8 +294,7 @@ public class AI
                 }
                 System.out.println("Found some good tiles");
 
-                if(goodSTiles.size()> 0)
-                {   //if there are good tiles out of range then use any one
+                if(goodSTiles.size()> 0){   //if there are good tiles out of range then use any one
                     summonState.cardClicked(out, indexOfHigh);
                     target = goodSTiles.get(0);
                     summonState.tileClicked(out, goodSTiles.get(0).getFirst(), goodSTiles.get(0).getSecond());
@@ -304,7 +303,7 @@ public class AI
                 else{
                     //otherwise we just use one of the basic summoning tiles (might be getting pressured)
                     summonState.cardClicked(out, indexOfHigh);
-                    target = goodSTiles.get(0);
+                    target = summonTiles.get(0);
                     summonState.tileClicked(out, summonTiles.get(0).getFirst(), summonTiles.get(0).getSecond());
                 }
                 System.out.println("Summoned!");
@@ -320,8 +319,7 @@ public class AI
             SummonInformation sumInfo = new SummonInformation(target, indexOfHigh, summonState.getBoard().getTile(target).getUnit());
             summonActions.add(new GameMemento(summonState.getTurn(), ActionType.SUMMON, sumInfo));
 
-            if(aiNode.parent != null)
-            {
+            if(aiNode.parent != null){
                 summonState.memento.addAll(aiNode.parent.gameState.memento);
             }
             summonState.memento.addAll(summonActions);
@@ -354,11 +352,9 @@ public class AI
             Card cardSelected = new Card();
             int indexOfHighManaCard = 0;
             int highCost = 0;
-            if(casts.size()>1)
-            {   
+            if(casts.size()>1){   
                 for(Pair<Integer, Card> info : casts){
-                    if(info.getSecond().getManacost()> highCost)
-                    {   //lets find the index of the highest cost card for efficiency 
+                    if(info.getSecond().getManacost()> highCost){   //lets find the index of the highest cost card for efficiency 
                         highCost = info.getSecond().getManacost();
                         indexOfHighManaCard = info.getFirst();
                         cardSelected=info.getSecond();
@@ -453,9 +449,6 @@ public class AI
             else{
                 System.out.println("yikes trying to use a spellcard that isnt a spellcard");
             }
-
-
-
 
             //Make the new memento and add it to the new node
             SpellInformation spellInfo = new SpellInformation(indexOfHighManaCard, castState.getBoard().getTile(target).getUnit(),target,cardSelected );
@@ -621,14 +614,8 @@ public class AI
                     targ = pair;
                 }
             }
-
-
             AI_SummonUnit(out, gs, indexOfHigh, targ);
         }
- 
-
-
- 
     }
 
 
@@ -651,11 +638,6 @@ public class AI
         }
         System.out.println("AI: found all summon tiles");
 
-        // for (Pair<Integer,Integer> tile : tiles) {
-        //     if(gs.getBoard().getTile(tile).hasUnit()){
-        //         tiles.remove(tile);
-        //     }
-        // }
 
         for(Iterator<Pair<Integer,Integer>> tile = tiles.iterator(); tile.hasNext();){            
             if(gs.getBoard().getTile(tile.next()).hasUnit()){
@@ -757,145 +739,6 @@ public class AI
         return null;
 
     }
-    // public void autoMove(ActorRef out, GameState gs)
-    // {
-    //     if(friendlies == null)
-    //     {   //cant move if everything is dead
-    //         return;
-    //     }
-
-    //     int friendliesNum = friendlies.size();
-    //     // for (Pair<Integer,Integer> pair : friendlies) {
-    //     //     if(Board.getInstance().getTile(pair).getUnit().getDoubleAttack())
-    //     //     {
-    //     //         friendliesNum = friendlies.size() + 1;
-    //     //     }
-    //     // }
-
-    //     if(moveIndex >= friendliesNum)
-    //     {   //If we've moved more than we have units big nope
-    //         return;
-    //     }
-        
-
-    //     Pair<Integer,Integer> unitPos = new Pair<>(friendlies.get(0).getFirst(),friendlies.get(0).getSecond());
-
-    //     Unit temp = Board.getInstance().getTile(unitPos).getUnit();
-
-    //     if(temp.getHasAttacked() || temp.getHasMoved())
-    //     {
-    //         return;
-    //     }
-
-    //     if(temp.isFlying()){
-    //         //do flying stuff
-    //     }
-
-    //     boolean moved = false;
-    //     targPos = enemyTarget;
-    //     System.out.println("init targ pos: " + targPos);
-
-    //     if(Board.getInstance().getTile(unitPos).getUnit().isRanged())
-    //     {
-    //         if(gs.getUnitMovementAndAttack().getFlyMoveTiles().contains(targPos)
-    //             && Board.getInstance().getTile(targPos).hasUnit())
-    //         {
-    //             moved = true; 
-
-    //             moveIndex++;
-    //             AI_AtkUnit(out, gs, unitPos, targPos);
-    //             System.out.println("Attack from range AI using move-to-attack");
-    //         }
-    //     }
-    //     else if(gs.getUnitMovementAndAttack().getAllAtkTiles(unitPos.getFirst(), unitPos.getSecond()).contains(targPos)
-    //         && Board.getInstance().getTile(targPos).hasUnit())
-    //     {   //if we can attack and move then go for it and let that logic take care of itself
-    //         moved = true; 
-
-    //         moveIndex++;
-    //         AI_AtkUnit(out, gs, unitPos, targPos);
-    //         System.out.println("Attack from range AI using move-to-attack");
-    //     }
-        
-    //     if(moved ==false)
-    //     {
-    //         //if we cant directly attack it then we need to find a new tile to move to that helps us
-                
-    //         int xMove = enemyTarget.getFirst() - unitPos.getFirst();
-    //         int yMove = enemyTarget.getSecond() - unitPos.getSecond();
-
-    //         //Prioritise vertical movement - safer
-    //         if(Math.abs(yMove) >= 2){
-    //             yMove = yMove > 0 ? 2 : -2;
-    //             xMove = 0;
-    //         }
-    //         else if(Math.abs(xMove) >= 2){
-    //             xMove = xMove > 0 ? 2 : -2;
-    //             yMove = 0;
-    //         }
-
-    //         if(gs.getUnitMovementAndAttack().moveBlockCheck(unitPos.getFirst(), unitPos.getSecond(), xMove, yMove)){
-    //             if(Math.abs(yMove) >= 2 || Math.abs(xMove) >= 2){
-    //                 if(gs.getUnitMovementAndAttack().moveBlockCheck(unitPos.getFirst(), unitPos.getSecond(), xMove/2, yMove/2)){
-    //                     System.out.println("Tile prior blocked2");
-    //                     return;
-    //                 }
-    //                 else{
-    //                     targPos = new Pair<>(unitPos.getFirst() + xMove/2, unitPos.getSecond() + yMove/2);
-    //                 }
-
-    //             }
-    //             else{
-    //                 System.out.println("Tile prior blocked1");
-
-    //                 return;
-    //             }
-
-    //         }
-    //         else{
-    //             targPos = new Pair<>(unitPos.getFirst() + xMove, unitPos.getSecond() + yMove);
-
-    //         }
-
-
-    //         System.err.println("Tiles selected by ai: ");
-    //         System.err.println(unitPos);
-    //         System.err.println(targPos);
-
-    //         System.err.println("enemy targ pos: ");
-    //         System.err.println(enemyTarget);
-
-    //         moveIndex++;
-
-    //         AI_MoveUnit(out, gs, unitPos, targPos);
-    //     }
-      
-            
-
-
-    
-
-    // //    if(targPos == enemyTarget)
-    // //    {
-    // //        //we are attacking
-    // //        move(out, gs);
-    // //    }
- 
-    // }
-
-
-    // // ===========================================================================
-    // // Helper Methods
-    // // ===========================================================================
-
-    // public void moveCheck(ActorRef out, GameState gs)
-    // {
-    //     System.err.println("recieve pulse");
-    //     if(moveIndex < (gs.getTurn()==Players.PLAYER2? gs.player2UnitsPosition:gs.player1UnitsPosition).size())
-    //     {
-    //         move(out, gs);
-    //     }
-    // }
 
     public static Pair<Integer, Integer> findEnemyTarget( GameState gs)
     {

@@ -196,12 +196,7 @@ public class GameState {
     }
 
 
-    public void AiPulse(ActorRef out, GameState gs)
-    {
-        ai.moreUnitsToMoveAtk(out, gs);
-
-    }
-
+    
     public void cardClicked(ActorRef out, int idx) {
         Card current = getCardsInHand(turn).get(idx);
         System.out.println("Card Clicked: " + current.getCardname());

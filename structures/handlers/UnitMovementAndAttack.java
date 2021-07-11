@@ -181,6 +181,7 @@ public class UnitMovementAndAttack {
         provokeFunc(valueX,valueY);
 
         if (!unit.isRanged()) {
+            System.out.println("ranged highlight??");
             basicMoveHighlight(out, unit.getPosition().getTilex(), unit.getPosition().getTiley(), true, false);
         } else {
             ArrayList<Pair<Integer, Integer>> units = new ArrayList<>();

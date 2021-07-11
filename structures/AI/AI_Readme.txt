@@ -2,3 +2,4 @@ The AI In this branch is based on a graph tree where each node in the tree has a
 If possible this would then be hooked into a turn generator that flipped the turns and assessed the human players options, and then again flipped to assess the responses to those situations. 
 Issues: There is an issue where the AI runs out of memory for processing, there is definitly a bug somewhere deep in the code.
 There is also an issue where the AI attempts to select a position that isnt represented on the board, this may be due to the concurrency issues faced, or may be more to do with the move-to-attack mechanic where units will automatically move closer to units that they can theoretically attack.
+It is only working in simple situations but it is operating somewhat as intended. 

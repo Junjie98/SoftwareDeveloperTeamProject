@@ -122,7 +122,11 @@ public class CardPlayed {
                     .setEffectAnimation(TileEffectAnimation.SUMMON)
                     .issueCommand();
 
-            try {Thread.sleep(500);} catch (InterruptedException e) {e.printStackTrace();} // Unit will appear with effect
+            if (out != null) {
+                try {Thread.sleep(500);} catch (InterruptedException e) {e.printStackTrace();} // Unit will appear with effect
+            }
+
+
 
             Unit unit = new UnitFactory().generateUnitByCard(current);
             unit.setFlying(cardname.equals("WindShrike"));
@@ -147,7 +151,9 @@ public class CardPlayed {
                     .setPlayerID(parent.getTurn())
                     .issueCommand();
 
-            try {Thread.sleep(30);} catch (InterruptedException e) {e.printStackTrace();}
+            if (out != null) {
+                try {Thread.sleep(30);} catch (InterruptedException e) {e.printStackTrace();}
+            }
 
             unit.setHealth(current.getBigCard().getHealth());
             unit.setDamage(current.getBigCard().getAttack());
@@ -156,7 +162,9 @@ public class CardPlayed {
                     .setStats(UnitStats.HEALTH, current.getBigCard().getHealth())
                     .issueCommand();
 
-            try {Thread.sleep(30);} catch (InterruptedException e) {e.printStackTrace();}
+            if (out != null) {
+                try {Thread.sleep(30);} catch (InterruptedException e) {e.printStackTrace();}
+            }
 
             builder.setMode(UnitCommandBuilderMode.SET)
                     .setStats(UnitStats.ATTACK, current.getBigCard().getAttack())

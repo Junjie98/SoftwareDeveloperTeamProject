@@ -38,8 +38,8 @@ public class ExtractedGameState extends GameState {
         }
     }
 
-    public Pair<Integer, Integer> getMyAvatarPosition() {
-        for (Pair<Integer, Integer> pair:  getTurn() == Players.PLAYER2?player2UnitsPosition:player1UnitsPosition) {
+    public Pair<Integer, Integer> getAIAvatarPosition() {
+        for (Pair<Integer, Integer> pair: player2UnitsPosition) {
             if (getBoard().getTile(pair).getUnit().isAvatar()) {
                 return pair;
             }
@@ -175,6 +175,18 @@ public class ExtractedGameState extends GameState {
             }
         }
         return out;
+    }
+
+    
+    // This should only be used for unit testing.
+    public void testSummon(Card card, Players player, Pair<Integer, Integer> position) {
+        Player myPlayer = getPlayer(player);
+        myPlayer.setMana(9);
+        ArrayList<Card> hand = getCardsInHand(player);
+        hand.clear();
+        hand.add(card);
+        cardClicked(null, 0);
+        getCardPlayed().moveCardToBoard(null, position.getFirst(), position.getSecond());
     }
 
     @Override

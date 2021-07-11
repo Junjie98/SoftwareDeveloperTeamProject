@@ -12,6 +12,7 @@ import structures.AI.AI;
 import structures.basic.Tile;
 import structures.basic.Unit;
 import structures.basic.UnitAnimationType;
+import structures.extractor.ExtractedGameState;
 import structures.memento.ActionType;
 import structures.memento.AttackInformation;
 import structures.memento.GameMemento;
@@ -29,7 +30,6 @@ public class UnitMovementAndAttack {
     Tile previousUnitLocation;
     boolean errorBool = false;
     int valueX = 0; int valueY = 0; //for flying and range unit provoke.
-
     public UnitMovementAndAttack(GameState parent) {
         this.parent = parent;
     }
@@ -280,8 +280,9 @@ public class UnitMovementAndAttack {
         if (destinationTile.getTileState() == States.NORMAL) {
             parent.getHighlighter().clearBoardHighlights(out);
         } else if (destinationTile.getTileState() == States.HIGHLIGHTED && unitsCanMove) { //added another condition to check
-            unitsCanMove = false;   // Prevent other units from moving.
-            
+            if (!(parent instanceof ExtractedGameState)) {
+                unitsCanMove = false;   // Prevent other units from moving.
+            }
 
             System.out.println("move valid : boolean = " + unitsCanMove); //debug //results found that within enemy tile range, the bool is set to true.
 
@@ -322,6 +323,7 @@ public class UnitMovementAndAttack {
     // Attack Logic
     // ===========================================================================
     public void launchAttack(ActorRef out, int x, int y) {
+        try{
         if (activeUnit == null) { return; }
         if (parent.getBoard().getTile(x, y).getUnit().getPlayerID() != parent.getTurn()) {
             System.out.println("attackLaunched");
@@ -363,7 +365,7 @@ public class UnitMovementAndAttack {
                     //move to a range then attack
                     Pair<Integer,Integer> moveTile = getMoveTileForAttack(attackerLocation.getTilex(), attackerLocation.getTiley(), x, y);
                     System.out.println(moveTile);
-
+                    //boolean provokerNearYou = provokeFuncMoveAttackCheck(x, y);
                     if(parent.getBoard().getTile(moveTile).hasUnit()){
                         //if this tile is blocked then we need to see if any other tiles in the atk range are within our move range
                         ArrayList<Pair<Integer,Integer>> rangeTiles = get1RAtkTiles(x, y);
@@ -396,7 +398,9 @@ public class UnitMovementAndAttack {
                                     }
                                     
                                     highlightedMoveTileClicked(out, pair.getFirst(), pair.getSecond());
-                                    try {Thread.sleep(3000);} catch (InterruptedException e) {e.printStackTrace();}
+                                    if (!(parent instanceof ExtractedGameState)) {
+                                        try {Thread.sleep(3000);} catch (InterruptedException e) {e.printStackTrace();}
+                                    }
 
                                     System.out.println(pair);
                                     attackerLocation =  parent.getBoard().getTile(pair);
@@ -418,17 +422,28 @@ public class UnitMovementAndAttack {
                         else {
                             return;
                         }
-                    } else {
+                    } else if(!provokeFuncMoveAttackCheck(x, y)) {
                         // Within attack range
+                        System.out.println("no provoker near you");
 
                         highlightedMoveTileClicked(out, moveTile.getFirst(), moveTile.getSecond());
-                        try {Thread.sleep(3000);} catch (InterruptedException e) {e.printStackTrace();}
+                        if (!(parent instanceof ExtractedGameState)) {
+                            try {
+                                Thread.sleep(3000);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                        }
                         attackerLocation =  parent.getBoard().getTile(moveTile);
                         
                         enemyHealthAfterAttack = attack(out, attackerLocation, enemyLocation, isRanged);
+                    }if(provokeFuncMoveAttackCheck(x, y)){
+                        System.out.println("provoker is around");
+                        highlightedMoveTileClicked(out, moveTile.getFirst(), moveTile.getSecond());
+                        try {Thread.sleep(3000);} catch (InterruptedException e) {e.printStackTrace();}
                     }
                 }
-                else{
+                else if(!provokeFuncMoveAttackCheck(x, y)){
                     enemyHealthAfterAttack = attack(out, attackerLocation, enemyLocation, isRanged);
                 }
                 parent.memento.add(new GameMemento(parent.getTurn(), ActionType.ATTACK, new AttackInformation(new Pair<>(attacker.getPosition().getTilex(), attacker.getPosition().getTiley()),
@@ -456,6 +471,11 @@ public class UnitMovementAndAttack {
          }
         }
         resetAnimations(out);
+    }catch(NullPointerException e){
+        System.out.println("Invoked the catch nullexception");
+        //Because checking empty tile invokes the .getHealth()
+
+    }
     }
 
     public boolean moveBlockCheck(int x, int y, int movex, int movey)
@@ -512,7 +532,13 @@ public class UnitMovementAndAttack {
                     .setMode(UnitCommandBuilderMode.ANIMATION)
                     .setAnimationType(UnitAnimationType.attack)
                     .issueCommand();
-    		try {Thread.sleep(2000);} catch (InterruptedException e) {e.printStackTrace();}
+            if (!(parent instanceof ExtractedGameState)) {
+                try {
+                    Thread.sleep(2000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
         }
 
         enemyCommandBuilder
@@ -675,6 +701,78 @@ public class UnitMovementAndAttack {
         }
     }
 
+    ////////
+    public boolean provokeFuncMoveAttackCheck(int x,int y){
+        try{
+            //calculate position in order to find where unit will land. 
+            //then, use the landing position to find 1tiles away if there is any provoker.
+            int valueX = activeUnit.getFirst(); //my player value
+            int valueY = activeUnit.getSecond(); // my player value
+            int enemyValueX = x;
+            int enemyValueY = y;
+            int realX = enemyValueX;
+            int realY = valueY;
+            if(valueX > enemyValueX){ //my player is resided on the right
+                realX+=1;
+            }else if(valueX < enemyValueX)
+            {
+                realX-=1;
+            }else{realX=enemyValueX;}
+            // if(valueY == enemyValueY)
+            // {
+            //     realY = enemyValueY;
+            if(valueY > enemyValueY)
+            {
+                realY-=1;
+            }else if(valueY < enemyValueY){
+                realY+=1;
+            }
+            ArrayList<Pair<Integer, Integer>> tiles = get1RAtkTiles(realX, realY);
+           // System.out.println(realX + " and " + realY + "Debug for check provokeMovetile");
+            boolean provokerNearby = false;
+            
+    
+            if(!parent.getBoard().getTile(activeUnit.getFirst(),activeUnit.getSecond()).getUnit().getProvoker()){ //if current turn player is not the provoker
+                Unit nonProvokerUnit = parent.getBoard().getTile(activeUnit.getFirst(),activeUnit.getSecond()).getUnit();
+                System.out.println("Not provoker unit");
+                for(Pair<Integer,Integer> tPair : tiles){
+                    if(parent.getBoard().getTile(tPair).getUnit()!=null && parent.getBoard().getTile(tPair).getUnit().getPlayerID()!=parent.getTurn()
+                    && parent.getBoard().getTile(tPair).getUnit().getProvoker()){ //tile not empty, not my unit, & is provoker
+                    //boolean provokerExist = parent.getHighlighter().getRedTile().get(i).getUnit().getProvoker();
+                    //System.out.println("PROVOKER EXIST? : " + provokerExist);
+                    Unit provokerUnit = parent.getBoard().getTile(tPair).getUnit();
+                    //if(provokerExist){
+                        nonProvokerUnit.setProvoked(true);
+                        //nonProvokerUnit.setProvokedMove(true); //blocks it from moving. It can only attack.
+                        nonProvokerUnit.setUnitProvoked(provokerUnit);
+                        System.out.println(parent.getBoard().getTile(activeUnit.getFirst(),activeUnit.getSecond()).getUnit().getProvoked());//debug purpose
+                        //provokerTile = tiles;
+                        System.out.println(tiles + " Debug this ya fucking cunt"); //checked.
+                        provokerNearby = true; 
+                        return true; //for check provoke while move
+                    //}
+    
+                    }
+                }
+            }
+            
+            if(parent.getBoard().getTile(activeUnit.getFirst(),activeUnit.getSecond()).getUnit().getProvoked() && !provokerNearby){ //check if unit can be resetted.
+                parent.getBoard().getTile(x,y).getUnit().setProvoked(false);
+                parent.getBoard().getTile(x,y).getUnit().setProvokedMove(false);
+                System.out.println(parent.getBoard().getTile(x,y).getUnit().getProvoked() + " Should be false here now.");
+
+            }return false;
+            
+            }catch(NullPointerException |ArrayIndexOutOfBoundsException e){
+                System.out.println("boom you fucked up"); //change to "" if needed
+    
+            }
+            return false;
+    }
+
+    /////////
+
+
     // ===========================================================================
     // Setters, getters, and resetters
     // ===========================================================================
@@ -684,8 +782,14 @@ public class UnitMovementAndAttack {
             unit.resetAttackCount();
             unit.clearAttackers();
 
-            try {Thread.sleep(30);} catch (InterruptedException e) {e.printStackTrace();}
-            
+            if (!(parent instanceof ExtractedGameState)) {
+                try {
+                    Thread.sleep(30);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+            }
             new UnitCommandBuilder(out, parent.isSimulation())
 	            .setUnit(unit)
 	            .setMode(UnitCommandBuilderMode.ANIMATION)

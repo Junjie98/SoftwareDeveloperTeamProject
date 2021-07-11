@@ -85,6 +85,8 @@ public class AiNode {
             System.out.println("Ainode at depth: " + depth);
             //System.out.println("ainode parent: " + parent.depth);
             System.out.println("Evaulating at unit: " + unit);
+            System.out.println("gameState: \n" +gameState);
+            System.out.println("Is there a unit here? :" +gameState.getBoard().getTile(unit).getUnit());
 
             totalScore+=gameState.getBoard().getTile(unit).getUnit().getHealth();
             totalScore+=UnitCost;

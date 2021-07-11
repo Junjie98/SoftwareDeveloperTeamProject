@@ -145,6 +145,7 @@ public class AI
         }
 
         
+        
         //Move Logic
         ExtractedGameState moveState = temp_sBoy.getExtractedGameState();
         moveState.setSimulation(true);
@@ -161,10 +162,8 @@ public class AI
                 Pair<Integer, Integer> targPos = findGoodMove(moveState, unitPos, target);
                 if(targPos != null)
                 {
-                    moveState.tileClicked(out, unitPos.getFirst(), unitPos.getSecond());
-                    moveState.tileClicked(out, targPos.getFirst(), targPos.getSecond());
-                    
-                    MovementInformation moveInfo = new MovementInformation(moveState.getBoard().getTile(unitPos).getUnit(), unitPos, targPos);
+                    AI_MoveUnit(out, moveState, unitPos, targPos);
+                    MovementInformation moveInfo = new MovementInformation(moveState.getBoard().getTile(targPos).getUnit(), unitPos, targPos);
                     moves.add(new GameMemento(moveState.getTurn(), ActionType.MOVE, moveInfo));
                 }
 

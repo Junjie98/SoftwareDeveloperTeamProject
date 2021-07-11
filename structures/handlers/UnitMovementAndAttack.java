@@ -9,7 +9,6 @@ import structures.GameState;
 import structures.basic.Tile;
 import structures.basic.Unit;
 import structures.basic.UnitAnimationType;
-import structures.extractor.ExtractedGameState;
 import structures.memento.ActionType;
 import structures.memento.AttackInformation;
 import structures.memento.GameMemento;
@@ -24,6 +23,8 @@ public class UnitMovementAndAttack {
     ArrayList<Unit> moveAttackAndCounterAttack = new ArrayList<>();
 
     boolean unitsCanMove = true;
+   // boolean provokerAround = false;
+    ArrayList<Unit> provokedUnitForEndReset = new ArrayList<>();
     int valueX = 0; int valueY = 0; //for flying and range unit provoke.
     public UnitMovementAndAttack(GameState parent) {
         this.parent = parent;
@@ -207,7 +208,6 @@ public class UnitMovementAndAttack {
         return output;
     }
     public ArrayList<Pair<Integer, Integer>> get1RAtkTiles(int x, int y) {
-        if (activeUnit == null) { System.exit(1); }
         ArrayList<Pair<Integer, Integer>> output = parent.getMoveTiles(x, y, 1, 0);
         output.addAll(parent.getMoveTiles(x, y, 1, 1));
         return output;
@@ -271,9 +271,7 @@ public class UnitMovementAndAttack {
         if (destinationTile.getTileState() == States.NORMAL) {
             parent.getHighlighter().clearBoardHighlights(out);
         } else if (destinationTile.getTileState() == States.HIGHLIGHTED && unitsCanMove) { //added another condition to check
-            if (!(parent instanceof ExtractedGameState)) {
-                unitsCanMove = false;   // Prevent other units from moving.
-            }
+            unitsCanMove = false;   // Prevent other units from moving.
 
             System.out.println("move valid : boolean = " + unitsCanMove); //debug //results found that within enemy tile range, the bool is set to true.
 
@@ -389,9 +387,7 @@ public class UnitMovementAndAttack {
                                     }
                                     
                                     highlightedMoveTileClicked(out, pair.getFirst(), pair.getSecond());
-                                    if (!(parent instanceof ExtractedGameState)) {
-                                        try {Thread.sleep(3000);} catch (InterruptedException e) {e.printStackTrace();}
-                                    }
+                                    try {Thread.sleep(3000);} catch (InterruptedException e) {e.printStackTrace();}
 
                                     System.out.println(pair);
                                     attackerLocation =  parent.getBoard().getTile(pair);
@@ -413,25 +409,28 @@ public class UnitMovementAndAttack {
                         else {
                             return;
                         }
-                    } else if(!provokeFuncMoveAttackCheck(x, y)) {
+                       
+                    }  
+                    boolean provokerAround = provokeFuncMoveAttackCheck(moveTile.getFirst(), moveTile.getSecond());
+                    if(!provokerAround) {
                         // Within attack range
-                        System.out.println("no provoker near you");
+                        System.out.println("no provoker near you" + provokerAround);
 
                         highlightedMoveTileClicked(out, moveTile.getFirst(), moveTile.getSecond());
-                        if (!(parent instanceof ExtractedGameState)) {
-                            try {
-                                Thread.sleep(3000);
-                            } catch (InterruptedException e) {
-                                e.printStackTrace();
-                            }
-                        }
+                        try {Thread.sleep(3000);} catch (InterruptedException e) {e.printStackTrace();}
                         attackerLocation =  parent.getBoard().getTile(moveTile);
                         
                         enemyHealthAfterAttack = attack(out, attackerLocation, enemyLocation, isRanged);
-                    }if(provokeFuncMoveAttackCheck(x, y)){
+                    }if(provokerAround){
+                        
                         System.out.println("provoker is around");
                         highlightedMoveTileClicked(out, moveTile.getFirst(), moveTile.getSecond());
                         try {Thread.sleep(3000);} catch (InterruptedException e) {e.printStackTrace();}
+                        if(parent.getBoard().getTile(x,y).getUnit().getProvoker()){
+                            //System.out.println("Icameinhere"); //debug purpose
+                            attackerLocation =  parent.getBoard().getTile(moveTile);
+                            enemyHealthAfterAttack = attack(out, attackerLocation, enemyLocation, isRanged);
+                        }
                     }
                 }
                 else if(!provokeFuncMoveAttackCheck(x, y)){
@@ -458,8 +457,8 @@ public class UnitMovementAndAttack {
                 }
              } else {
                 System.out.println("Nonono, you are provoked!");
-            }
-         }
+             }
+          }
         }
         resetAnimations(out);
     }catch(NullPointerException e){
@@ -521,13 +520,7 @@ public class UnitMovementAndAttack {
                     .setMode(UnitCommandBuilderMode.ANIMATION)
                     .setAnimationType(UnitAnimationType.attack)
                     .issueCommand();
-            if (!(parent instanceof ExtractedGameState)) {
-                try {
-                    Thread.sleep(2000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
+    		try {Thread.sleep(2000);} catch (InterruptedException e) {e.printStackTrace();}
         }
 
         enemyCommandBuilder
@@ -610,17 +603,9 @@ public class UnitMovementAndAttack {
     public void provokeFunc(int x,int y){
         try{
             ArrayList<Pair<Integer, Integer>> tiles = get1RAtkTiles(activeUnit.getFirst(), activeUnit.getSecond());
-            
-            // ArrayList<Pair<Integer, Integer>> provokerTile;
+
             Boolean provokerNearYou = false;
-            // for (Pair<Integer,Integer> pair : tiles) {
-            //     if(parent.getBoard().getTile(pair).getUnit()!=null && parent.getBoard().getTile(pair).getUnit().getPlayerID()!=parent.getTurn()){ //not my unit
-            //     System.out.println(parent.getBoard().getTile(pair).getUnit().getProvoker()+ " HELLLLLLLLLLLO IT IS TRUEEE>>>>><<<<");
-            //         if(parent.getBoard().getTile(pair).getUnit().getProvoker()){
-            //             provokerTile = tiles;
-            //         }
-            //     }
-            // }//^ Testing or debugging
+
             
             if(parent.getBoard().getTile(x,y).getUnit().getProvoker()){//provoker. Set highlight unit to not able to move.
                 for(Pair<Integer, Integer> tPair : tiles){
@@ -631,6 +616,7 @@ public class UnitMovementAndAttack {
                    // previousRedTileUnit.add(t);
                     System.out.println(parent.getBoard().getTile(tPair).getUnit().getProvoked() + " nearby unit has been provoked! ");//debug purpose
                     //provokerTile = tiles;
+                    provokedUnitForEndReset.add(parent.getBoard().getTile(tPair).getUnit()); 
                     provokerNearYou=true;
                     }
                 }
@@ -651,7 +637,8 @@ public class UnitMovementAndAttack {
                         nonProvokerUnit.setProvokedMove(true); //blocks it from moving. It can only attack.
                         nonProvokerUnit.setUnitProvoked(provokerUnit);
                         System.out.println(parent.getBoard().getTile(x,y).getUnit().getProvoked());//debug purpose
-                        //provokerTile = tiles;
+
+                        provokedUnitForEndReset.add(nonProvokerUnit); 
                         provokerNearYou=true;
                     //}
     
@@ -666,7 +653,7 @@ public class UnitMovementAndAttack {
 
             }
             }catch(NullPointerException |ArrayIndexOutOfBoundsException e){
-                System.out.println("boom you fucked up"); //change to "" if needed
+                System.out.println("Caught something!"); //change to "" if needed
     
             }
     
@@ -676,7 +663,7 @@ public class UnitMovementAndAttack {
         Unit enemy = enemyLocation.getUnit();
         Unit attacker = attackerLocation.getUnit();
         int enemyHealthAfterAttack = attack(out, attackerLocation, enemyLocation, isRanged);
-        System.out.println("Smack provoking thorfinn");
+        System.out.println("Attacking provoking unit");
 
         if (enemyHealthAfterAttack > 0) {
             // Launch Counter Attack
@@ -690,33 +677,10 @@ public class UnitMovementAndAttack {
         }
     }
 
-    ////////
+
     public boolean provokeFuncMoveAttackCheck(int x,int y){
         try{
-            //calculate position in order to find where unit will land. 
-            //then, use the landing position to find 1tiles away if there is any provoker.
-            int valueX = activeUnit.getFirst(); //my player value
-            int valueY = activeUnit.getSecond(); // my player value
-            int enemyValueX = x;
-            int enemyValueY = y;
-            int realX = enemyValueX;
-            int realY = valueY;
-            if(valueX > enemyValueX){ //my player is resided on the right
-                realX+=1;
-            }else if(valueX < enemyValueX)
-            {
-                realX-=1;
-            }else{realX=enemyValueX;}
-            // if(valueY == enemyValueY)
-            // {
-            //     realY = enemyValueY;
-            if(valueY > enemyValueY)
-            {
-                realY-=1;
-            }else if(valueY < enemyValueY){
-                realY+=1;
-            }
-            ArrayList<Pair<Integer, Integer>> tiles = get1RAtkTiles(realX, realY);
+           ArrayList<Pair<Integer, Integer>> tiles = get1RAtkTiles(x, y);
            // System.out.println(realX + " and " + realY + "Debug for check provokeMovetile");
             boolean provokerNearby = false;
             
@@ -736,7 +700,7 @@ public class UnitMovementAndAttack {
                         nonProvokerUnit.setUnitProvoked(provokerUnit);
                         System.out.println(parent.getBoard().getTile(activeUnit.getFirst(),activeUnit.getSecond()).getUnit().getProvoked());//debug purpose
                         //provokerTile = tiles;
-                        System.out.println(tiles + " Debug this ya fucking cunt"); //checked.
+                        System.out.println(tiles + " Debug"); //checked.
                         provokerNearby = true; 
                         return true; //for check provoke while move
                     //}
@@ -753,13 +717,11 @@ public class UnitMovementAndAttack {
             }return false;
             
             }catch(NullPointerException |ArrayIndexOutOfBoundsException e){
-                System.out.println("boom you fucked up"); //change to "" if needed
+                System.out.println("caught something!"); //change to "" if needed
     
             }
             return false;
     }
-
-    /////////
 
 
     // ===========================================================================
@@ -770,20 +732,18 @@ public class UnitMovementAndAttack {
             unit.setHasMoved(false);
             unit.resetAttackCount();
             unit.clearAttackers();
+            System.out.println("Resetting");
 
-            if (!(parent instanceof ExtractedGameState)) {
-                try {
-                    Thread.sleep(30);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-
-            }
+            try {Thread.sleep(30);} catch (InterruptedException e) {e.printStackTrace();}
+            
             new UnitCommandBuilder(out, parent.isSimulation())
 	            .setUnit(unit)
 	            .setMode(UnitCommandBuilderMode.ANIMATION)
 	            .setAnimationType(UnitAnimationType.idle)
 	            .issueCommand();
+        }
+        for(Unit unit : provokedUnitForEndReset){
+            unit.setHasMoved(false);
         }
         moveAttackAndCounterAttack.clear();
     }

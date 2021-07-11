@@ -10,6 +10,11 @@ import structures.handlers.Pair;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * Implementation of a randomiser based dumb AI.
+ * @author Yu-Sung Hsu (2540296h@student.gla.ac.uk)
+ */
+
 public class SmartBoy {
     enum ActionType { MOVEMENTORATTACK, SUMMON }
 

@@ -38,6 +38,10 @@ public class DeckTwo {
         return temp;
     }
 
+    public int getSize() {
+        return cards.size();
+    }
+
     public boolean isEmpty() {
         return cards.isEmpty();
     }

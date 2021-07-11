@@ -26,7 +26,8 @@ public class GameState {
     protected int roundNumber = 3;
     private Players turn = Players.PLAYER1;
     protected Player player1, player2;
-    private Card currentHighlightedCard;
+    protected Unit human, aiAvatar;
+    public Pair<Card, Integer> currentHighlightedCard;
     public ArrayList<Card> player1CardsInHand = new ArrayList<>();
     public ArrayList<Card> player2CardsInHand = new ArrayList<>();
     public ArrayList<Pair<Integer, Integer>> player1UnitsPosition = new ArrayList<>();
@@ -46,7 +47,7 @@ public class GameState {
     final private CardDrawing cardDrawing = new CardDrawing(this);
     final private CardPlayed cardPlayed = new CardPlayed(this);
     final private Highlighter highlighter = new Highlighter(this);
-    final private SpecialEffect specialEffect = new SpecialEffect(this);
+    final private SpecialAbilities specialAbilities = new SpecialAbilities(this);
 
 
     
@@ -76,9 +77,17 @@ public class GameState {
     //Spawns Avatars in starting positions at init
     public void spawnAvatars(ActorRef out) {
         //Avatar1
-        Unit human = new UnitFactory().generateUnit(UnitType.HUMAN);
+        human = new UnitFactory().generateUnit(UnitType.HUMAN);
         human.setAvatar(true);
         human.setName("Human Avatar");
+        human.setPlayerID(Players.PLAYER1);
+
+        human.setDamage(2);
+        human.setHealth(player1.getHealth());
+
+        Tile tile = getBoard().getTile(1, 2);
+        tile.setUnit(human);
+        human.setPositionByTile(tile);
 
         UnitCommandBuilder humanCommands = new UnitCommandBuilder(out, isSimulation())
                 .setUnit(human);
@@ -108,9 +117,17 @@ public class GameState {
         try {Thread.sleep(30);} catch (InterruptedException e) {e.printStackTrace();}
 
         //Avatar2
-        Unit aiAvatar = new UnitFactory().generateUnit(UnitType.AI);
+        aiAvatar = new UnitFactory().generateUnit(UnitType.AI);
         aiAvatar.setAvatar(true);
         aiAvatar.setName("AI Avatar");
+        aiAvatar.setPlayerID(Players.PLAYER2);
+
+        aiAvatar.setDamage(2);
+        aiAvatar.setHealth(player2.getHealth());
+
+        Tile tile2 = getBoard().getTile(7, 2);
+        tile2.setUnit(aiAvatar);
+        aiAvatar.setPositionByTile(tile2);
 
         UnitCommandBuilder aiCommands = new UnitCommandBuilder(out, isSimulation())
                 .setUnit(aiAvatar);
@@ -165,7 +182,7 @@ public class GameState {
             cardDrawing.drawNewCardFor(out, turn);
         }
         cardDrawing.displayCardsOnScreenFor(out, turn);
-        specialEffect.turnDidEnd(out);
+        specialAbilities.turnDidEnd(out);
         ++roundNumber; // Divide this by 2 when we are going to use this.
         if (turn == Players.PLAYER2) {
             smartBoy.tester(out);
@@ -195,20 +212,19 @@ public class GameState {
         int playersMana = (turn == Players.PLAYER1) ? player1.getMana() : player2.getMana();
         boolean enoughMana = playersMana >= manaCost;   //if enough mana then true
 
-        // Redraw cards at hand at every card click
-        cardDrawing.displayCardsOnScreenFor(out, turn);
-        
         // if enough mana, then highlight and play the card, else drop a notification
         if(enoughMana) {
             highlighter.clearBoardHighlights(out);
             
             // For unit Planar Scout
         	if (current.getCardname().equals("Planar Scout")) {
-        		
-        		cardPlayed.setActiveCard(current, idx);
-        		unitMovementAndAttack.summonAnywhereHighlight(out);
+        	    if (currentHighlightedCard != null && currentHighlightedCard.getFirst().getCardname().equals("Planar Scout")) {
+                    highlighter.clearBoardHighlights(out);
+                } else {
+                    cardPlayed.setActiveCard(current, idx);
+                    unitMovementAndAttack.summonAnywhereHighlight(out);
+                }
         	}
-       
         	else if (card == null || card.getSecond() != idx) {
                 cardPlayed.setActiveCard(current, idx);
                 ArrayList<Pair<Integer, Integer>> friendlyUnits = getUnitsPosition(turn);
@@ -217,18 +233,20 @@ public class GameState {
                 }
             }
         } else {
+            highlighter.clearBoardHighlights(out);
             new PlayerNotificationCommandBuilder(out, isSimulation())
                     .setMessage("Insufficient Mana")
                     .setPlayer(Players.PLAYER1)
                     .setDisplaySeconds(2)
                     .issueCommand();
         }
-        
+
         // Highlight clicked card and unhighlight when clicked again
-        if (currentHighlightedCard == null || currentHighlightedCard != current)
-        	highlightCard(out, current, idx);
-        else
-        	currentHighlightedCard = null;
+        if (enoughMana && (currentHighlightedCard == null || currentHighlightedCard.getFirst() != current)) {
+            highlightCard(out, current, idx);
+        } else {
+            dehighlightCard(out);
+        }
     }
 
     public void tileClicked(ActorRef out, int x, int y) {
@@ -264,11 +282,17 @@ public class GameState {
             if (unitMovementAndAttack.getActiveUnit() == null) {
                 if (tile != null && tile.hasUnit()) {
                     // User clicked on a unit.
+                    System.out.println("Shouldnt move cos its tired?");
+                    System.out.println("attacked: " + tile.getUnit().getHasAttacked());
+                    System.out.println("moved: " + tile.getUnit().getHasMoved());
                     if (tile.getUnit().getHasAttacked() && tile.getUnit().getHasMoved()) {
                         // Block hasAttacked -> hasMoved
+                        System.out.println("Shouldnt move cos its tired A+M");
                         return;
                     } else if (tile.getUnit().getHasAttacked()) {
                         // Block hasAttacked
+                        System.out.println("Shouldnt move cos its tired A");
+
                         return;
                     }
                     unitMovementAndAttack.unitClicked(out, x ,y);
@@ -299,17 +323,11 @@ public class GameState {
         // Win condition: should be moved to a method where we are checking player's health
 
         if (player1.getHealth() < 1) {
-            winner = player1;
-        } else if (player2.getHealth() < 1) {
             winner = player2;
-
+        } else if (player2.getHealth() < 1) {
+            winner = player1;
         }
-        // If any of the decks run out of card, the player loses. (May not be true)
-        //} else if (cardDrawing.isDeckOneEmpty()) {
-        //    winner = player2;
-        //} else if (cardDrawing.isDeckTwoEmpty()) {
-        //    winner = player1;
-        //}
+        
         if (winner != null) {
             String message = (winner == player1) ? "Player 1 won!" : "Player 2 won!" ;
             new PlayerNotificationCommandBuilder(out, isSimulation())
@@ -390,7 +408,7 @@ public class GameState {
     }
 
     public void unitDied(ActorRef out, Tile unitLocaltion, ArrayList<Pair<Integer, Integer>> pool) {
-        specialEffect.unitDidDie(out, unitLocaltion.getUnit());
+        specialAbilities.unitDidDie(out, unitLocaltion.getUnit());
 
         UnitCommandBuilder builder = new UnitCommandBuilder(out, isSimulation())
                 .setUnit(unitLocaltion.getUnit());
@@ -421,6 +439,9 @@ public class GameState {
     
     // Highlighting the clicked card at hand
     public void highlightCard(ActorRef out, Card current, int idx) {
+
+        dehighlightCard(out);
+
     	// Highlight clicked card
         new CardInHandCommandBuilder(out, isSimulation())
 	        .setCommandMode(CardInHandCommandMode.DRAW)
@@ -429,8 +450,20 @@ public class GameState {
 	        .setState(States.HIGHLIGHTED)
 	        .issueCommand();
         
-        currentHighlightedCard = current;
+        currentHighlightedCard = new Pair<>(current, idx);
     }
+
+    private void dehighlightCard(ActorRef out) {
+        if (currentHighlightedCard == null) { return; }
+        new CardInHandCommandBuilder(out, isSimulation())
+                .setCommandMode(CardInHandCommandMode.DRAW)
+                .setCard(currentHighlightedCard.getFirst())
+                .setPosition(currentHighlightedCard.getSecond())
+                .setState(States.NORMAL)
+                .issueCommand();
+        currentHighlightedCard = null;
+    }
+
 
     // ===========================================================================
     // Getters & Setters
@@ -439,8 +472,8 @@ public class GameState {
         return unitMovementAndAttack;
     }
 
-    public SpecialEffect getSpecialEffect() {
-        return specialEffect;
+    public SpecialAbilities getSpecialAbilities() {
+        return specialAbilities;
     }
 
     public CardDrawing getCardDrawing() {
@@ -475,6 +508,14 @@ public class GameState {
         switch (player) {
             case PLAYER1: return player2UnitsPosition;
             case PLAYER2: return player1UnitsPosition;
+        }
+        return null;
+    }
+
+    public Unit getAvatar(Players player) {
+        switch (player) {
+            case PLAYER1: return human;
+            case PLAYER2: return aiAvatar;
         }
         return null;
     }

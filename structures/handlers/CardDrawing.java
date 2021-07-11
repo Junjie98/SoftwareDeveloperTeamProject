@@ -50,9 +50,14 @@ public class CardDrawing {
         Card temp = (player == Players.PLAYER1) ? deck1.nextCard() : deck2.nextCard();
         current.add(temp);
 
-        if (current.size() >= MAX_CARD_COUNT_IN_HAND) {
-            current.remove(0);
+        if (current.size() > MAX_CARD_COUNT_IN_HAND) {
+            // Remove the last card drawn.
+            current.remove(current.size()-1);
         }
+
+        //Print the size of deck of cards
+        int deckSize = (player == Players.PLAYER1) ? deck1.getSize() : deck2.getSize();
+        System.out.println(player + " has another " + deckSize + " cards.");
     }
     public void displayCardsOnScreenFor(ActorRef out, Players player) {
         if (parent.isSimulation()) {

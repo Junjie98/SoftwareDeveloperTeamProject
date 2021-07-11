@@ -1,22 +1,20 @@
 package structures.handlers;
 
 import akka.actor.ActorRef;
+import commandbuilders.PlayerSetCommandsBuilder;
 import commandbuilders.UnitCommandBuilder;
-import commandbuilders.enums.Players;
-import commandbuilders.enums.UnitCommandBuilderMode;
-import commandbuilders.enums.UnitStats;
-import commandbuilders.enums.UnitType;
+import commandbuilders.enums.*;
 import structures.GameState;
 import structures.basic.Unit;
 
 import java.util.ArrayList;
 
-public class SpecialEffect {
+public class SpecialAbilities {
     GameState parent;
     ArrayList<Unit> knights = new ArrayList<>();
     Players angryKnight = null;
 
-    public SpecialEffect(GameState gameState) {
+    public SpecialAbilities(GameState gameState) {
         parent = gameState;
     }
 
@@ -31,11 +29,34 @@ public class SpecialEffect {
         parent.getCardDrawing().drawNewCardFor(out, player);
     }
 
-    public void unitIsSummoned(Unit unit) {
-        if (unit.getType() != UnitType.SILVERGUARD_KNIGHT) {
-            return;
+    public void unitIsSummoned(ActorRef out, Unit unit) {
+        switch (unit.getType()) {
+            case AZURE_HERALD:
+                int newHealth = parent.getPlayer(unit.getPlayerID()).getHealth() + 3;
+                if(newHealth > 20)
+                    newHealth = 20;
+                parent.getPlayer(unit.getPlayerID()).setHealth(newHealth);
+                new PlayerSetCommandsBuilder(out, parent.isSimulation())
+                        .setPlayer(unit.getPlayerID())
+                        .setStats(PlayerStats.HEALTH)
+                        .setInstance(parent.getPlayer(unit.getPlayerID()))
+                        .issueCommand();
+
+               new UnitCommandBuilder(out, parent.isSimulation())
+                       .setMode(UnitCommandBuilderMode.SET)
+                       .setStats(UnitStats.HEALTH, parent.getPlayer(unit.getPlayerID()).getHealth())
+                       .setUnit(parent.getAvatar(unit.getPlayerID()))
+                       .issueCommand();
+
+                break;
+            case BLAZE_HOUND:
+                parent.getCardDrawing().drawNewCardFor(out, Players.PLAYER1);
+                parent.getCardDrawing().drawNewCardFor(out, Players.PLAYER2);
+                break;
+            case SILVERGUARD_KNIGHT:
+                knights.add(unit);
+                break;
         }
-        knights.add(unit);
     }
 
     public void unitIsDamaged(ActorRef out, Unit unit) {

@@ -29,7 +29,7 @@ public class CardPlayed {
     public void moveCardToBoard(ActorRef out, int x, int y) {
         Card current = parent.getCardsInHand(parent.getTurn()).get(activeCard.getSecond());
         this.cardname = current.getCardname();
-        System.out.println(cardname);
+        System.out.println("Card's name is " + cardname);
         int tempCardToDelete = activeCard.getSecond();      //Need that if we want to have beautiful effects, and not a bug
         parent.getHighlighter().clearBoardHighlights(out);  // which decrease mana and deletes a card even when clicked at red tile
 
@@ -109,10 +109,6 @@ public class CardPlayed {
             parent.memento.add(new GameMemento(parent.getTurn(), ActionType.SPELL, new SpellInformation(targetUnit, new Pair<>(x, y), current)));
         // If normal Unit
         } else {
-            // TODO: Would you like to move this to the SpecialEffect class's isSummoned?
-        	if (current.isSpecialCard())
-        		specialAction(out, current, x, y);
-        	
             Tile tile = parent.getBoard().getTile(x, y);
             if (tile.hasUnit()) {
                 // Cannot deal a card to a Tile that has unit.
@@ -132,8 +128,16 @@ public class CardPlayed {
             unit.setFlying(cardname.equals("WindShrike"));
             // Ana: Ranged Attack
             unit.setRanged(cardname.equals("Pyromancer") || cardname.equals("Fire Spitter"));
+            // set to true
+            unit.setProvoker((cardname.equals("Silverguard Knight") || cardname.equals("Ironcliff Guardian") || cardname.equals("Rock Pulveriser")));
+            if (unit.getType() == UnitType.AZURITE_LION || unit.getType().equals(UnitType.SERPENTI))
+                unit.setAttackLimit(2);
 
-            parent.getSpecialEffect().unitIsSummoned(unit);
+            unit.setPlayerID(parent.getTurn());
+            tile.setUnit(unit);
+            unit.setPositionByTile(tile);
+        
+            parent.getSpecialAbilities().unitIsSummoned(out, unit);
 
             UnitCommandBuilder builder = new UnitCommandBuilder(out, parent.isSimulation())
                     .setUnit(unit);
@@ -145,6 +149,8 @@ public class CardPlayed {
 
             try {Thread.sleep(30);} catch (InterruptedException e) {e.printStackTrace();}
 
+            unit.setHealth(current.getBigCard().getHealth());
+            unit.setDamage(current.getBigCard().getAttack());
             //updates the UI from bigCard stats
             builder.setMode(UnitCommandBuilderMode.SET)
                     .setStats(UnitStats.HEALTH, current.getBigCard().getHealth())
@@ -183,23 +189,27 @@ public class CardPlayed {
                     .setStats(UnitStats.HEALTH, healthAfterDamage)
                     .issueCommand();
 
+            target.setHealth(healthAfterDamage);
+
             // delete unit if health <=0
             if (healthAfterDamage == 0) {
                 parent.unitDied(out, targetLocation, parent.getEnemyUnitsPosition(parent.getTurn()));
             }
         }else if (cardname.equals("Staff of Y'Kir'")){      //Avatar gains +2 Attack
-            int enemyAvatarAttack = target.getDamage();
-            System.out.println(enemyAvatarAttack);
-            int attackAfterSpell = enemyAvatarAttack + strengthOfSpell;
+            int friendlyAvatarAttack = target.getDamage();
+            int attackAfterSpell = friendlyAvatarAttack + strengthOfSpell;
 
             targetCommandBuilder
                     .setMode(UnitCommandBuilderMode.SET)
                     .setStats(UnitStats.ATTACK, attackAfterSpell)
                     .issueCommand();
+
+            target.setDamage(attackAfterSpell);
         }
 
         // update avatar health to UI player health.
         if(target.isAvatar() && target.getPlayerID() == Players.PLAYER1) {
+
             parent.getPlayer(Players.PLAYER1).setHealth(target.getHealth());
             new PlayerSetCommandsBuilder(out, parent.isSimulation())
                     .setPlayer(Players.PLAYER1)
@@ -222,44 +232,6 @@ public class CardPlayed {
             }
         }
     }
-    
-    public void specialAction(ActorRef out, Card current, int x, int y) {
-    	switch (current.getCardname()) {
-    		case "Azure Herald":
-    			boolean isPlayer1 = false;
-    			if (parent.getTurn() == Players.PLAYER1)
-    				isPlayer1 = true;
-    			
-    			if (isPlayer1) {
-    				int newHealth = parent.getPlayer(Players.PLAYER1).getHealth() + 3;
-    				if(newHealth > 20)
-    					newHealth = 20;
-	               parent.getPlayer(Players.PLAYER1).setHealth(newHealth);
-    			   new PlayerSetCommandsBuilder(out, parent.isSimulation())
-	                   .setPlayer(Players.PLAYER1)
-	                   .setStats(PlayerStats.HEALTH)
-	                   .setInstance(parent.getPlayer(Players.PLAYER1))
-	                   .issueCommand();
-    			}
-                else {
-            		int newHealth = parent.getPlayer(Players.PLAYER2).getHealth() + 3;
-    				if(newHealth > 20)
-    					newHealth = 20;
-    				parent.getPlayer(Players.PLAYER2).setHealth(newHealth);
-                	new PlayerSetCommandsBuilder(out, parent.isSimulation())
-	                    .setPlayer(Players.PLAYER2)
-	                    .setStats(PlayerStats.HEALTH)
-	                    .setInstance(parent.getPlayer(Players.PLAYER2))
-	                    .issueCommand();
-                }
-    			break;
-    			
-    		case "Blaze Hound":
-    			parent.getCardDrawing().drawNewCardFor(out, Players.PLAYER1);
-    			parent.getCardDrawing().drawNewCardFor(out, Players.PLAYER2);
-    			break;
-    	}
-    }
 
     // ===========================================================================
     // Delete Cards and Units
@@ -268,6 +240,7 @@ public class CardPlayed {
         ArrayList<Card> current = parent.getCardsInHand(parent.getTurn());
         current.remove(pos);
         parent.getCardDrawing().displayCardsOnScreenFor(out, parent.getTurn());
+        parent.currentHighlightedCard = null;
     }
 
     // ===========================================================================

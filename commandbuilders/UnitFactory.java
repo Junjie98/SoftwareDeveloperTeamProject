@@ -6,8 +6,15 @@ import structures.basic.Unit;
 import utils.BasicObjectBuilders;
 import utils.StaticConfFiles;
 
+/**
+ * Factory for the Units.
+ * @author Yu-Sung Hsu (2540296h@student.gla.ac.uk)
+ * @author Theodoros Vrakas (2593566v@student.gla.ac.uk)
+ */
+
 public class UnitFactory {
     private static int counter = 0;
+    // @author Yu-Sung Hsu (2540296h@student.gla.ac.uk)
     public Unit generateUnit(UnitType type) {
         String conf = "";
         switch (type) {
@@ -72,6 +79,7 @@ public class UnitFactory {
         return loadedUnit;
     }
 
+    // @author Yu-Sung Hsu (2540296h@student.gla.ac.uk)
     public Unit generateUnitByUnitConfig(Unit oldUnit) {
         // This is only used for simulations!
         Unit unit = BasicObjectBuilders.loadUnit(oldUnit.getConfigFile(), -1, Unit.class);
@@ -86,6 +94,7 @@ public class UnitFactory {
         return unit;
     }
 
+    // @author Theodoros Vrakas (2593566v@student.gla.ac.uk)
     public Unit generateUnitByCard(Card card){
         Unit unit;
         String cardname = card.getCardname();

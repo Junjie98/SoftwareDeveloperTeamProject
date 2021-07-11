@@ -1,5 +1,12 @@
 package structures.handlers;
 
+/**
+ * A generic pair class that makes it easier to bundle two values.
+ * @param <T>
+ * @param <U>
+ * @author Yu-Sung Hsu (2540296h@student.gla.ac.uk)
+ */
+
 public class Pair<T, U> {
     private T first;
     private U second;

@@ -10,6 +10,13 @@ import structures.memento.GameMemento;
 
 import java.util.ArrayList;
 
+/**
+ * An extractor for GameState.
+ * It generates an ExtractedGameState Object when extract is called.
+ * This class is hooked to the GameState when it is created.
+ * @author Yu-Sung Hsu (2540296h@student.gla.ac.uk)
+ */
+
 public class GameStateExtractor {
     private final GameState parent;
 

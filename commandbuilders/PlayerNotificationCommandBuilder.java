@@ -16,6 +16,8 @@ import commandbuilders.enums.Players;
  *
  * Although the user is defined as enum of PLAYER1 and PLAYER2,
  *      the PLAYER2 is not properly supported by the front end so it is strongly discouraged to use it.
+ *
+ * @author Yu-Sung Hsu (2540296h@student.gla.ac.uk)
  */
 
 public class PlayerNotificationCommandBuilder extends CommandBuilder {

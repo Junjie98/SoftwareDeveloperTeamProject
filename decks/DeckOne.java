@@ -7,6 +7,12 @@ import utils.StaticConfFiles;
 import java.util.ArrayList;
 import java.util.Collections;
 
+/**
+ * Information holder of the first deck.
+ * It provides an interface to draw card.
+ * @author Yu-Sung Hsu (2540296h@student.gla.ac.uk)
+ */
+
 public class DeckOne {
     private ArrayList<Card> cards = new ArrayList<>();
 

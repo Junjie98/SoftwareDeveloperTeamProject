@@ -14,6 +14,8 @@ import structures.basic.Player;
  * You will need to call .setPlayer(Players) to decide the player to set is PLAYER1 or PLAYER2,
  *      .setStats(PlayerStats) to decide to set MANA, HEALTH, or ALL, and
  *      .setInstance(Player) to provide an instance whose specified Stats will be set to the UI.
+ *
+ * @author Yu-Sung Hsu (2540296h@student.gla.ac.uk)
  */
 
 public class PlayerSetCommandsBuilder extends CommandBuilder {

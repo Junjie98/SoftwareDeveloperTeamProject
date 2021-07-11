@@ -19,6 +19,8 @@ import structures.basic.Card;
  *
  * - mode DELETE - When set to delete, you will need to call .setPosition(int) to indicate the position of card to be removed.
  *      Notice any other fields set will be ignored by the .issueCommand() function.
+ *
+ * @author Yu-Sung Hsu (2540296h@student.gla.ac.uk)
  */
 
 public class CardInHandCommandBuilder extends CommandBuilder {

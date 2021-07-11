@@ -3,6 +3,12 @@ package structures.memento;
 import structures.basic.Unit;
 import structures.handlers.Pair;
 
+/**
+ * The movement information that implements the Relevant information interface.
+ * If needed, cast the interface to specific type to get even more detailed information.
+ * @author Yu-Sung Hsu (2540296h@student.gla.ac.uk)
+ */
+
 public class AttackInformation implements RelevantInformation {
     final private Pair<Integer, Integer> source, target;
     final private Unit sourceUnit, targetUnit;

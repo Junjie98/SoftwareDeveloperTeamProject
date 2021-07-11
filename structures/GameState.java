@@ -88,22 +88,37 @@ public class GameState {
         // setting health & attack to board. *They doesn't stack*
         // uses the health that has been initialised earlier with the player constructor
 
-        try {Thread.sleep(30);} catch (InterruptedException e) {e.printStackTrace();}
-
+        if (out != null) {
+            try {
+                Thread.sleep(30);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
         humanCommands.setMode(UnitCommandBuilderMode.SET)
                 .setStats(UnitStats.HEALTH, player1.getHealth())
                 .issueCommand();
 
-        try {Thread.sleep(30);} catch (InterruptedException e) {e.printStackTrace();}
-
+        if (out != null) {
+            try {
+                Thread.sleep(30);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
         humanCommands.setMode(UnitCommandBuilderMode.SET)
                 .setStats(UnitStats.ATTACK, 2)
                 .issueCommand();
 
         player1UnitsPosition.add(new Pair<>(1, 2));
 
-        try {Thread.sleep(30);} catch (InterruptedException e) {e.printStackTrace();}
-
+        if (out != null) {
+            try {
+                Thread.sleep(30);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
         //Avatar2
         aiAvatar = new UnitFactory().generateUnit(UnitType.AI);
         aiAvatar.setAvatar(true);
@@ -125,22 +140,38 @@ public class GameState {
                 .setPlayerID(Players.PLAYER2)
                 .issueCommand();
 
-        try {Thread.sleep(30);} catch (InterruptedException e) {e.printStackTrace();}
-
+        if (out != null) {
+            try {
+                Thread.sleep(30);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
         //uses the health that has been initialised earlier with the player constructor
 
         aiCommands.setMode(UnitCommandBuilderMode.SET)
                 .setStats(UnitStats.HEALTH, player2.getHealth())
                 .issueCommand();
 
-        try {Thread.sleep(30);} catch (InterruptedException e) {e.printStackTrace();}
+        if (out != null) {
+            try {
+                Thread.sleep(30);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
 
         aiCommands.setMode(UnitCommandBuilderMode.SET)
                 .setStats(UnitStats.ATTACK, 2)
                 .issueCommand();
 
-        try {Thread.sleep(30);} catch (InterruptedException e) {e.printStackTrace();}
-
+        if (out != null) {
+            try {
+                Thread.sleep(30);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
         player2UnitsPosition.add(new Pair<>(7, 2));
 
         //Save the original health state to a hashmap. Used for calculations.
@@ -359,7 +390,9 @@ public class GameState {
                 .setAnimationType(UnitAnimationType.death)
                 .issueCommand();
 
-        try {Thread.sleep(3000);} catch (InterruptedException e) {e.printStackTrace();}
+        if (out != null) {
+            try {Thread.sleep(3000);} catch (InterruptedException e) {e.printStackTrace();}
+        }
 
         builder.setMode(UnitCommandBuilderMode.DELETE)
                 .issueCommand();

@@ -3,6 +3,7 @@ package structures.extractor;
 import commandbuilders.enums.Players;
 import structures.Board;
 import structures.GameState;
+import structures.basic.Card;
 import structures.basic.Player;
 import structures.handlers.Pair;
 
@@ -36,7 +37,7 @@ public class ExtractedGameState extends GameState {
         }
     }
 
-    public Pair<Integer, Integer> getMyAvatarPosition() {
+    public Pair<Integer, Integer> getAIAvatarPosition() {
         for (Pair<Integer, Integer> pair: player2UnitsPosition) {
             if (getBoard().getTile(pair).getUnit().isAvatar()) {
                 return pair;
@@ -63,6 +64,17 @@ public class ExtractedGameState extends GameState {
             }
         }
         return output;
+    }
+
+    // This should only be used for unit testing.
+    public void testSummon(Card card, Players player, Pair<Integer, Integer> position) {
+        Player myPlayer = getPlayer(player);
+        myPlayer.setMana(9);
+        ArrayList<Card> hand = getCardsInHand(player);
+        hand.clear();
+        hand.add(card);
+        cardClicked(null, 0);
+        getCardPlayed().moveCardToBoard(null, position.getFirst(), position.getSecond());
     }
 
     @Override

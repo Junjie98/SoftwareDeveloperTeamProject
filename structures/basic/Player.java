@@ -25,6 +25,12 @@ public class Player {
 	public int getHealth() {
 		return health;
 	}
+
+	//////////////////////////////////////////////////////////////////////////////////////
+	                /*
+					*Sets the cap of health and mana.
+                    *@author Jun Jie Low (2600104L@student.gla.ac.uk/nelsonlow_88@hotmail.com)
+                    */
 	public void setHealth(int health) {
 		if(health > 20) { //sets the health cap.
 			this.health = 20;
@@ -40,6 +46,6 @@ public class Player {
 		}else {
 			this.mana = mana;
 		}
-		
+//////////////////////////////////////////////////////////////////////////////////////////		
 	}
 }

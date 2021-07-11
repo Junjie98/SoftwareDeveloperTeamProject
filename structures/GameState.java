@@ -306,7 +306,10 @@ public class GameState {
         // This is separated for the potential use in simulation.
         return Math.min(getRound() + 1, 9);
     }
-
+                    /*
+                    *Minor contribution towards mana as Mana has been refactored by Anamika! :D
+                    *@author Jun Jie Low (2600104L@student.gla.ac.uk/nelsonlow_88@hotmail.com)
+                    */
     private void setManaByRound(ActorRef out) {
         int mana = getCurrentRoundMana();
 

@@ -129,7 +129,14 @@ public class CardPlayed {
             // Ana: Ranged Attack
             unit.setRanged(cardname.equals("Pyromancer") || cardname.equals("Fire Spitter"));
             // set to true
+/////////////////////////////////////////////////////////////////////////////////////////
+
+                    /*
+                    *set selected card as provoker.
+                    *@author Jun Jie Low (2600104L@student.gla.ac.uk/nelsonlow_88@hotmail.com)
+                    */
             unit.setProvoker((cardname.equals("Silverguard Knight") || cardname.equals("Ironcliff Guardian") || cardname.equals("Rock Pulveriser")));
+////////////////////////////////////////////////////////////////////////////////////////
             if (unit.getType() == UnitType.AZURITE_LION || unit.getType().equals(UnitType.SERPENTI))
                 unit.setAttackLimit(2);
 
@@ -207,7 +214,13 @@ public class CardPlayed {
             target.setDamage(attackAfterSpell);
         }
 
+        ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                     /*
+                    *This is just to keep the board health linked with the avatar's health on the side of the board.
+                    *@author Jun Jie Low (2600104L@student.gla.ac.uk/nelsonlow_88@hotmail.com)
+                    */
         // update avatar health to UI player health.
+        ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
         if(target.isAvatar() && target.getPlayerID() == Players.PLAYER1) {
 
             parent.getPlayer(Players.PLAYER1).setHealth(target.getHealth());

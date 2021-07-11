@@ -291,7 +291,9 @@ public class UnitMovementAndAttack {
             parent.getHighlighter().clearBoardHighlights(out);
         } else if (destinationTile.getTileState() == States.HIGHLIGHTED && unitsCanMove) { //added another condition to check
             if (!(parent instanceof ExtractedGameState)) {
-                unitsCanMove = false;   // Prevent other units from moving.
+                if(!parent.isSimulation()){
+                    unitsCanMove = false;   // Prevent other units from moving.
+                }
             }
 
             System.out.println("move valid : boolean = " + unitsCanMove); //debug //results found that within enemy tile range, the bool is set to true.

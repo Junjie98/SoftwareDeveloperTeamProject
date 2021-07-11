@@ -196,7 +196,10 @@ public class GameState {
 
     }
 
-
+    public void Ai_GSPulse(ActorRef out, GameState gs)
+    {
+        ai.actionAIStack(out, gs);
+    }
     
     public void cardClicked(ActorRef out, int idx) {
         Card current = getCardsInHand(turn).get(idx);

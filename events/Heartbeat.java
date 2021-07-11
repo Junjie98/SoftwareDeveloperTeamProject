@@ -22,11 +22,11 @@ import structures.GameState;
 public class Heartbeat implements EventProcessor{
 	@Override
 	public void processEvent(ActorRef out, GameState gameState, JsonNode message) {
-		if(gameState.getTurn() != Players.PLAYER2)
-        {
-			//System.out.println("Send to ai pulse");
-            //gameState.ai.moveCheck(out, gameState);;
-        }
+		// if(gameState.getTurn() == Players.PLAYER2)
+        // {
+		// 	//System.out.println("Send to ai pulse");
+        //     gameState.Ai_GSPulse(out, gameState);;
+        // }
 		
 	}
 }

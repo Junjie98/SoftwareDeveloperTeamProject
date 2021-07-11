@@ -8,7 +8,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import javax.lang.model.util.ElementScanner14;
 
 import akka.actor.ActorRef;
 
@@ -33,7 +32,8 @@ public class AI
     static int moveIndex = 0;
     static boolean attack = false;
     int mana = 0;
-
+    ArrayList<GameMemento> mems = new ArrayList<>();
+    int memInd = 0;
     public AI()
     {
 
@@ -43,14 +43,13 @@ public class AI
     {
         //think method that runs sim returns list of actions with info in order for this turn
         //act on the methods return info
-
+        mems = new ArrayList<>();
         if(gs.getTurn()==Players.PLAYER2)
         {
             System.out.println("AI Started");
             findBestMoves(out, gs);
             //moveInit(out, gs);
             //castInit(out, gs);
-            gs.endTurnClicked(out);
         }
 
     }
@@ -80,21 +79,41 @@ public class AI
         generateMoves(out, nodes, depth, depthLimit);
         Collections.sort(nodes);
 
-        System.out.println("First node goodness: " +nodes.get(0).goodness);
-        System.out.println("First node scan: " +nodes.get(0).gameState.getBoard().scanForUnits());
-        System.out.println("First node pmem: " +nodes.get(0).gameState.parentMemento);
-        System.out.println("First node mem: " +nodes.get(0).gameState.memento);
-        System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
-        System.out.println("second node goodness: " +nodes.get(1).goodness);
-        System.out.println("second node mem: " +nodes.get(1).gameState.memento);
+        // System.out.println("First node goodness: " +nodes.get(0).goodness);
+        // System.out.println("First node scan: " +nodes.get(0).gameState.getBoard().scanForUnits());
+        // System.out.println("First node pmem: " +nodes.get(0).gameState.parentMemento);
+        // System.out.println("First node mem: " +nodes.get(0).gameState.memento);
+        // System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+        // System.out.println("second node goodness: " +nodes.get(1).goodness);
+        // System.out.println("second node mem: " +nodes.get(1).gameState.memento);
 
         //System.out.println("number of nodes created: "+nodes.size());
 
-        for(GameMemento mem : nodes.get(0).gameState.memento)
-        {
+        mems= nodes.get(0).gameState.memento;
+        
+        System.out.println("mems size : " + mems.size());
+        //actionAIStack(out, gameState);
+        for (GameMemento mem : mems) {
             AI_Action(out, gameState, mem);
-
         }
+        gameState.endTurnClicked(out);
+    }
+
+    public void actionAIStack(ActorRef out, GameState gs)
+    {
+        // if(memInd < mems.size())
+        // {
+        //     System.out.println("mem action");
+        //     int temp = memInd;
+        //     memInd++;
+        //     AI_Action(out, gs, mems.get(temp));
+        //     try {Thread.sleep(3000);} catch (InterruptedException e) {e.printStackTrace();}
+        // }
+        // else{
+        //     System.out.println("mems done");
+        //     gs.endTurnClicked(out);
+        // }
+
     }
 
     public void generateMoves(ActorRef out, ArrayList<AiNode> nodes, int depth, int limit)
@@ -154,6 +173,8 @@ public class AI
                 atkState.tileClicked(out, attacker.getFirst(), attacker.getSecond());
                 atkState.tileClicked(out, attackee.getFirst(), attackee.getSecond());
                 System.out.println("~~~~~~~~~~~~AttackUnit location " + atkState.locateUnit(unitLocator));
+                
+                Pair<Integer,Integer> attackerPosChecked = atkState.locateUnit(unitLocator) ==null? attacker:atkState.locateUnit(unitLocator);
 
                 AttackInformation atkInfo = new AttackInformation(attacker, attackee, atkState.getBoard().getTile(attacker).getUnit(),atkState.getBoard().getTile(attackee).getUnit());
                 attacks.add(new GameMemento(atkState.getTurn(), ActionType.ATTACK, atkInfo));
@@ -511,6 +532,7 @@ public class AI
 
     public void AI_Action(ActorRef out, GameState gs, GameMemento mem)
     {
+        System.out.println("[AI ACTION OUT]");
         ActionType type = mem.getActionType();
 
         switch(type)

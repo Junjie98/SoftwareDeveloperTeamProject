@@ -408,7 +408,7 @@ public class UnitMovementAndAttack {
                         else {
                             return;
                         }
-                    } else if(!provokeFuncMoveAttackCheck(x, y)) {
+                    } else if(!provokeFuncMoveAttackCheck(moveTile.getFirst(), moveTile.getSecond())) {
                         // Within attack range
                         System.out.println("no provoker near you");
 
@@ -417,7 +417,7 @@ public class UnitMovementAndAttack {
                         attackerLocation =  parent.getBoard().getTile(moveTile);
                         
                         enemyHealthAfterAttack = attack(out, attackerLocation, enemyLocation, isRanged);
-                    }if(provokeFuncMoveAttackCheck(x, y)){
+                    }if(provokeFuncMoveAttackCheck(moveTile.getFirst(), moveTile.getSecond())){
                         System.out.println("provoker is around");
                         highlightedMoveTileClicked(out, moveTile.getFirst(), moveTile.getSecond());
                         try {Thread.sleep(3000);} catch (InterruptedException e) {e.printStackTrace();}
@@ -649,7 +649,7 @@ public class UnitMovementAndAttack {
 
             }
             }catch(NullPointerException |ArrayIndexOutOfBoundsException e){
-                System.out.println("boom you fucked up"); //change to "" if needed
+                System.out.println("Caught something!"); //change to "" if needed
     
             }
     
@@ -676,30 +676,7 @@ public class UnitMovementAndAttack {
     ////////
     public boolean provokeFuncMoveAttackCheck(int x,int y){
         try{
-            //calculate position in order to find where unit will land. 
-            //then, use the landing position to find 1tiles away if there is any provoker.
-            int valueX = activeUnit.getFirst(); //my player value
-            int valueY = activeUnit.getSecond(); // my player value
-            int enemyValueX = x;
-            int enemyValueY = y;
-            int realX = enemyValueX;
-            int realY = valueY;
-            if(valueX > enemyValueX){ //my player is resided on the right
-                realX+=1;
-            }else if(valueX < enemyValueX)
-            {
-                realX-=1;
-            }else{realX=enemyValueX;}
-            // if(valueY == enemyValueY)
-            // {
-            //     realY = enemyValueY;
-            if(valueY > enemyValueY)
-            {
-                realY-=1;
-            }else if(valueY < enemyValueY){
-                realY+=1;
-            }
-            ArrayList<Pair<Integer, Integer>> tiles = get1RAtkTiles(realX, realY);
+           ArrayList<Pair<Integer, Integer>> tiles = get1RAtkTiles(x, y);
            // System.out.println(realX + " and " + realY + "Debug for check provokeMovetile");
             boolean provokerNearby = false;
             
@@ -719,7 +696,7 @@ public class UnitMovementAndAttack {
                         nonProvokerUnit.setUnitProvoked(provokerUnit);
                         System.out.println(parent.getBoard().getTile(activeUnit.getFirst(),activeUnit.getSecond()).getUnit().getProvoked());//debug purpose
                         //provokerTile = tiles;
-                        System.out.println(tiles + " Debug this ya fucking cunt"); //checked.
+                        System.out.println(tiles + " Debug"); //checked.
                         provokerNearby = true; 
                         return true; //for check provoke while move
                     //}
@@ -736,7 +713,7 @@ public class UnitMovementAndAttack {
             }return false;
             
             }catch(NullPointerException |ArrayIndexOutOfBoundsException e){
-                System.out.println("boom you fucked up"); //change to "" if needed
+                System.out.println("caught something!"); //change to "" if needed
     
             }
             return false;
@@ -753,6 +730,7 @@ public class UnitMovementAndAttack {
             unit.setHasMoved(false);
             unit.resetAttackCount();
             unit.clearAttackers();
+            System.out.println("Resetting");
 
             try {Thread.sleep(30);} catch (InterruptedException e) {e.printStackTrace();}
             

@@ -39,7 +39,7 @@ public class UnitMovementAndAttack {
     // ===========================================================================
     // Highlight Logic
     // ===========================================================================
-    public void unitClicked(ActorRef out, int x, int y) {
+    public void unitClicked(ActorRef out, int x, int y, boolean AI_Bypass) {
         Tile tile = parent.getBoard().getTile(x, y);
         if (tile.getUnit().getPlayerID() != parent.getTurn()) {
             // This is not your unit.
@@ -67,7 +67,7 @@ public class UnitMovementAndAttack {
             }
 
 
-        } else if (unitsCanMove) {
+        } else if (unitsCanMove ) {
             parent.getHighlighter().clearBoardHighlights(out);
             activeUnit = new Pair<>(x, y);
             if(parent.getBoard().getTile(activeUnit).getUnit().getHasMoved())

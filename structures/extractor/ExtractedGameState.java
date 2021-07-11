@@ -212,7 +212,7 @@ public class ExtractedGameState extends GameState {
     {
         for (int x = 0; x < 9; x++) {
             for (int y = 0; y < 5; y++) {
-                if(getBoard().getTile(x, y).hasUnit() && getBoard().getTile(x, y).getUnit().equals(locate))
+                if(getBoard().getTile(x, y).hasUnit() && getBoard().getTile(x, y).hasUnit() && getBoard().getTile(x, y).hasUnit() && getBoard().getTile(x, y).getUnit().equals(locate))
                 {
                     return new Pair<>(x,y);
                 }

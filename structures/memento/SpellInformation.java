@@ -36,6 +36,6 @@ public class SpellInformation implements RelevantInformation {
     }
     @Override
     public String toString() {
-        return "Spell ("  + spellCard.getCardname() + ") is used on " + spellTarget.getName() + target;
+        return "Spell ("  + spellCard.getCardname() + ") is used on " +  target;
     }
 }

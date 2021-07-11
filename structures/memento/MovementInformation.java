@@ -26,6 +26,6 @@ public class MovementInformation implements RelevantInformation {
 
     @Override
     public String toString() {
-        return "Unit " + unit.getName() + " moved from " + source + " to " + target;
+        return "Unit  moved from " + source + " to " + target;
     }
 }

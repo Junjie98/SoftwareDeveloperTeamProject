@@ -79,13 +79,13 @@ public class AI
         generateMoves(out, nodes, depth, depthLimit);
         Collections.sort(nodes);
 
-        // System.out.println("First node goodness: " +nodes.get(0).goodness);
-        // System.out.println("First node scan: " +nodes.get(0).gameState.getBoard().scanForUnits());
-        // System.out.println("First node pmem: " +nodes.get(0).gameState.parentMemento);
-        // System.out.println("First node mem: " +nodes.get(0).gameState.memento);
-        // System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
-        // System.out.println("second node goodness: " +nodes.get(1).goodness);
-        // System.out.println("second node mem: " +nodes.get(1).gameState.memento);
+        System.out.println("First node goodness: " +nodes.get(0).goodness);
+        System.out.println("First node scan: " +nodes.get(0).gameState.getBoard().scanForUnits());
+        System.out.println("First node pmem: " +nodes.get(0).gameState.parentMemento);
+        System.out.println("First node mem: " +nodes.get(0).gameState.memento);
+        System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+        System.out.println("second node goodness: " +nodes.get(1).goodness);
+        System.out.println("second node mem: " +nodes.get(1).gameState.memento);
 
         //System.out.println("number of nodes created: "+nodes.size());
 
@@ -168,7 +168,7 @@ public class AI
                 Pair<Integer,Integer> attacker = attackMove.getFirst();
                 Pair<Integer,Integer> attackee = attackMove.getSecond();
                 Unit unitLocator = atkState.getBoard().getTile(attacker).getUnit();
-                System.out.println(atkState.getBoard().getTile(attacker).getUnit().getName());
+                //System.out.println(atkState.getBoard().getTile(attacker).getUnit().getName());
 
                 atkState.tileClicked(out, attacker.getFirst(), attacker.getSecond());
                 atkState.tileClicked(out, attackee.getFirst(), attackee.getSecond());

@@ -106,7 +106,7 @@ public class CardPlayed {
                 }
             }
             // Track this action in the memento.
-            parent.memento.add(new GameMemento(parent.getTurn(), ActionType.SPELL, new SpellInformation(targetUnit, new Pair<>(x, y), current)));
+            //parent.memento.add(new GameMemento(parent.getTurn(), ActionType.SPELL, new SpellInformation(targetUnit, new Pair<>(x, y), current)));
         // If normal Unit
         } else {
             Tile tile = parent.getBoard().getTile(x, y);
@@ -136,6 +136,8 @@ public class CardPlayed {
             unit.setPlayerID(parent.getTurn());
             tile.setUnit(unit);
             unit.setPositionByTile(tile);
+            unit.setHasAttacked();
+            unit.setHasMoved(true);
         
             parent.getSpecialAbilities().unitIsSummoned(out, unit);
 
@@ -167,7 +169,7 @@ public class CardPlayed {
 
             parent.getUnitsPosition(parent.getTurn()).add(new Pair<>(x, y));
 
-            parent.memento.add(new GameMemento(parent.getTurn(), ActionType.SUMMON, new SummonInformation(new Pair<>(x, y), unit)));
+            //parent.memento.add(new GameMemento(parent.getTurn(), ActionType.SUMMON, new SummonInformation(new Pair<>(x, y), unit)));
         }
         deleteCardFromHand(out, tempCardToDelete);      //these two have to take place at the end to avoid a bug.
         parent.decreaseManaPerCardPlayed(out, current.getManacost());

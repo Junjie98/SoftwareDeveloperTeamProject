@@ -7,11 +7,13 @@ import structures.handlers.Pair;
 public class SpellInformation implements RelevantInformation {
     final private Pair<Integer, Integer> target;
     final private Card spellCard;
+    final private int indexInHand;
     final private Unit spellTarget;
-    public SpellInformation(Unit spellTarget, Pair<Integer, Integer> target, Card spellCard) {
+    public SpellInformation(int indexInHand, Unit spellTarget, Pair<Integer, Integer> target, Card spellCard) {
         this.spellTarget = spellTarget;
         this.target = target;
         this.spellCard = spellCard;
+        this.indexInHand = indexInHand;
     }
     @Override
     public Pair<Integer, Integer> getSource() {
@@ -28,6 +30,10 @@ public class SpellInformation implements RelevantInformation {
         return spellTarget;
     }
 
+    public int getIndexInHand()
+    {
+        return indexInHand;
+    }
     @Override
     public String toString() {
         return "Spell ("  + spellCard.getCardname() + ") is used on " + spellTarget.getName() + target;

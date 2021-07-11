@@ -6,9 +6,11 @@ import structures.handlers.Pair;
 public class SummonInformation implements RelevantInformation {
     final private Pair<Integer, Integer> target;
     final private Unit summonedUnit;
-    public SummonInformation(Pair<Integer, Integer> target, Unit summonedUnit) {
+    final private int indexInHand;
+    public SummonInformation(Pair<Integer, Integer> target, int indexInHand, Unit summonedUnit) {
         this.target = target;
         this.summonedUnit = summonedUnit;
+        this.indexInHand = indexInHand;
     }
     @Override
     public Pair<Integer, Integer> getSource() {
@@ -17,6 +19,10 @@ public class SummonInformation implements RelevantInformation {
     @Override
     public Pair<Integer, Integer> getTarget() {
         return target;
+    }
+    public int getIndexInHand()
+    {
+        return indexInHand;
     }
     public Unit getSummonedUnit() {
         return summonedUnit;

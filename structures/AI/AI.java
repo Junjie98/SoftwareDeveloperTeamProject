@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -48,6 +49,7 @@ public class AI
         findBestMoves(out, gs);
         //moveInit(out, gs);
         //castInit(out, gs);
+        gs.endTurnClicked(out);
     }
 
     
@@ -75,13 +77,19 @@ public class AI
         generateMoves(out, nodes, depth, depthLimit);
         Collections.sort(nodes);
 
-        ArrayList<AiNode> goodPathNodes = new ArrayList<>();
-        for (int i = 0; i < depthLimit; i++) {
-            
-        }
+        System.out.println("First node goodness: " +nodes.get(0).goodness);
+        System.out.println("First node mem: " +nodes.get(0).gameState.memento);
+        System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+        System.out.println("second node goodness: " +nodes.get(1).goodness);
+        System.out.println("second node mem: " +nodes.get(1).gameState.memento);
 
         //System.out.println("number of nodes created: "+nodes.size());
 
+        for(GameMemento mem : nodes.get(0).gameState.memento)
+        {
+            AI_Action(out, gameState, mem);
+
+        }
     }
 
     public void generateMoves(ActorRef out, ArrayList<AiNode> nodes, int depth, int limit)
@@ -188,7 +196,8 @@ public class AI
                 Pair<Integer, Integer> targPos = findGoodMove(moveState, unitPos, target);
                 if(targPos != null)
                 {
-                    AI_MoveUnit(out, moveState, unitPos, targPos);
+                    moveState.tileClicked(out, unitPos.getFirst(), unitPos.getSecond());
+                    moveState.tileClicked(out, targPos.getFirst(), targPos.getSecond());
                     
                     MovementInformation moveInfo = new MovementInformation(moveState.getBoard().getTile(targPos).getUnit(), unitPos, targPos);
                     moves.add(new GameMemento(moveState.getTurn(), ActionType.MOVE, moveInfo));
@@ -226,7 +235,9 @@ public class AI
         summonState.setSimulation(true);
         ArrayList<Pair<Integer, Card>> summons = summonState.canStillSummon();
 
+
         if(summons.size()>0){
+            System.out.println("first summonable card name: " + summons.get(0).getSecond().getCardname());
             System.out.println("calculating summon for node at depth: " + depth);
             Pair<Integer,Integer> target = findEnemyTarget(summonState);
             ArrayList<GameMemento> summonActions = new ArrayList<>();
@@ -245,10 +256,10 @@ public class AI
             }
             else{
                 //otherwise any card will do if they are the same or only one
-                indexOfHigh = 0;
+                indexOfHigh = summons.get(0).getFirst();
             }
 
-            System.out.println("Found High cost card");
+            System.out.println("Found High cost card at ind: " + indexOfHigh);
             ArrayList<Pair<Integer, Integer>> summonTiles = getSummonTiles(summonState);
             ArrayList<Pair<Integer, Integer>> goodSTiles = new ArrayList<>();
             ArrayList<Card> hand = new ArrayList<>();
@@ -306,7 +317,7 @@ public class AI
             System.out.println("making mementos");
 
             //Make the new memento and 
-            SummonInformation sumInfo = new SummonInformation(target, summonState.getBoard().getTile(target).getUnit());
+            SummonInformation sumInfo = new SummonInformation(target, indexOfHigh, summonState.getBoard().getTile(target).getUnit());
             summonActions.add(new GameMemento(summonState.getTurn(), ActionType.SUMMON, sumInfo));
 
             if(aiNode.parent != null)
@@ -364,7 +375,7 @@ public class AI
             Pair<Integer,Integer> target= new Pair<Integer,Integer>(0,0);
             String cardName = "";
             cardName =castState.getCardsInHand(castState.getTurn()).get(indexOfHighManaCard).getCardname();
-            if(cardName.equals("Staff of Y'Kir"))
+            if(cardName.equals("Staff of Y'Kir'"))
             {
                 //+2 attack to avatar
                 Pair<Integer,Integer> avatarPos = castState.getMyAvatarPosition();
@@ -447,8 +458,8 @@ public class AI
 
 
             //Make the new memento and add it to the new node
-            SpellInformation sumInfo = new SpellInformation(castState.getBoard().getTile(target).getUnit(),target,cardSelected );
-            castActions.add(new GameMemento(castState.getTurn(), ActionType.MOVE, sumInfo));
+            SpellInformation spellInfo = new SpellInformation(indexOfHighManaCard, castState.getBoard().getTile(target).getUnit(),target,cardSelected );
+            castActions.add(new GameMemento(castState.getTurn(), ActionType.SPELL, spellInfo));
 
             if(aiNode.parent != null)
             {
@@ -463,7 +474,7 @@ public class AI
 
         }
         else{
-            System.out.println("no summons available AI depth: " + ldepth);
+            System.out.println("no casts available AI depth: " + ldepth);
         }
 
         System.out.println("done generating for node at depth: " + depth);
@@ -478,6 +489,39 @@ public class AI
 
 
     //Part of the AI control "interface"
+
+    public void AI_Action(ActorRef out, GameState gs, GameMemento mem)
+    {
+        ActionType type = mem.getActionType();
+
+        switch(type)
+        {
+            case ATTACK:
+                AttackInformation aInfo =(AttackInformation) mem.getInformation();
+                AI_AtkUnit(out, gs, aInfo.getSource(), aInfo.getTarget());
+                break;
+
+            case MOVE:
+                MovementInformation mInfo =(MovementInformation) mem.getInformation();
+                AI_MoveUnit(out, gs, mInfo.getSource(), mInfo.getTarget());
+                break;
+
+            case SUMMON:
+                SummonInformation sInfo =(SummonInformation) mem.getInformation();
+                AI_SummonUnit(out, gs, sInfo.getIndexInHand(), sInfo.getTarget());
+                break;
+
+            case SPELL:
+                SpellInformation cinfo =(SpellInformation) mem.getInformation();
+                AI_CastSpell(out, gs, cinfo.getIndexInHand(), cinfo.getTarget());
+                break;
+            
+            
+            default:
+                System.err.println("What happened here? Memento fail from AI_Action Switch");
+                break;
+        }
+    }
     public void AI_SummonUnit(ActorRef out, GameState gs, int cardIndex, Pair<Integer, Integer> pos)
     {
         gs.cardClicked(out, cardIndex);
@@ -503,6 +547,14 @@ public class AI
         moreUnitsToMoveAtk(out, gs);
     }
 
+    public void AI_CastSpell(ActorRef out, GameState gs, int handInd, Pair<Integer,Integer> target)
+    {
+        gs.cardClicked(out, handInd);
+        try {Thread.sleep(500);} catch (InterruptedException e) {e.printStackTrace();}
+        gs.tileClicked(out, target.getFirst(), target.getSecond());
+        try {Thread.sleep(1500);} catch (InterruptedException e) {e.printStackTrace();}
+        moreUnitsToMoveAtk(out, gs);
+    }
     public void moreUnitsToMoveAtk(ActorRef out, GameState gs)
     {
         if(moveIndex < (gs.getTurn()==Players.PLAYER2? gs.player2UnitsPosition:gs.player1UnitsPosition).size())
@@ -599,9 +651,15 @@ public class AI
         }
         System.out.println("AI: found all summon tiles");
 
-        for (Pair<Integer,Integer> friend : friendlies) {
-            if(tiles.contains(friend)){
-                tiles.remove(friend);
+        // for (Pair<Integer,Integer> tile : tiles) {
+        //     if(gs.getBoard().getTile(tile).hasUnit()){
+        //         tiles.remove(tile);
+        //     }
+        // }
+
+        for(Iterator<Pair<Integer,Integer>> tile = tiles.iterator(); tile.hasNext();){            
+            if(gs.getBoard().getTile(tile.next()).hasUnit()){
+                tile.remove(); // right call
             }
         }
         System.out.println("AI: removed all the friendlies from summon tiles");
@@ -644,10 +702,10 @@ public class AI
             yMove = 0;
         }
 
-        if(Board.getInstance().getTile(unitPos).getUnit().isRanged())
+        if(gs.getBoard().getTile(unitPos).getUnit().isRanged())
         {
             if(gs.getUnitMovementAndAttack().getFlyMoveTiles().contains(targPos)
-                && Board.getInstance().getTile(targPos).hasUnit())
+                && gs.getBoard().getTile(targPos).hasUnit())
             {
                 moved = true; 
 
@@ -657,7 +715,7 @@ public class AI
             }
         }
         else if(gs.getUnitMovementAndAttack().getAllAtkTiles(unitPos.getFirst(), unitPos.getSecond()).contains(targPos)
-            && Board.getInstance().getTile(targPos).hasUnit()
+            && gs.getBoard().getTile(targPos).hasUnit()
             && gs.getUnitMovementAndAttack().moveBlockCheck(unitPos.getFirst(), unitPos.getSecond(),xMove,yMove))
         {   //if we can attack and move then go for it and let that logic take care of itself
             moved = true; 

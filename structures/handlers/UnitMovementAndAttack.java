@@ -216,7 +216,7 @@ public class UnitMovementAndAttack {
         return output;
     }
     public ArrayList<Pair<Integer, Integer>> get1RAtkTiles(int x, int y) {
-        if (activeUnit == null) { System.exit(1); }
+        //if (activeUnit == null) { return null; }
         ArrayList<Pair<Integer, Integer>> output = parent.getMoveTiles(x, y, 1, 0);
         output.addAll(parent.getMoveTiles(x, y, 1, 1));
         return output;

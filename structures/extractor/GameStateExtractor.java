@@ -24,7 +24,9 @@ public class GameStateExtractor {
         ExtractedGameState output = new ExtractedGameState();
         output.setSimulation(true);       // Simulation will be used to block draw board and prevent changes to affect the main GameState, including card drawing.
 
-        output.setBoard(Board.getCopy());
+        output.setBoard(parent.getBoard().getCopy());
+        System.out.println("Extracted gamestate time: ");
+        System.out.println(output.getBoard().scanForUnits());
         output.player1CardsInHand = cloneCardList(parent.player1CardsInHand);
         output.player2CardsInHand = cloneCardList(parent.player2CardsInHand);
         output.player1UnitsPosition = clonePairList(parent.player1UnitsPosition);

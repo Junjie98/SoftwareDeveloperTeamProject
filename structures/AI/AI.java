@@ -1,6 +1,8 @@
 package structures.AI;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -69,48 +71,65 @@ public class AI
         int depth = 0;
         nodes.add(new AiNode(null, rootState, depth));
 
-        generateMoves(out, nodes, depth, 5);
-        System.out.println("number of nodes created: "+nodes.size());
+        int depthLimit = 5;
+        generateMoves(out, nodes, depth, depthLimit);
+        Collections.sort(nodes);
+
+        ArrayList<AiNode> goodPathNodes = new ArrayList<>();
+        for (int i = 0; i < depthLimit; i++) {
+            
+        }
+
+        //System.out.println("number of nodes created: "+nodes.size());
 
     }
 
     public void generateMoves(ActorRef out, ArrayList<AiNode> nodes, int depth, int limit)
     {
-        System.out.println("AI depth: "+depth);
+        System.out.println("AI depth gen at: "+depth);
         System.out.println("number of nodes created: "+nodes.size());
 
         if(depth>=limit)
         {
             return;
         }
-        for (AiNode aiNode : nodes){
+        for (int i = 0; i < nodes.size(); i++){
+            AiNode aiNode = nodes.get(i);
             if(aiNode.depth == depth){
                 generateMovesForNode(out, nodes, aiNode, depth);
             }
+
         }
+        System.out.println("END:AI depth gen at: "+depth);
+        System.out.println("END:number of nodes created: "+nodes.size());
+
         generateMoves(out, nodes, ++depth, limit);
     }
 
     public void generateMovesForNode(ActorRef out, ArrayList<AiNode> nodes, AiNode aiNode, int depth)
     {
 
+        System.out.println("Generating at depth: " + depth);
         //set depth for this iteration
         int ldepth = ++depth;
         //set the gamestate in the smartboy
-        SmartBoy temp_sBoy = new SmartBoy(aiNode.gameState);
-
+        //SmartBoy temp_sBoy = new SmartBoy(aiNode.gameState);
+        System.out.println( "Scsn gamesstae for units before generation : " + aiNode.gameState.getBoard().scanForUnits());
 
         //Right well then, lets go through a list of nodes, creating new nodes for each action that can be performed
         //split this into attacking casting summoning and moving
         
         //Attack Logic
         //get attack state for manipulation
-        ExtractedGameState atkState = temp_sBoy.getExtractedGameState();
+        //ExtractedGameState atkState = temp_sBoy.getExtractedGameState();
+        ExtractedGameState atkState = aiNode.gameState;
         atkState.setSimulation(true);
 
         ArrayList<Pair<Pair<Integer,Integer>,Pair<Integer,Integer>>> attackers = atkState.canStillAttack();
         //do a check to see if there are any valid attacks that can be actioned.
         if(attackers.size()>0){
+            System.out.println("calculating attack for node at depth: " + depth);
+
             //if so then action all these attacks and collect the data
             ArrayList<GameMemento> attacks = new ArrayList<>();
             for (Pair<Pair<Integer,Integer>,Pair<Integer,Integer>> attackMove : attackers) {
@@ -126,6 +145,10 @@ public class AI
 
             //once the data is collected and the gamestate has been actioned 
             //we update the state with a record of the actions performed
+            if(aiNode.parent != null)
+            {
+                atkState.memento.addAll(aiNode.parent.gameState.memento);
+            }
             atkState.memento.addAll(attacks);
 
             //we then create a new node that has the new state in it
@@ -145,14 +168,17 @@ public class AI
         }
 
         
-        
+
         //Move Logic
-        ExtractedGameState moveState = temp_sBoy.getExtractedGameState();
+        //ExtractedGameState moveState = temp_sBoy.getExtractedGameState();
+        ExtractedGameState moveState = aiNode.gameState;
         moveState.setSimulation(true);
         ArrayList<Pair<Integer,Integer>> movers = moveState.canStillMove();
 
         if(movers.size()>0){
-            System.out.println("mover at: " + moveState.getMyAvatarPosition());
+            System.out.println("calculating move for node at depth: " + depth);
+
+            //System.out.println("mover at: " + moveState.getMyAvatarPosition());
             Pair<Integer,Integer> target = findEnemyTarget(moveState);
             System.out.println("enemy at: " + target);
             ArrayList<GameMemento> moves = new ArrayList<>();
@@ -163,10 +189,15 @@ public class AI
                 if(targPos != null)
                 {
                     AI_MoveUnit(out, moveState, unitPos, targPos);
+                    
                     MovementInformation moveInfo = new MovementInformation(moveState.getBoard().getTile(targPos).getUnit(), unitPos, targPos);
                     moves.add(new GameMemento(moveState.getTurn(), ActionType.MOVE, moveInfo));
                 }
 
+            }
+            if(aiNode.parent != null)
+            {
+                moveState.memento.addAll(aiNode.parent.gameState.memento);
             }
             moveState.memento.addAll(moves);
             Map<ArrayList<GameMemento>,AiNode> output = new HashMap<>();
@@ -174,27 +205,29 @@ public class AI
             output.put(moves, newNode);
             aiNode.updateMap(output);
             nodes.add(newNode);
-
         }
         else{
             System.out.println("no movers available AI depth: " + ldepth);
         }
 
 
-        System.out.println("mover at: " + moveState.getMyAvatarPosition());
-        Pair<Integer,Integer> ttarget = findEnemyTarget(moveState);
-        System.out.println("enemy at: " + ttarget);
-        ArrayList<GameMemento> moves = new ArrayList<>();
+        // System.out.println("mover at: " + moveState.getMyAvatarPosition());
+        // Pair<Integer,Integer> ttarget = findEnemyTarget(moveState);
+        // System.out.println("enemy at: " + ttarget);
+        // ArrayList<GameMemento> moves = new ArrayList<>();
 
 
 
 
         //Summon Logic
-        ExtractedGameState summonState = temp_sBoy.getExtractedGameState();
+        //ExtractedGameState summonState = temp_sBoy.getExtractedGameState();
+        ExtractedGameState summonState = aiNode.gameState;
+
         summonState.setSimulation(true);
         ArrayList<Pair<Integer, Card>> summons = summonState.canStillSummon();
 
         if(summons.size()>0){
+            System.out.println("calculating summon for node at depth: " + depth);
             Pair<Integer,Integer> target = findEnemyTarget(summonState);
             ArrayList<GameMemento> summonActions = new ArrayList<>();
 
@@ -215,9 +248,12 @@ public class AI
                 indexOfHigh = 0;
             }
 
+            System.out.println("Found High cost card");
             ArrayList<Pair<Integer, Integer>> summonTiles = getSummonTiles(summonState);
             ArrayList<Pair<Integer, Integer>> goodSTiles = new ArrayList<>();
             ArrayList<Card> hand = new ArrayList<>();
+            System.out.println("Found card summon spots");
+
             if(summonTiles.size()>0)
             {   //if there are spaces to summon
                 int range;
@@ -245,6 +281,8 @@ public class AI
                         }
                     }
                 }
+                System.out.println("Found some good tiles");
+
                 if(goodSTiles.size()> 0)
                 {   //if there are good tiles out of range then use any one
                     summonState.cardClicked(out, indexOfHigh);
@@ -258,23 +296,30 @@ public class AI
                     target = goodSTiles.get(0);
                     summonState.tileClicked(out, summonTiles.get(0).getFirst(), summonTiles.get(0).getSecond());
                 }
-          
+                System.out.println("Summoned!");
+
             }
             else{
                 System.out.println("nowhere to summon");
             }
 
+            System.out.println("making mementos");
 
             //Make the new memento and 
             SummonInformation sumInfo = new SummonInformation(target, summonState.getBoard().getTile(target).getUnit());
             summonActions.add(new GameMemento(summonState.getTurn(), ActionType.SUMMON, sumInfo));
 
+            if(aiNode.parent != null)
+            {
+                summonState.memento.addAll(aiNode.parent.gameState.memento);
+            }
             summonState.memento.addAll(summonActions);
             Map<ArrayList<GameMemento>,AiNode> output = new HashMap<>();
             AiNode newNode = new AiNode(aiNode, summonState, ldepth);
             output.put(summonActions, newNode);
             aiNode.updateMap(output);
             nodes.add(newNode);
+            System.out.println("done making mementos");
 
         }
         else{
@@ -284,11 +329,15 @@ public class AI
 
         
         //Cast Logic
-        ExtractedGameState castState = temp_sBoy.getExtractedGameState();
+        //ExtractedGameState castState = temp_sBoy.getExtractedGameState();
+        ExtractedGameState castState = aiNode.gameState;
+
         castState.setSimulation(true);
         ArrayList<Pair<Integer, Card>> casts = castState.canStillCast();
 
         if(casts.size()>0){
+            System.out.println("calculating cast for node at depth: " + depth);
+
             ArrayList<GameMemento> castActions = new ArrayList<>();
 
             Card cardSelected = new Card();
@@ -307,12 +356,14 @@ public class AI
             }
             else{
                 //otherwise any card will do if they are the same or only one
-                indexOfHighManaCard = 0;
+                indexOfHighManaCard = casts.get(0).getFirst();
+                cardSelected=casts.get(0).getSecond();
+
             }
 
             Pair<Integer,Integer> target= new Pair<Integer,Integer>(0,0);
             String cardName = "";
-            cardName =cardSelected.getCardname();
+            cardName =castState.getCardsInHand(castState.getTurn()).get(indexOfHighManaCard).getCardname();
             if(cardName.equals("Staff of Y'Kir"))
             {
                 //+2 attack to avatar
@@ -399,6 +450,10 @@ public class AI
             SpellInformation sumInfo = new SpellInformation(castState.getBoard().getTile(target).getUnit(),target,cardSelected );
             castActions.add(new GameMemento(castState.getTurn(), ActionType.MOVE, sumInfo));
 
+            if(aiNode.parent != null)
+            {
+                castState.memento.addAll(aiNode.parent.gameState.memento);
+            }
             castState.memento.addAll(castActions);
             Map<ArrayList<GameMemento>,AiNode> output = new HashMap<>();
             AiNode newNode = new AiNode(aiNode, castState, ldepth);
@@ -411,6 +466,7 @@ public class AI
             System.out.println("no summons available AI depth: " + ldepth);
         }
 
+        System.out.println("done generating for node at depth: " + depth);
 
     }
 
@@ -527,21 +583,29 @@ public class AI
     
     public ArrayList<Pair<Integer,Integer>> getSummonTiles(GameState gs)
     {
+        System.out.println("AI: getting summon tiles");
         ArrayList<Pair<Integer,Integer>> tiles = new ArrayList<>();
+        System.out.println("AI: about to get all friendlies");
 
-        ArrayList<Pair<Integer,Integer>> friendlies = gs.getTurn()==Players.PLAYER2?gs.player2UnitsPosition:gs.player1UnitsPosition;
+        ArrayList<Pair<Integer,Integer>> friendlies = gs.getUnitsPosition(gs.getTurn());
+        System.out.println("AI: got all friendlies");
+
         for(int i =0; i < friendlies.size(); i++){
- 
+            System.out.println("AI: got a friend");
+
             Pair<Integer,Integer> pos = friendlies.get(i);
             tiles.addAll(gs.getUnitMovementAndAttack().get1RAtkTiles(pos.getFirst(), pos.getSecond()));
    
         }
+        System.out.println("AI: found all summon tiles");
 
         for (Pair<Integer,Integer> friend : friendlies) {
             if(tiles.contains(friend)){
                 tiles.remove(friend);
             }
         }
+        System.out.println("AI: removed all the friendlies from summon tiles");
+
         return tiles;
     }
 

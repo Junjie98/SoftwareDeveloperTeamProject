@@ -1,5 +1,7 @@
 package structures;
 
+import java.util.ArrayList;
+
 import commandbuilders.UnitFactory;
 import structures.basic.Tile;
 import structures.basic.Unit;
@@ -20,6 +22,20 @@ public class Board {
 
     public static Board getInstance() {
         return instance;
+    }
+
+    public ArrayList<Pair<Integer,Integer>> scanForUnits()
+    {
+        ArrayList<Pair<Integer,Integer>> out = new ArrayList<>();
+        for (int x = 0; x < 9; x++) {
+            for (int y = 0; y < 5; y++) {
+                if(board[x][y].getUnit() != null)
+                {
+                    out.add(new Pair<>(x,y));
+                }
+            }
+        }
+        return out;
     }
 
     public Tile getTile(int x, int y) {
@@ -45,7 +61,7 @@ public class Board {
     public static void reloadBoard() {
         instance = new Board();
     }
-    public static Board getCopy() {
+    public Board getCopy() {
         Board copy = new Board();
         for (int x = 0; x < 9; x++) {
             for (int y = 0; y < 5; y++) {

@@ -14,19 +14,21 @@ import structures.extractor.ExtractedGameState;
 import structures.handlers.Pair;
 import structures.memento.GameMemento;
 
-public class AiNode {
+public class AiNode implements Comparable<AiNode>{
     AiNode parent = null;
     int depth = 0;
     ExtractedGameState gameState = null;
     Map<ArrayList<GameMemento>, AiNode> childPaths = new HashMap<>();
     int goodness = 0;
 
-    AiNode(AiNode parent, GameState gs, int depth)
+    AiNode(AiNode parent, ExtractedGameState gs, int depth)
     {
         this.parent = parent;
         this.depth = depth;
 
-        gameState = new SmartBoy(gs).getExtractedGameState();
+        gameState = gs;
+
+
         goodness = evaulate();
     }
 
@@ -82,11 +84,11 @@ public class AiNode {
 
         for (Pair<Integer,Integer> unit : friendlies) {
 
-            System.out.println("Ainode at depth: " + depth);
-            //System.out.println("ainode parent: " + parent.depth);
-            System.out.println("Evaulating at unit: " + unit);
-            System.out.println("gameState: \n" +gameState);
-            System.out.println("Is there a unit here? :" +gameState.getBoard().getTile(unit).getUnit());
+           // System.out.println("Ainode at depth: " + depth);
+            //System.out.println("Evaulating at unit: " + unit);
+
+            
+
 
             totalScore+=gameState.getBoard().getTile(unit).getUnit().getHealth();
             totalScore+=UnitCost;
@@ -107,4 +109,21 @@ public class AiNode {
 
         return totalScore;
     }
+
+    @Override
+	public int compareTo(AiNode o) 
+	{
+		if(this.goodness>o.goodness)
+		{
+			return  -1; 
+		}
+		else if(this.goodness<o.goodness)
+		{
+			return  1;
+		}
+		else
+		{
+			return 0;
+		}
+	}
 }

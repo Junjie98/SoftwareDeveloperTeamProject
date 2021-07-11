@@ -14,11 +14,11 @@ public class AttackInformation implements RelevantInformation {
     }
     @Override
     public Pair<Integer, Integer> getSource() {
-        return null;
+        return source;
     }
     @Override
     public Pair<Integer, Integer> getTarget() {
-        return null;
+        return target;
     }
     public Unit getSourceUnit() {
         return sourceUnit;
@@ -29,6 +29,6 @@ public class AttackInformation implements RelevantInformation {
 
     @Override
     public String toString() {
-        return "Unit " + sourceUnit.getName() + source + " attacked " + targetUnit.getName() + target;
+        return "Unit " + source + " attacked " + targetUnit.getName() + target;
     }
 }

@@ -138,7 +138,7 @@ public class CardPlayed {
             unit.setPositionByTile(tile);
             unit.setHasAttacked();
             unit.setHasMoved(true);
-        
+            parent.getUnitMovementAndAttack().moveAttackAndCounterAttack.add(unit);
             parent.getSpecialAbilities().unitIsSummoned(out, unit);
 
             UnitCommandBuilder builder = new UnitCommandBuilder(out, parent.isSimulation())

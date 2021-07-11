@@ -81,6 +81,8 @@ public class AI
         Collections.sort(nodes);
 
         System.out.println("First node goodness: " +nodes.get(0).goodness);
+        System.out.println("First node scan: " +nodes.get(0).gameState.getBoard().scanForUnits());
+        System.out.println("First node pmem: " +nodes.get(0).gameState.parentMemento);
         System.out.println("First node mem: " +nodes.get(0).gameState.memento);
         System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
         System.out.println("second node goodness: " +nodes.get(1).goodness);
@@ -146,9 +148,13 @@ public class AI
             for (Pair<Pair<Integer,Integer>,Pair<Integer,Integer>> attackMove : attackers) {
                 Pair<Integer,Integer> attacker = attackMove.getFirst();
                 Pair<Integer,Integer> attackee = attackMove.getSecond();
+                Unit unitLocator = atkState.getBoard().getTile(attacker).getUnit();
+                System.out.println(atkState.getBoard().getTile(attacker).getUnit().getName());
+
                 atkState.tileClicked(out, attacker.getFirst(), attacker.getSecond());
                 atkState.tileClicked(out, attackee.getFirst(), attackee.getSecond());
-                
+                System.out.println("~~~~~~~~~~~~AttackUnit location " + atkState.locateUnit(unitLocator));
+
                 AttackInformation atkInfo = new AttackInformation(attacker, attackee, atkState.getBoard().getTile(attacker).getUnit(),atkState.getBoard().getTile(attackee).getUnit());
                 attacks.add(new GameMemento(atkState.getTurn(), ActionType.ATTACK, atkInfo));
             }           
@@ -158,7 +164,11 @@ public class AI
             //we update the state with a record of the actions performed
             if(aiNode.parent != null)
             {
-                atkState.memento.addAll(aiNode.parent.gameState.memento);
+                if(aiNode.parent.parent!= null)
+                {
+                    atkState.parentMemento.addAll(aiNode.parent.gameState.parentMemento);
+                }
+                atkState.parentMemento.addAll(aiNode.parent.gameState.memento);
             }
             atkState.memento.addAll(attacks);
 
@@ -201,7 +211,7 @@ public class AI
                 {
                     moveState.tileClicked(out, unitPos.getFirst(), unitPos.getSecond());
                     moveState.tileClicked(out, targPos.getFirst(), targPos.getSecond());
-                    
+                    moveState.getBoard().getTile(targPos).getUnit().setHasMoved(true);
                     MovementInformation moveInfo = new MovementInformation(moveState.getBoard().getTile(targPos).getUnit(), unitPos, targPos);
                     moves.add(new GameMemento(moveState.getTurn(), ActionType.MOVE, moveInfo));
                 }
@@ -209,7 +219,14 @@ public class AI
             }
             if(aiNode.parent != null)
             {
-                moveState.memento.addAll(aiNode.parent.gameState.memento);
+                System.out.println("~~~~~~~~adding p mem");
+                if(aiNode.parent.parent!= null)
+                {
+                    System.out.println("~~~~~~~~~~concat p mem");
+
+                    moveState.parentMemento.addAll(aiNode.parent.gameState.parentMemento);
+                }
+                moveState.parentMemento.addAll(aiNode.parent.gameState.memento);
             }
             moveState.memento.addAll(moves);
             Map<ArrayList<GameMemento>,AiNode> output = new HashMap<>();
@@ -319,8 +336,13 @@ public class AI
             SummonInformation sumInfo = new SummonInformation(target, indexOfHigh, summonState.getBoard().getTile(target).getUnit());
             summonActions.add(new GameMemento(summonState.getTurn(), ActionType.SUMMON, sumInfo));
 
-            if(aiNode.parent != null){
-                summonState.memento.addAll(aiNode.parent.gameState.memento);
+            if(aiNode.parent != null)
+            {
+                if(aiNode.parent.parent!= null)
+                {
+                    summonState.parentMemento.addAll(aiNode.parent.gameState.parentMemento);
+                }
+                summonState.parentMemento.addAll(aiNode.parent.gameState.memento);
             }
             summonState.memento.addAll(summonActions);
             Map<ArrayList<GameMemento>,AiNode> output = new HashMap<>();
@@ -456,7 +478,11 @@ public class AI
 
             if(aiNode.parent != null)
             {
-                castState.memento.addAll(aiNode.parent.gameState.memento);
+                if(aiNode.parent.parent!= null)
+                {
+                    castState.parentMemento.addAll(aiNode.parent.gameState.parentMemento);
+                }
+                castState.parentMemento.addAll(aiNode.parent.gameState.memento);
             }
             castState.memento.addAll(castActions);
             Map<ArrayList<GameMemento>,AiNode> output = new HashMap<>();
@@ -518,32 +544,32 @@ public class AI
     public void AI_SummonUnit(ActorRef out, GameState gs, int cardIndex, Pair<Integer, Integer> pos)
     {
         gs.cardClicked(out, cardIndex);
-        try {Thread.sleep(2500);} catch (InterruptedException e) {e.printStackTrace();}
+        try {Thread.sleep(3000);} catch (InterruptedException e) {e.printStackTrace();}
         gs.tileClicked(out, pos.getFirst(), pos.getSecond());
-        try {Thread.sleep(2500);} catch (InterruptedException e) {e.printStackTrace();}
+        try {Thread.sleep(3000);} catch (InterruptedException e) {e.printStackTrace();}
         moreUnitsToMoveAtk(out, gs);
 
     }
     public void AI_MoveUnit(ActorRef out, GameState gs, Pair<Integer, Integer> friendlyPosition, Pair<Integer, Integer> moveToPosition)
     {
         gs.tileClicked(out, friendlyPosition.getFirst(), friendlyPosition.getSecond());
-        try {Thread.sleep(2500);} catch (InterruptedException e) {e.printStackTrace();}
+        try {Thread.sleep(3000);} catch (InterruptedException e) {e.printStackTrace();}
         gs.tileClicked(out, moveToPosition.getFirst(), moveToPosition.getSecond());
-        try {Thread.sleep(2500);} catch (InterruptedException e) {e.printStackTrace();}
+        try {Thread.sleep(3000);} catch (InterruptedException e) {e.printStackTrace();}
     }
     public void AI_AtkUnit(ActorRef out, GameState gs, Pair<Integer, Integer> friendlyPosition, Pair<Integer, Integer> enemyPosition)
     {
         gs.tileClicked(out, friendlyPosition.getFirst(), friendlyPosition.getSecond());
-        try {Thread.sleep(2500);} catch (InterruptedException e) {e.printStackTrace();}
+        try {Thread.sleep(3000);} catch (InterruptedException e) {e.printStackTrace();}
         gs.tileClicked(out, enemyPosition.getFirst(), enemyPosition.getSecond());
-        try {Thread.sleep(2500);} catch (InterruptedException e) {e.printStackTrace();}
+        try {Thread.sleep(3000);} catch (InterruptedException e) {e.printStackTrace();}
         moreUnitsToMoveAtk(out, gs);
     }
 
     public void AI_CastSpell(ActorRef out, GameState gs, int handInd, Pair<Integer,Integer> target)
     {
         gs.cardClicked(out, handInd);
-        try {Thread.sleep(500);} catch (InterruptedException e) {e.printStackTrace();}
+        try {Thread.sleep(1000);} catch (InterruptedException e) {e.printStackTrace();}
         gs.tileClicked(out, target.getFirst(), target.getSecond());
         try {Thread.sleep(1500);} catch (InterruptedException e) {e.printStackTrace();}
         moreUnitsToMoveAtk(out, gs);

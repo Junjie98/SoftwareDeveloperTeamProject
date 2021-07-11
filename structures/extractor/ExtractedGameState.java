@@ -5,9 +5,12 @@ import structures.Board;
 import structures.GameState;
 import structures.basic.Card;
 import structures.basic.Player;
+import structures.basic.Unit;
 import structures.handlers.Pair;
 
 import java.util.ArrayList;
+
+import javax.lang.model.util.ElementScanner14;
 
 
 public class ExtractedGameState extends GameState {
@@ -163,30 +166,94 @@ public class ExtractedGameState extends GameState {
     {
         ArrayList<Pair<Pair<Integer,Integer>,Pair<Integer,Integer>>> out = new ArrayList<>();
         for (Pair<Integer,Integer> unit : getUnitsPosition(getTurn())) {
-            if(!board.getTile(unit).getUnit().getHasAttacked())
+            if(!board.getTile(unit).getUnit().getHasAttacked() && !board.getTile(unit).getUnit().getHasMoved())
             {
-                ArrayList<Pair<Integer,Integer>> allAtkTilesR = getUnitMovementAndAttack().getAllAtkTiles(unit.getFirst(), unit.getSecond());
-                allAtkTilesR.addAll(getUnitMovementAndAttack().getAllMoveTiles(unit.getFirst(), unit.getSecond()));
-            
-                for (Pair<Integer,Integer> enemy : (getTurn()==Players.PLAYER2) ? player1UnitsPosition : player2UnitsPosition) {
-                    if(allAtkTilesR.contains(enemy))
-                    {
-                        int movex = enemy.getFirst() - unit.getFirst();
-                        int movey = enemy.getSecond() - unit.getSecond();
-                        if(!getUnitMovementAndAttack().moveBlockCheck(unit.getFirst(), unit.getSecond(), movex, movey))
-                        {
-                            Pair<Integer,Integer> attaker = unit;
-                            Pair<Integer,Integer> attackee = enemy;
-
-                            out.add(new Pair<>(attaker, attackee));
+                
+                if(board.getTile(unit).getUnit().isRanged())
+                {
+                    out.add(new Pair<>(unit, getEnemyAvatarPosition()));
+                }
+                else{
+                    System.out.println("~~~~Attack calculation triggered");
+                    ArrayList<Pair<Integer,Integer>> allAtkTilesR = getUnitMovementAndAttack().getAllAtkTiles(unit.getFirst(), unit.getSecond());
+                    allAtkTilesR.addAll(getUnitMovementAndAttack().getAllMoveTiles(unit.getFirst(), unit.getSecond()));
+                
+                    for (Pair<Integer,Integer> enemy : (getTurn()==Players.PLAYER2) ? player1UnitsPosition : player2UnitsPosition) {
+                        for (Pair<Integer,Integer> pair : allAtkTilesR) {
+                            if(pair.equals(enemy))
+                            {
+                                System.out.println("~~~enemy in range! do the maths");
+                                int movex = enemy.getFirst() - unit.getFirst();
+                                int movey = enemy.getSecond() - unit.getSecond();
+                                if(!moveBlockCheckAI(unit, movex, movey))
+                                {
+                                    System.out.println("notblocked");
+                                    Pair<Integer,Integer> attaker = unit;
+                                    Pair<Integer,Integer> attackee = enemy;
+        
+                                    out.add(new Pair<>(attaker, attackee));
+                                }
+                                else{
+                                    System.out.println("blocked");
+                                }
+                            }
                         }
+                        
+            
                     }
                 }
+               
             }
         }
         return out;
     }
 
+    public Pair<Integer,Integer> locateUnit(Unit locate)
+    {
+        for (int x = 0; x < 9; x++) {
+            for (int y = 0; y < 5; y++) {
+                if(getBoard().getTile(x, y).hasUnit() && getBoard().getTile(x, y).getUnit().equals(locate))
+                {
+                    return new Pair<>(x,y);
+                }
+            }
+        }
+        return null;
+    }
+
+    public boolean moveBlockCheckAI(Pair<Integer,Integer> source,int xMove, int yMove)
+    {
+        if(Math.abs(xMove) == 1 &&Math.abs(yMove) == 1)
+        {
+            return false;
+        }
+        else if(Math.abs(xMove) == 2) {
+            if(getBoard().getTile(source.getFirst() + xMove/2, source.getSecond()).hasUnit())
+            {
+                return true;
+            }
+            else{
+                return false;
+            }
+        }else if(Math.abs(yMove) == 2) {
+            if(getBoard().getTile(source.getFirst() , source.getSecond()+ yMove/2).hasUnit())
+            {
+                return true;
+            }
+            else{
+                return false;
+            }
+        }else if((Math.abs(xMove)==1 && yMove==0) ||(Math.abs(yMove)==1 && xMove==0))
+        {
+            return false;
+        }
+        else{
+            System.out.println("!ERROR CHECK! Error check this move");
+            System.out.println(source);
+            System.out.println(xMove + " : "+ yMove);
+            return false;
+        }
+    }
     
     // This should only be used for unit testing.
     public void testSummon(Card card, Players player, Pair<Integer, Integer> position) {

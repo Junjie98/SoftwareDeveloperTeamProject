@@ -105,26 +105,32 @@ public class UnitMovementAndAttack {
             }
             count++;
         }
+        System.out.println("Do we get here on pyro bug1?");
+        System.out.println("interDir size : " + interDir.size());
+        System.out.println("initdirb size : " + initDirB.length);
 
         //for the inter tiles do some logic
         if(initDirB[0] || initDirB[1]) {
             parent.getHighlighter().checkTileHighlight(out, interDir.get(0), false, redOnly);
         }
-        if(initDirB[1] || initDirB[3]) {
+        if((initDirB[1] || initDirB[3]) && interDir.size() > 1) {
             parent.getHighlighter().checkTileHighlight(out, interDir.get(1), false, redOnly);
         }
-        if(initDirB[2] || initDirB[0]) {
+        if((initDirB[2] || initDirB[0]) && interDir.size() > 2) {
             parent.getHighlighter().checkTileHighlight(out, interDir.get(2), false, redOnly);
         }
-        if(initDirB[2] || initDirB[3]) {
+        if((initDirB[2] || initDirB[3]) && interDir.size() > 3) {
             parent.getHighlighter().checkTileHighlight(out, interDir.get(3), false, redOnly);
         }
+        System.out.println("Do we get here on pyro bug2?");
         if (!whiteOnly && !redOnly) {
             //basica attack highlight connected to normal movement highlight
             ArrayList<Pair<Integer, Integer>> atkTiles = getAllAtkTiles(x, y);
 
             for (Pair<Integer, Integer> pos : atkTiles) {
                 Pair<Integer,Integer> moveTile = getMoveTileForAttack(x, y, pos.getFirst(), pos.getSecond());
+                System.out.println("Do we get here on pyro bug3?");
+
                 if (parent.getBoard().getTile(moveTile) != null) {
                     if (!parent.getBoard().getTile(moveTile).hasUnit()) {
                         parent.getHighlighter().checkAttackHighlight(out, pos);
@@ -176,14 +182,15 @@ public class UnitMovementAndAttack {
                 parent.getHighlighter().checkTileHighlight(out, ti, false, false);
             }
         } else {
+            System.out.println("Unit is not flying i guess?");
             basicMoveHighlight(out, unit.getPosition().getTilex(), unit.getPosition().getTiley(), false, true);
         }
         provokeFunc(valueX,valueY);
 
         if (!unit.isRanged()) {
-            System.out.println("ranged highlight??");
             basicMoveHighlight(out, unit.getPosition().getTilex(), unit.getPosition().getTiley(), true, false);
         } else {
+            System.out.println("ranged highlight??");
             ArrayList<Pair<Integer, Integer>> units = new ArrayList<>();
             units.addAll(parent.player1UnitsPosition);
             units.addAll(parent.player2UnitsPosition);
@@ -300,8 +307,8 @@ public class UnitMovementAndAttack {
             Tile tile = parent.getBoard().getTile(x, y);
             unit.setPositionByTile(tile);
 
-            parent.memento.add(new GameMemento(parent.getTurn(), ActionType.MOVE, new MovementInformation(unit, activeUnit, new Pair<>(x, y))));
-            System.out.println(parent.memento.get(parent.memento.size() - 1));
+            //parent.memento.add(new GameMemento(parent.getTurn(), ActionType.MOVE, new MovementInformation(unit, activeUnit, new Pair<>(x, y))));
+            //System.out.println(parent.memento.get(parent.memento.size() - 1));
 
             // Update the units position in the stored position lists.
             ArrayList<Pair<Integer, Integer>> pool = parent.getUnitsPosition(parent.getTurn());
@@ -459,8 +466,8 @@ public class UnitMovementAndAttack {
                 else if(!provokeFuncMoveAttackCheck(x, y)){
                     enemyHealthAfterAttack = attack(out, attackerLocation, enemyLocation, isRanged);
                 }
-                parent.memento.add(new GameMemento(parent.getTurn(), ActionType.ATTACK, new AttackInformation(new Pair<>(attacker.getPosition().getTilex(), attacker.getPosition().getTiley()),
-                        new Pair<>(x, y), attacker, enemy)));
+                //parent.memento.add(new GameMemento(parent.getTurn(), ActionType.ATTACK, new AttackInformation(new Pair<>(attacker.getPosition().getTilex(), attacker.getPosition().getTiley()),
+                //        new Pair<>(x, y), attacker, enemy)));
 
 
                 if (enemyHealthAfterAttack > 0) {

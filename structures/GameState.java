@@ -32,6 +32,7 @@ public class GameState {
     public ArrayList<Card> player2CardsInHand = new ArrayList<>();
     public ArrayList<Pair<Integer, Integer>> player1UnitsPosition = new ArrayList<>();
     public ArrayList<Pair<Integer, Integer>> player2UnitsPosition = new ArrayList<>();
+    public ArrayList<GameMemento> parentMemento = new ArrayList<>();
     public ArrayList<GameMemento> memento = new ArrayList<>();
 
     protected boolean simulation = false;

@@ -68,13 +68,27 @@ public class ExtractedGameState extends GameState {
 
     // This should only be used for unit testing.
     public void testSummon(Card card, Players player, Pair<Integer, Integer> position) {
+        boolean flag = false;
+
+        if (getTurn() != player) {
+            endTurnClicked(null);
+            flag = true;
+        }
+
+
         Player myPlayer = getPlayer(player);
         myPlayer.setMana(9);
+
         ArrayList<Card> hand = getCardsInHand(player);
         hand.clear();
         hand.add(card);
+
         cardClicked(null, 0);
         getCardPlayed().moveCardToBoard(null, position.getFirst(), position.getSecond());
+
+        if (flag) {
+            endTurnClicked(null);
+        }
     }
 
     @Override

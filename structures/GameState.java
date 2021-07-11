@@ -309,22 +309,12 @@ public class GameState {
 
     private void setManaByRound(ActorRef out) {
         int mana = getCurrentRoundMana();
-
-        if(turn == Players.PLAYER1) {
-            player1.setMana(mana);
-            new PlayerSetCommandsBuilder(out, isSimulation())
-                    .setPlayer(Players.PLAYER1)
-                    .setStats(PlayerStats.MANA)
-                    .setInstance(player1)
-                    .issueCommand();
-        } else {
-            player2.setMana(mana);
-            new PlayerSetCommandsBuilder(out, isSimulation())
-                    .setPlayer(Players.PLAYER2)
-                    .setStats(PlayerStats.MANA)
-                    .setInstance(player2)
-                    .issueCommand();
-        }
+        getPlayer(getTurn()).setMana(mana);
+        new PlayerSetCommandsBuilder(out, isSimulation())
+                .setPlayer(getTurn())
+                .setStats(PlayerStats.MANA)
+                .setInstance(getPlayer(getTurn()))
+                .issueCommand();
     }
 
     public void decreaseManaPerCardPlayed(ActorRef out, int manaCost) {

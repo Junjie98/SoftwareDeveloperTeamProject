@@ -9,6 +9,7 @@ import structures.GameState;
 import structures.basic.Tile;
 import structures.basic.Unit;
 import structures.basic.UnitAnimationType;
+import structures.extractor.ExtractedGameState;
 import structures.memento.ActionType;
 import structures.memento.AttackInformation;
 import structures.memento.GameMemento;
@@ -270,7 +271,9 @@ public class UnitMovementAndAttack {
         if (destinationTile.getTileState() == States.NORMAL) {
             parent.getHighlighter().clearBoardHighlights(out);
         } else if (destinationTile.getTileState() == States.HIGHLIGHTED && unitsCanMove) { //added another condition to check
-            unitsCanMove = false;   // Prevent other units from moving.
+            if (!(parent instanceof ExtractedGameState)) {
+                unitsCanMove = false;   // Prevent other units from moving.
+            }
 
             System.out.println("move valid : boolean = " + unitsCanMove); //debug //results found that within enemy tile range, the bool is set to true.
 
@@ -386,7 +389,9 @@ public class UnitMovementAndAttack {
                                     }
                                     
                                     highlightedMoveTileClicked(out, pair.getFirst(), pair.getSecond());
-                                    try {Thread.sleep(3000);} catch (InterruptedException e) {e.printStackTrace();}
+                                    if (!(parent instanceof ExtractedGameState)) {
+                                        try {Thread.sleep(3000);} catch (InterruptedException e) {e.printStackTrace();}
+                                    }
 
                                     System.out.println(pair);
                                     attackerLocation =  parent.getBoard().getTile(pair);
@@ -413,7 +418,13 @@ public class UnitMovementAndAttack {
                         System.out.println("no provoker near you");
 
                         highlightedMoveTileClicked(out, moveTile.getFirst(), moveTile.getSecond());
-                        try {Thread.sleep(3000);} catch (InterruptedException e) {e.printStackTrace();}
+                        if (!(parent instanceof ExtractedGameState)) {
+                            try {
+                                Thread.sleep(3000);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                        }
                         attackerLocation =  parent.getBoard().getTile(moveTile);
                         
                         enemyHealthAfterAttack = attack(out, attackerLocation, enemyLocation, isRanged);
@@ -510,7 +521,13 @@ public class UnitMovementAndAttack {
                     .setMode(UnitCommandBuilderMode.ANIMATION)
                     .setAnimationType(UnitAnimationType.attack)
                     .issueCommand();
-    		try {Thread.sleep(2000);} catch (InterruptedException e) {e.printStackTrace();}
+            if (!(parent instanceof ExtractedGameState)) {
+                try {
+                    Thread.sleep(2000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
         }
 
         enemyCommandBuilder
@@ -754,8 +771,14 @@ public class UnitMovementAndAttack {
             unit.resetAttackCount();
             unit.clearAttackers();
 
-            try {Thread.sleep(30);} catch (InterruptedException e) {e.printStackTrace();}
-            
+            if (!(parent instanceof ExtractedGameState)) {
+                try {
+                    Thread.sleep(30);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+            }
             new UnitCommandBuilder(out, parent.isSimulation())
 	            .setUnit(unit)
 	            .setMode(UnitCommandBuilderMode.ANIMATION)

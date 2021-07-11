@@ -14,7 +14,8 @@ import structures.memento.GameMemento;
  * Its created with the GameActor.
  * 
  * @author Dr. Richard McCreadie
- *
+ * @author Theodoros Vrakas (2593566v@student.gla.ac.uk)
+ * @author William T Manson (2604495m@student.gla.ac.uk)
  */
 
 public class GameState {
@@ -177,6 +178,7 @@ public class GameState {
         }
     }
 
+    // @author Theodoros Vrakas (2593566v@student.gla.ac.uk)
     public void cardClicked(ActorRef out, int idx) {
         Card current = getCardsInHand(turn).get(idx);
         System.out.println("Card Clicked: " + current.getCardname());
@@ -326,7 +328,7 @@ public class GameState {
                     .issueCommand();
         }
     }
-
+    // @author Theodoros Vrakas (2593566v@student.gla.ac.uk)
     public void decreaseManaPerCardPlayed(ActorRef out, int manaCost) {
         int previousMana = (turn == Players.PLAYER1) ? player1.getMana() : player2.getMana();
         int currentMana = previousMana - manaCost;      // We check beforehand that currentMana always >=0

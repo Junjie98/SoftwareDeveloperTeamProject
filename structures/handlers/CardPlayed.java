@@ -1,3 +1,11 @@
+/**
+ * Implementation of the actions that take place after a Card
+ * and a Tile are selected in order for the card to move the the board
+ * and what actions should trigger based in what type of card it is.
+ * @author Theodoros Vrakas (2593566v@student.gla.ac.uk)
+ * @author William T Manson (2604495m@student.gla.ac.uk)
+ */
+
 package structures.handlers;
 
 import akka.actor.ActorRef;
@@ -24,7 +32,9 @@ public class CardPlayed {
     public CardPlayed(GameState parent) { this.parent = parent; }
 
     // ===========================================================================
-    // Move card to the Board and logic behind it.
+    // Move card to the Board and logic behind it. Considers if the card
+    // is a spell card or a normal Unit card for different actions.
+    // @author Theodoros Vrakas (2593566v@student.gla.ac.uk)
     // ===========================================================================
     public void moveCardToBoard(ActorRef out, int x, int y) {
         Card current = parent.getCardsInHand(parent.getTurn()).get(activeCard.getSecond());
@@ -173,7 +183,9 @@ public class CardPlayed {
         parent.decreaseManaPerCardPlayed(out, current.getManacost());
 
     }
-    
+
+    // Include the actions that takes place by the Spell Cards.
+    // @author Theodoros Vrakas (2593566v@student.gla.ac.uk)
     public void spellAction(ActorRef out, int x, int y, int strengthOfSpell) {
         Tile targetLocation = parent.getBoard().getTile(x, y);
         Unit target = targetLocation.getUnit();
@@ -236,6 +248,7 @@ public class CardPlayed {
     // ===========================================================================
     // Delete Cards and Units
     // ===========================================================================
+    // @author Theodoros Vrakas (2593566v@student.gla.ac.uk)
     public void deleteCardFromHand(ActorRef out, int pos) {
         ArrayList<Card> current = parent.getCardsInHand(parent.getTurn());
         current.remove(pos);

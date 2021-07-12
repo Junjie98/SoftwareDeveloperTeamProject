@@ -39,7 +39,7 @@ public class UnitMovementAndAttack {
     // ===========================================================================
     // Highlight Logic
     // ===========================================================================
-    public void unitClicked(ActorRef out, int x, int y, boolean AI_Bypass) {
+    public void unitClicked(ActorRef out, int x, int y) {
         Tile tile = parent.getBoard().getTile(x, y);
         if (tile.getUnit().getPlayerID() != parent.getTurn()) {
             // This is not your unit.

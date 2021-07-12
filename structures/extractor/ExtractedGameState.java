@@ -9,6 +9,14 @@ import structures.handlers.Pair;
 
 import java.util.ArrayList;
 
+/**
+ * An extracted GameState implementation.
+ * This is used in unit tests and potentially AI.
+ * This class creates a copy of the game state information that will not affect the GameState,
+ * good for simulation or testing.
+ * @author Yu-Sung Hsu (2540296h@student.gla.ac.uk)
+ */
+
 public class ExtractedGameState extends GameState {
     protected Board board = null;
 

@@ -6,6 +6,11 @@ import structures.basic.Unit;
 import structures.handlers.Pair;
 import utils.BasicObjectBuilders;
 
+/**
+ * The singleton Board class to give access to the Board for command builders.
+ * @author Yu-Sung Hsu (2540296h@student.gla.ac.uk)
+ */
+
 public class Board {
     final private Tile[][] board = new Tile[9][5];
     private static Board instance = new Board();
@@ -38,13 +43,17 @@ public class Board {
         }
         return null;
     }
+
     public void setUnitToTile(Unit unit, int x, int y) {
         board[x][y].setUnit(unit);
     }
 
+    // Reset the Board instance.
     public static void reloadBoard() {
         instance = new Board();
     }
+
+    // Get a value copy of the singleton instance of the Board.
     public static Board getCopy() {
         Board copy = new Board();
         for (int x = 0; x < 9; x++) {

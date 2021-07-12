@@ -9,6 +9,12 @@ import structures.basic.Unit;
 
 import java.util.ArrayList;
 
+/**
+ * Handler of the special abilities of codes.
+ * @author Yu-Sung Hsu (2540296h@student.gla.ac.uk)
+ * @author Anamika Maurya (2570847m@student.gla.ac.uk)
+ */
+
 public class SpecialAbilities {
     GameState parent;
     ArrayList<Unit> knights = new ArrayList<>();
@@ -18,6 +24,7 @@ public class SpecialAbilities {
         parent = gameState;
     }
 
+    // @author Yu-Sung Hsu (2540296h@student.gla.ac.uk)
     public void unitDidDie(ActorRef out, Unit unit) {
         if (unit.getType() == UnitType.SILVERGUARD_KNIGHT) {
             knights.remove(unit);
@@ -29,6 +36,8 @@ public class SpecialAbilities {
         parent.getCardDrawing().drawNewCardFor(out, player);
     }
 
+
+    // @author Anamika Maurya (2570847m@student.gla.ac.uk)
     public void unitIsSummoned(ActorRef out, Unit unit) {
         switch (unit.getType()) {
             case AZURE_HERALD:
@@ -59,6 +68,7 @@ public class SpecialAbilities {
         }
     }
 
+    // @author Yu-Sung Hsu (2540296h@student.gla.ac.uk)
     public void unitIsDamaged(ActorRef out, Unit unit) {
         // Silverguard Knight: If your avatar is dealt damage this unit gains +2 attack.
         if (unit.isAvatar() && !knights.isEmpty() && unit.getPlayerID() == knights.get(0).getPlayerID()) {
@@ -73,6 +83,7 @@ public class SpecialAbilities {
         }
     }
 
+    // @author Yu-Sung Hsu (2540296h@student.gla.ac.uk)
     public void turnDidEnd(ActorRef out) {
         // Remove buff after 1 turn.
         if (angryKnight != null && parent.getTurn() == angryKnight) {
@@ -83,7 +94,7 @@ public class SpecialAbilities {
         }
     }
 
-
+    // @author Yu-Sung Hsu (2540296h@student.gla.ac.uk)
     private void updateUnitAttack(ActorRef out, Unit unit, int newValue) {
         unit.setDamage(newValue);
         new UnitCommandBuilder(out, parent.isSimulation())

@@ -17,6 +17,13 @@ import structures.memento.MovementInformation;
 
 import java.util.ArrayList;
 
+/**
+ * This class consists of a unit's movement and attack logic.
+ * @author Anamika Maurya (2570847M@student.gla.ac.uk)
+ * @author Thorfinn Manson (2604495M@student.gla.ac.uk)
+ * @author Yu-Sung Hsu (2540296h@student.gla.ac.uk)
+ */
+
 public class UnitMovementAndAttack {
     Pair<Integer, Integer> activeUnit = null;
     private final GameState parent;
@@ -34,6 +41,7 @@ public class UnitMovementAndAttack {
     // ===========================================================================
     // Highlight Logic
     // ===========================================================================
+    // @author William T Manson (2604495m@student.gla.ac.uk)
     public void unitClicked(ActorRef out, int x, int y) {
         Tile tile = parent.getBoard().getTile(x, y);
         if (tile.getUnit().getPlayerID() != parent.getTurn()) {
@@ -73,6 +81,7 @@ public class UnitMovementAndAttack {
         }
     }
 
+    // @author William T Manson (2604495m@student.gla.ac.uk)
     public void basicMoveHighlight(ActorRef out, int x, int y, boolean redOnly, boolean whiteOnly) {
         ArrayList<Pair<Integer, Integer>> initDir = parent.getMoveTiles(x, y, 1, 0);
         ArrayList<Pair<Integer, Integer>> secondDir = parent.getMoveTiles(x, y,2, 0);
@@ -127,7 +136,7 @@ public class UnitMovementAndAttack {
         provokeFunc(x,y);
     }
 
-    //angry at nelson for amking me name something so ugly >=(
+    // @author William T Manson (2604495m@student.gla.ac.uk)
     public void movedButCanAttackHighlight(ActorRef out, int x, int y)
     {
         if(parent.getBoard().getTile(x,y) != null)
@@ -147,6 +156,8 @@ public class UnitMovementAndAttack {
 
         }
     }
+
+    // @author William T Manson (2604495m@student.gla.ac.uk)
     public void moveHighlight(ActorRef out, int x, int y) {
         if (parent.getBoard().getTile(x, y) != null) {
             Unit temp = parent.getBoard().getTile(x, y).getUnit();
@@ -160,6 +171,10 @@ public class UnitMovementAndAttack {
         }
     }
 
+    /**
+     * This method consists logic to highlight tiles for flying or ranged attacks.
+     * @author Anamika Maurya (2570847M@student.gla.ac.uk)
+     */
     public void flyingOrRangedMoveHighlight(ActorRef out, Unit unit) {
         if (unit.isFlying()) {
             for (Pair<Integer, Integer> ti : getFlyMoveTiles()) {
@@ -185,7 +200,11 @@ public class UnitMovementAndAttack {
         }
     }
     
-    // To be used to highlight the tiles for units that can be summoned anywhere
+    /**
+     * This method is used to highlight the tiles for units that 
+     * can be summoned anywhere.
+     * @author Anamika Maurya (2570847M@student.gla.ac.uk)
+     */
     public void summonAnywhereHighlight(ActorRef out) {
 	    for (Pair<Integer, Integer> ti : getFlyMoveTiles()) {
 	        //available tiles
@@ -193,12 +212,15 @@ public class UnitMovementAndAttack {
 	    }
     }
 
+    // @author William T Manson (2604495m@student.gla.ac.uk)
     public ArrayList<Pair<Integer, Integer>> getAllMoveTiles(int x, int y) {
         ArrayList<Pair<Integer, Integer>> output = parent.getMoveTiles(x, y, 1, 0);
         output.addAll(parent.getMoveTiles(x, y, 2, 0));
         output.addAll(parent.getMoveTiles(x, y, 1, 1));
         return output;
     }
+
+    // @author William T Manson (2604495m@student.gla.ac.uk)
     public ArrayList<Pair<Integer, Integer>> getAllAtkTiles(int x, int y) {
         ArrayList<Pair<Integer, Integer>> output = parent.getMoveTiles(x, y, 2, 1);
         output.addAll(parent.getMoveTiles(x, y, 2, 2));
@@ -208,16 +230,20 @@ public class UnitMovementAndAttack {
         output.addAll(parent.getMoveTiles(x, y, 3, 1));
         return output;
     }
+
+    // @author William T Manson (2604495m@student.gla.ac.uk)
     public ArrayList<Pair<Integer, Integer>> get1RAtkTiles(int x, int y) {
         ArrayList<Pair<Integer, Integer>> output = parent.getMoveTiles(x, y, 1, 0);
         output.addAll(parent.getMoveTiles(x, y, 1, 1));
         return output;
     }
+
+    // @author William T Manson (2604495m@student.gla.ac.uk)
     public Pair<Integer,Integer> getMoveTileForAttack(int Ax, int Ay, int Ex, int Ey)
     {
         //ArrayList<Pair<Integer,Integer>> rangeTiles = get1RAtkTiles(x, y);
         int mx = Ax-Ex;
-        int my = Ay-Ey; //my butterfly, suga baby //https://youtu.be/6FEDrU85FLE?t=7
+        int my = Ay-Ey;
 
         if(Math.abs(mx)>0)
         {
@@ -229,8 +255,9 @@ public class UnitMovementAndAttack {
         }
         Pair<Integer, Integer> out = new Pair<>(Ex + mx, Ey + my);
         return out;
-
     }
+
+    // @author William T Manson (2604495m@student.gla.ac.uk)
     public ArrayList<Pair<Integer, Integer>> getFlyMoveTiles() {
         int[][] maxContainer = new int[45][2];
         int count = 0 ;
@@ -252,6 +279,7 @@ public class UnitMovementAndAttack {
         return output;
     }
 
+    // @author William T Manson (2604495m@student.gla.ac.uk)
     public void highlightedMoveTileClicked(ActorRef out, int x, int y) {
         Tile activatedTile = parent.getBoard().getTile(activeUnit);
         System.out.println("move activated to: " +x + ":" + y);
@@ -314,6 +342,15 @@ public class UnitMovementAndAttack {
     // ===========================================================================
     // Attack Logic
     // ===========================================================================
+    
+    /**
+     * This method is used to write attack logic for a unit.
+     * This method is initiated by Yu-Sung Hsu,
+     * Rewritten by William T Manson (2604495m@student.gla.ac.uk),
+     * Refactored by
+     * @author Anamika Maurya (2570847M@student.gla.ac.uk)
+     * @author Yu-Sung Hsu (2540296h@student.gla.ac.uk)
+     */
     public void launchAttack(ActorRef out, int x, int y) {
         try{
         if (activeUnit == null) { return; }
@@ -329,6 +366,13 @@ public class UnitMovementAndAttack {
                 boolean isRanged = attacker.isRanged();
                 int enemyHealthAfterAttack = enemy.getHealth();
 
+ ////////////////////////////////////////////////////////////////////////////////////////               
+                    /*
+                    *This implementation below checks if unit has been provoked.
+                    *if it is, it can only attack provoker unit. Else, if not provoked,
+                    *it can attack anyone that is within the range. (checked by attackCheck above ^)
+                    *@author Jun Jie Low (2600104L@student.gla.ac.uk/nelsonlow_88@hotmail.com)
+                    */
             if(enemy.getProvoker()&&attacker.getProvoked()) {
                 provokeAttack(out, attackerLocation, enemyLocation, isRanged);
                 return;
@@ -345,6 +389,7 @@ public class UnitMovementAndAttack {
                                 parent.unitDied(out, attackerLocation, parent.getUnitsPosition(parent.getTurn()));
                             }
                         }
+/////////////////////////////////////////////////////////////////////////////////////////
                     } else {
                         parent.unitDied(out, enemyLocation, parent.getEnemyUnitsPosition(parent.getTurn()));
                     }
@@ -416,6 +461,11 @@ public class UnitMovementAndAttack {
                         }
                        
                     }  
+
+                    /*
+                    *Implementation of walk and attack logic for provoke. (Checks before attack)
+                    *@author Jun Jie Low (2600104L@student.gla.ac.uk/nelsonlow_88@hotmail.com)
+                    */
                     boolean provokerAround = provokeFuncMoveAttackCheck(moveTile.getFirst(), moveTile.getSecond());
                     if(!provokerAround) {
                         // Within attack range
@@ -508,7 +558,17 @@ public class UnitMovementAndAttack {
         }
     }
 
-    // Ana: Counter attack, including ranged attack
+                    /*
+                    *Implementation of the attack method. After all checks above,
+                    *this method attacks the unit, decrease their health and updates
+                    *the health on the user interface.
+                    *
+                    * This method is used for the actions to be performed after 
+                    * attacking a unit.
+                    * @author Anamika Maurya (2570847M@student.gla.ac.uk)
+                    *@author Jun Jie Low (2600104L@student.gla.ac.uk/nelsonlow_88@hotmail.com)
+                    *@author Anamika Maurya (2570847M@student.gla.ac.uk)
+                    */
     public int attack(ActorRef out, Tile attackerLocation, Tile enemyLocation, boolean isRanged) {
         Unit attacker = attackerLocation.getUnit();
         Unit enemy = enemyLocation.getUnit();
@@ -594,6 +654,12 @@ public class UnitMovementAndAttack {
         return false;
     }
 
+                    /*
+                    *Implementation of attackCheck method. This method checks
+                    *the tile clicked to see if it is an available tile to launch attack
+                    *@author Jun Jie Low (2600104L@student.gla.ac.uk/nelsonlow_88@hotmail.com)
+                    * @author Anamika Maurya (2570847M@student.gla.ac.uk)
+                    */
     public boolean attackCheck(int x, int y, Unit attacker) {
         if (activeUnit == null) { return false; }
 
@@ -601,7 +667,6 @@ public class UnitMovementAndAttack {
         ArrayList<Pair<Integer, Integer>> tileActive = getAllMoveTiles(activeUnit.getFirst(), activeUnit.getSecond());
         tileActive.addAll(getAllAtkTiles(activeUnit.getFirst(), activeUnit.getSecond()));
 
-        //Ana: for counter attack
         if (parent.getBoard().getTile(x, y).getUnit() != null && parent.getBoard().getTile(x, y).getUnit().hasBeenAttackedBy(attacker))
             return false;
 
@@ -617,6 +682,13 @@ public class UnitMovementAndAttack {
 
 
     ////////////////////////Provoke Method/////////////////////////////////
+                    /*
+                    *This method is used to check when tiles are highlighted. It is implemented in all movetile methods.
+                    *It checks if the unit's tile 1 radius away has any provoker. If a provoker exist, it sets the current player
+                    *unit to moved = true. This is to prevent the unit to be able to move after provoked.
+                    *the provoker attack logic is implemented in provokeAttack method, and in launchAttack
+                    *@author Jun Jie Low (2600104L@student.gla.ac.uk/nelsonlow_88@hotmail.com)
+                    */
     
     public void provokeFunc(int x,int y){
         try{
@@ -677,6 +749,14 @@ public class UnitMovementAndAttack {
     
     }
 
+                    /*
+                    *Works along with launchAttack. After checking, it calls this method
+                    *to attack and counter attack. 
+                    *
+                    * This method is used to launch counter attack.
+                    *@author Jun Jie Low (2600104L@student.gla.ac.uk/nelsonlow_88@hotmail.com)
+                    * @author Anamika Maurya (2570847M@student.gla.ac.uk)
+                    */
     private void provokeAttack(ActorRef out, Tile attackerLocation, Tile enemyLocation, boolean isRanged) {
         Unit enemy = enemyLocation.getUnit();
         Unit attacker = attackerLocation.getUnit();
@@ -695,7 +775,14 @@ public class UnitMovementAndAttack {
         }
     }
 
-
+                    /*
+                    *This method is called during move&attack. It checks the tile that the unit will land before
+                    *the attack. Then, it checks that specific tile 1 radius away to see if there is any provoker.
+                    *If there is not provoker, unit will be able to move and attack. Else, move & attack only applies
+                    *to the provoker unit. If attempt of walk and attack an enemy unit with enemy provoker 1 tile away,
+                    *it will walk, stop at the landing tile checked earlier without attack.
+                    *@author Jun Jie Low (2600104L@student.gla.ac.uk/nelsonlow_88@hotmail.com)
+                    */
     public boolean provokeFuncMoveAttackCheck(int x,int y){
         try{
            ArrayList<Pair<Integer, Integer>> tiles = get1RAtkTiles(x, y);
@@ -709,8 +796,7 @@ public class UnitMovementAndAttack {
                 for(Pair<Integer,Integer> tPair : tiles){
                     if(parent.getBoard().getTile(tPair).getUnit()!=null && parent.getBoard().getTile(tPair).getUnit().getPlayerID()!=parent.getTurn()
                     && parent.getBoard().getTile(tPair).getUnit().getProvoker()){ //tile not empty, not my unit, & is provoker
-                    //boolean provokerExist = parent.getHighlighter().getRedTile().get(i).getUnit().getProvoker();
-                    //System.out.println("PROVOKER EXIST? : " + provokerExist);
+
                     Unit provokerUnit = parent.getBoard().getTile(tPair).getUnit();
                     //if(provokerExist){
                         nonProvokerUnit.setProvoked(true);
@@ -745,6 +831,14 @@ public class UnitMovementAndAttack {
     // ===========================================================================
     // Setters, getters, and resetters
     // ===========================================================================
+    
+    /**
+     * This method is used to reset the units to idle after attack
+     * and counter attack.
+     * @author Anamika Maurya (2570847M@student.gla.ac.uk)
+     * @author Yu-Sung Hsu (2540296h@student.gla.ac.uk)
+     * 
+     */
     public void resetMoveAttackAndCounterAttack(ActorRef out) {
         for (Unit unit: moveAttackAndCounterAttack) {
             unit.setHasMoved(false);
@@ -767,6 +861,12 @@ public class UnitMovementAndAttack {
 	            .setAnimationType(UnitAnimationType.idle)
 	            .issueCommand();
         }
+        //////////////////////////////////////////////////////////////
+                    /*
+                    *Included this to reset the provoked unit each turn.
+                    *@author Jun Jie Low (2600104L@student.gla.ac.uk/nelsonlow_88@hotmail.com)
+                    */
+        //////////////////////////////////////////////////////////////
         for(Unit unit : provokedUnitForEndReset){
             unit.setHasMoved(false);
         }

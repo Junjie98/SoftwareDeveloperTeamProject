@@ -24,6 +24,8 @@ import utils.StaticConfFiles;
  *
  * - mode ANIMATION: You will need to call .setEffectAnimation(TileEffectAnimation) to set animation.
  *      It is defined with an enum containing INMOLATION, BUFF, MARTYRDOM, SUMMON options.
+ *
+ * @author Yu-Sung Hsu (2540296h@student.gla.ac.uk)
  */
 
 public class TileCommandBuilder extends CommandBuilder {

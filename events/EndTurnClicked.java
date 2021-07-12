@@ -16,7 +16,7 @@ import commandbuilders.enums.Players;
  * }
  * 
  * @author Dr. Richard McCreadie
- *
+ * @author Yu-Sung Hsu (2540296h@student.gla.ac.uk)
  */
 public class EndTurnClicked implements EventProcessor{
 	@Override

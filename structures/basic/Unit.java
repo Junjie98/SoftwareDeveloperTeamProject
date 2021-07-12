@@ -19,6 +19,13 @@ import structures.handlers.Pair;
  * 
  * @author Dr. Richard McCreadie
  *
+ * Getters and properties are added when needed:
+ *
+ * @author Theodoros Vrakas (2593566v@student.gla.ac.uk)
+ * @author William T Manson (2604495m@student.gla.ac.uk)
+ * @author Anamika Maurya (2570847M@student.gla.ac.uk)
+ * @author Yu-Sung Hsu (2540296h@student.gla.ac.uk)
+ * @author Jun Jie Low (2600104L@student.gla.ac.uk/nelsonlow_88@hotmail.com)
  */
 public class Unit {
 
@@ -119,6 +126,11 @@ public class Unit {
 	public void setHasMoved(boolean newValue) {
 		hasMoved = newValue;
 	}
+//////////////////////////////////////////////////////////////////////////////////////////
+	/**
+	* getter and setter to work for provoke
+	* @author Jun Jie Low (2600104L@student.gla.ac.uk/nelsonlow_88@hotmail.com)
+	*/
 	
 	public void setProvoker(boolean value){
 		this.provoker = value;
@@ -141,7 +153,7 @@ public class Unit {
 	public ArrayList<Unit> getUnitProvoked(){
 		return unitProvoked;
 	}
-
+/////////////////////////////////////////////////////////////////////////////////////////////
 	public int getId() {
 		return id;
 	}

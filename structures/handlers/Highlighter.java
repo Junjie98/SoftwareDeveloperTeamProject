@@ -11,6 +11,17 @@ import java.util.ArrayList;
 
 import static commandbuilders.enums.Players.PLAYER1;
 
+/**
+ * This class consists of all kinds of highlighting logic such as, attack highlight
+ * move highlight, clear board highlight etc.
+ *
+ * This class is designed by Yu-Sung Hsu and implemented by
+ * @author Anamika Maurya (2570847M@student.gla.ac.uk)
+ *
+ * The underlying logic was initiated by
+ * @author William T Manson (2604495m@student.gla.ac.uk)
+ */
+
 public class Highlighter {
     private ArrayList<Tile> highlightedTiles = new ArrayList<>();
     private final GameState parent;
@@ -21,6 +32,7 @@ public class Highlighter {
         this.parent = parent;
     }
 
+    // @author William T Manson (2604495m@student.gla.ac.uk)
     public boolean checkAttackHighlight(ActorRef out, Pair<Integer, Integer> pos) {
         int x = pos.getFirst();
         int y = pos.getSecond();
@@ -66,6 +78,7 @@ public class Highlighter {
         }
     }
 
+    // @author William T Manson (2604495m@student.gla.ac.uk)
     public boolean checkTileHighlight(ActorRef out, Pair<Integer, Integer> pos, boolean summon, boolean redOnly)  {
         int x = pos.getFirst();
         int y = pos.getSecond();
@@ -119,6 +132,8 @@ public class Highlighter {
             return false;
         }
     }
+
+    // @author William T Manson (2604495m@student.gla.ac.uk)
     public void cardTileHighlight(ActorRef out, int x, int y) {
         // if spell card
         if (parent.getCardPlayed().getActiveCard().getFirst().getCardname().equals("Truestrike") || parent.getCardPlayed().getActiveCard().getFirst().getCardname().equals("Entropic Decay")) {
@@ -206,6 +221,7 @@ public class Highlighter {
         return highlightedTiles;
     }
 
+    // @author Anamika Maurya (2570847M@student.gla.ac.uk)
     public void clearBoardHighlights(ActorRef out) {
         parent.getUnitMovementAndAttack().setActiveUnit(null);
         parent.getCardPlayed().clearActiveCard();
@@ -221,15 +237,4 @@ public class Highlighter {
         //highlightedRedTiles.clear();
 
     }
-
-    //public ArrayList<Tile> getRedTile(){
-    //    return highlightedRedTiles;
-    //}
-
-   // public ArrayList<Tile> getProvokeTile(){
-    //    return highlightedTilesProv;
-    //}
-    
-
-    
 }

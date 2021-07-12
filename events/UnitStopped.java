@@ -14,9 +14,9 @@ import structures.GameState;
  *   messageType = “unitStopped”
  *   id = <unit id>
  * }
- * 
- * @author Dr. Richard McCreadie
  *
+ * @author Dr. Richard McCreadie
+ * @author Yu-Sung Hsu (2540296h@student.gla.ac.uk)
  */
 public class UnitStopped implements EventProcessor{
 	@Override

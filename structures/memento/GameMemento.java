@@ -2,6 +2,12 @@ package structures.memento;
 
 import commandbuilders.enums.Players;
 
+/**
+ * A game memento class to keep track of vital actions.
+ * This can support debugging and potentially smarter AI implementation.
+ * @author Yu-Sung Hsu (2540296h@student.gla.ac.uk)
+ */
+
 public class GameMemento {
     private Players player;
     private ActionType actionType;

@@ -17,9 +17,10 @@ import utils.StaticConfFiles;
  * You will need to call .setSource(Tile) and .setDestination(Tile) before you issue the command.
  *
  * Notice the issueCommand code is now a generalised version of the Demo code. Further testing may reveal some refinements needed.
+ *  @author Yu-Sung Hsu (2540296h@student.gla.ac.uk)
+ *  @author Jun Jie Low (2600104L@student.gla.ac.uk(Minor assisted))
  */
 
-// TODO: This may need to be tested and refined.
 
 public class ProjectTileAnimationCommandBuilder extends CommandBuilder {
     private final ActorRef reference;

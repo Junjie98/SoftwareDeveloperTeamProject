@@ -4,6 +4,12 @@ import structures.basic.Card;
 import structures.basic.Unit;
 import structures.handlers.Pair;
 
+/**
+ * The spell information that implements the Relevant information interface.
+ * If needed, cast the interface to specific type to get even more detailed information.
+ * @author Yu-Sung Hsu (2540296h@student.gla.ac.uk)
+ */
+
 public class SpellInformation implements RelevantInformation {
     final private Pair<Integer, Integer> target;
     final private Card spellCard;

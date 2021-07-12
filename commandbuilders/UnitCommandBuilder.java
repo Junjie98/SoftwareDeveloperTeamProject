@@ -32,6 +32,8 @@ import utils.StaticConfFiles;
  *      idle, death, attack, move, channel, hit.
  *
  * Each command issuing will only take effect once. Setting the non-required fields will be ignored.
+ *
+ * @author Yu-Sung Hsu (2540296h@student.gla.ac.uk)
  */
 
 public class UnitCommandBuilder extends CommandBuilder{

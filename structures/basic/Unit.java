@@ -18,7 +18,7 @@ import structures.handlers.Pair;
  * information for centering the unit on the tile. 
  * 
  * @author Dr. Richard McCreadie
- *
+ * @author Anamika Maurya (2570847M@student.gla.ac.uk)
  */
 public class Unit {
 

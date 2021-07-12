@@ -10,6 +10,13 @@ package structures.handlers;
 
 import akka.actor.ActorRef;
 
+/**
+ * This class consists of the logic related to events after a card 
+ * has been played.
+ * @author Anamika Maurya (2570847M@student.gla.ac.uk)
+ * @author Theodoros Vrakas (2593566v@student.gla.ac.uk)
+ */
+
 import commandbuilders.*;
 import commandbuilders.enums.*;
 import structures.GameState;
@@ -36,6 +43,11 @@ public class CardPlayed {
     // is a spell card or a normal Unit card for different actions.
     // @author Theodoros Vrakas (2593566v@student.gla.ac.uk)
     // ===========================================================================
+    /**
+     * This method moves a card to board.
+     * @author Anamika Maurya (2570847M@student.gla.ac.uk)
+     * @author Theodoros Vrakas (2593566v@student.gla.ac.uk)
+     */
     public void moveCardToBoard(ActorRef out, int x, int y) {
         Card current = parent.getCardsInHand(parent.getTurn()).get(activeCard.getSecond());
         this.cardname = current.getCardname();

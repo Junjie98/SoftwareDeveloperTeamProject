@@ -17,6 +17,14 @@ import structures.memento.MovementInformation;
 
 import java.util.ArrayList;
 
+/**
+ * This class consists of a unit's movement and attack logic.
+ * @author Anamika Maurya (2570847M@student.gla.ac.uk)
+ * @author Thorfinn Manson (2604495M@student.gla.ac.uk)
+ * @author Yu-Sung Hsu (2540296h@student.gla.ac.uk)
+ * 
+ */
+
 public class UnitMovementAndAttack {
     Pair<Integer, Integer> activeUnit = null;
     private final GameState parent;
@@ -160,6 +168,11 @@ public class UnitMovementAndAttack {
         }
     }
 
+    /**
+     * This method consists logic to highlight tiles for flying or ranged attacks.
+     * @author Anamika Maurya (2570847M@student.gla.ac.uk)
+     * 
+     */
     public void flyingOrRangedMoveHighlight(ActorRef out, Unit unit) {
         if (unit.isFlying()) {
             for (Pair<Integer, Integer> ti : getFlyMoveTiles()) {
@@ -185,7 +198,12 @@ public class UnitMovementAndAttack {
         }
     }
     
-    // To be used to highlight the tiles for units that can be summoned anywhere
+    /**
+     * This method is used to highlight the tiles for units that 
+     * can be summoned anywhere.
+     * @author Anamika Maurya (2570847M@student.gla.ac.uk)
+     * 
+     */
     public void summonAnywhereHighlight(ActorRef out) {
 	    for (Pair<Integer, Integer> ti : getFlyMoveTiles()) {
 	        //available tiles
@@ -217,7 +235,7 @@ public class UnitMovementAndAttack {
     {
         //ArrayList<Pair<Integer,Integer>> rangeTiles = get1RAtkTiles(x, y);
         int mx = Ax-Ex;
-        int my = Ay-Ey; //my butterfly, suga baby //https://youtu.be/6FEDrU85FLE?t=7
+        int my = Ay-Ey;
 
         if(Math.abs(mx)>0)
         {
@@ -314,6 +332,12 @@ public class UnitMovementAndAttack {
     // ===========================================================================
     // Attack Logic
     // ===========================================================================
+    
+    /**
+     * This method is used to write attack logic for a unit.
+     * @author Anamika Maurya (2570847M@student.gla.ac.uk)
+     * 
+     */
     public void launchAttack(ActorRef out, int x, int y) {
         try{
         if (activeUnit == null) { return; }
@@ -525,10 +549,12 @@ public class UnitMovementAndAttack {
                     *Implementation of the attack method. After all checks above,
                     *this method attacks the unit, decrease their health and updates
                     *the health on the user interface.
+                    *
+                    * This method is used for the actions to be performed after 
+                    * attacking a unit.
+                    * @author Anamika Maurya (2570847M@student.gla.ac.uk)
                     *@author Jun Jie Low (2600104L@student.gla.ac.uk/nelsonlow_88@hotmail.com)
-                    *
-                    *
-                    *@author Ana
+                    *@author Anamika Maurya (2570847M@student.gla.ac.uk)
                     */
     public int attack(ActorRef out, Tile attackerLocation, Tile enemyLocation, boolean isRanged) {
         Unit attacker = attackerLocation.getUnit();
@@ -619,6 +645,7 @@ public class UnitMovementAndAttack {
                     *Implementation of attackCheck method. This method checks
                     *the tile clicked to see if it is an available tile to launch attack
                     *@author Jun Jie Low (2600104L@student.gla.ac.uk/nelsonlow_88@hotmail.com)
+                    * @author Anamika Maurya (2570847M@student.gla.ac.uk)
                     */
     public boolean attackCheck(int x, int y, Unit attacker) {
         if (activeUnit == null) { return false; }
@@ -627,7 +654,6 @@ public class UnitMovementAndAttack {
         ArrayList<Pair<Integer, Integer>> tileActive = getAllMoveTiles(activeUnit.getFirst(), activeUnit.getSecond());
         tileActive.addAll(getAllAtkTiles(activeUnit.getFirst(), activeUnit.getSecond()));
 
-        //Ana: for counter attack
         if (parent.getBoard().getTile(x, y).getUnit() != null && parent.getBoard().getTile(x, y).getUnit().hasBeenAttackedBy(attacker))
             return false;
 
@@ -713,7 +739,10 @@ public class UnitMovementAndAttack {
                     /*
                     *Works along with launchAttack. After checking, it calls this method
                     *to attack and counter attack. 
+                    *
+                    * This method is used to launch counter attack.
                     *@author Jun Jie Low (2600104L@student.gla.ac.uk/nelsonlow_88@hotmail.com)
+                    * @author Anamika Maurya (2570847M@student.gla.ac.uk)
                     */
     private void provokeAttack(ActorRef out, Tile attackerLocation, Tile enemyLocation, boolean isRanged) {
         Unit enemy = enemyLocation.getUnit();
@@ -789,6 +818,14 @@ public class UnitMovementAndAttack {
     // ===========================================================================
     // Setters, getters, and resetters
     // ===========================================================================
+    
+    /**
+     * This method is used to reset the units to idle after attack
+     * and counter attack.
+     * @author Anamika Maurya (2570847M@student.gla.ac.uk)
+     * @author Yu-Sung Hsu (2540296h@student.gla.ac.uk)
+     * 
+     */
     public void resetMoveAttackAndCounterAttack(ActorRef out) {
         for (Unit unit: moveAttackAndCounterAttack) {
             unit.setHasMoved(false);

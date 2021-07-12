@@ -16,6 +16,8 @@ import structures.memento.GameMemento;
  * @author Dr. Richard McCreadie
  * @author Theodoros Vrakas (2593566v@student.gla.ac.uk)
  * @author William T Manson (2604495m@student.gla.ac.uk)
+ * @author Anamika Maurya (2570847M@student.gla.ac.uk)
+ * @author Yu-Sung Hsu (2540296h@student.gla.ac.uk)
  */
 
 public class GameState {
@@ -178,7 +180,11 @@ public class GameState {
         }
     }
 
-    // @author Theodoros Vrakas (2593566v@student.gla.ac.uk)
+    /**
+     * This method implements the actions to be performed when a card is clicked.
+     * @author Anamika Maurya (2570847M@student.gla.ac.uk)
+     * @author Theodoros Vrakas (2593566v@student.gla.ac.uk)
+     */
     public void cardClicked(ActorRef out, int idx) {
         Card current = getCardsInHand(turn).get(idx);
         System.out.println("Card Clicked: " + current.getCardname());
@@ -284,6 +290,10 @@ public class GameState {
         }
     }
 
+    /**
+     * End game implements the logic for the game end.
+     * @author Anamika Maurya (2570847M@student.gla.ac.uk)
+     */
     public void endGame(ActorRef out) {
         Player winner = null;
         // Win condition: should be moved to a method where we are checking player's health
@@ -309,8 +319,11 @@ public class GameState {
         return Math.min(getRound() + 1, 9);
     }
                     /*
-                    *Minor contribution towards mana as Mana has been refactored by Anamika! :D
+                    * Method to reset mana per turn.
+                    *Minor contribution towards mana as Mana has been refactored by Anamika & Yu-Sung! :D
                     *@author Jun Jie Low (2600104L@student.gla.ac.uk/nelsonlow_88@hotmail.com)
+                    *  @author Anamika Maurya (2570847M@student.gla.ac.uk)
+                    *  @author Yu-Sung Hsu (2540296h@student.gla.ac.uk)
                     */
     private void setManaByRound(ActorRef out) {
         int mana = getCurrentRoundMana();
@@ -331,7 +344,12 @@ public class GameState {
                     .issueCommand();
         }
     }
-    // @author Theodoros Vrakas (2593566v@student.gla.ac.uk)
+
+    /**
+     * Method to decrease the mana whenever a card is played.
+     * @author Anamika Maurya (2570847M@student.gla.ac.uk)
+     * @author Theodoros Vrakas (2593566v@student.gla.ac.uk)
+     */
     public void decreaseManaPerCardPlayed(ActorRef out, int manaCost) {
         int previousMana = (turn == Players.PLAYER1) ? player1.getMana() : player2.getMana();
         int currentMana = previousMana - manaCost;      // We check beforehand that currentMana always >=0
@@ -394,6 +412,11 @@ public class GameState {
         }
     }
     
+    /**
+     * Method to highlight a card at hand when clicked.
+     * @author Anamika Maurya (2570847M@student.gla.ac.uk)
+     * @author Yu-Sung Hsu (2540296h@student.gla.ac.uk)
+     */
     // Highlighting the clicked card at hand
     public void highlightCard(ActorRef out, Card current, int idx) {
 
@@ -410,6 +433,11 @@ public class GameState {
         currentHighlightedCard = new Pair<>(current, idx);
     }
 
+    /**
+     * Method to un-highlight a card at hand when clicked again.
+     * @author Anamika Maurya (2570847M@student.gla.ac.uk)
+     * @author Yu-Sung Hsu (2540296h@student.gla.ac.uk)
+     */
     private void dehighlightCard(ActorRef out) {
         if (currentHighlightedCard == null) { return; }
         new CardInHandCommandBuilder(out, isSimulation())

@@ -11,6 +11,14 @@ import java.util.ArrayList;
 
 import static commandbuilders.enums.Players.PLAYER1;
 
+/**
+ * This class consists of all kinds of highlighting logic such as, attack highlight
+ * move highlight, clear board highlight etc.
+ * 
+ * @author Anamika Maurya (2570847M@student.gla.ac.uk)
+ *
+ */
+
 public class Highlighter {
     private ArrayList<Tile> highlightedTiles = new ArrayList<>();
     private final GameState parent;
@@ -221,15 +229,4 @@ public class Highlighter {
         //highlightedRedTiles.clear();
 
     }
-
-    //public ArrayList<Tile> getRedTile(){
-    //    return highlightedRedTiles;
-    //}
-
-   // public ArrayList<Tile> getProvokeTile(){
-    //    return highlightedTilesProv;
-    //}
-    
-
-    
 }

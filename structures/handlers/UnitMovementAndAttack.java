@@ -105,9 +105,7 @@ public class UnitMovementAndAttack {
             }
             count++;
         }
-        System.out.println("Do we get here on pyro bug1?");
-        System.out.println("interDir size : " + interDir.size());
-        System.out.println("initdirb size : " + initDirB.length);
+ 
 
         //for the inter tiles do some logic
         if(initDirB[0] || initDirB[1]) {
@@ -122,14 +120,12 @@ public class UnitMovementAndAttack {
         if((initDirB[2] || initDirB[3]) && interDir.size() > 3) {
             parent.getHighlighter().checkTileHighlight(out, interDir.get(3), false, redOnly);
         }
-        System.out.println("Do we get here on pyro bug2?");
         if (!whiteOnly && !redOnly) {
             //basica attack highlight connected to normal movement highlight
             ArrayList<Pair<Integer, Integer>> atkTiles = getAllAtkTiles(x, y);
 
             for (Pair<Integer, Integer> pos : atkTiles) {
                 Pair<Integer,Integer> moveTile = getMoveTileForAttack(x, y, pos.getFirst(), pos.getSecond());
-                System.out.println("Do we get here on pyro bug3?");
 
                 if (parent.getBoard().getTile(moveTile) != null) {
                     if (!parent.getBoard().getTile(moveTile).hasUnit()) {
@@ -227,8 +223,8 @@ public class UnitMovementAndAttack {
     }
     public ArrayList<Pair<Integer, Integer>> get1RAtkTiles(int x, int y) {
         //if (activeUnit == null) { return null; }
-        ArrayList<Pair<Integer, Integer>> output = parent.getMoveTiles(x, y, 1, 0);
-        output.addAll(parent.getMoveTiles(x, y, 1, 1));
+        ArrayList<Pair<Integer, Integer>> output = parent.getMoveTiles(x, y, 1, 1);
+        output.addAll(parent.getMoveTiles(x, y, 1, 0));
         return output;
     }
     public Pair<Integer,Integer> getMoveTileForAttack(int Ax, int Ay, int Ex, int Ey)

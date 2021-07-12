@@ -668,14 +668,17 @@ public class AI
 
 
     
-    public ArrayList<Pair<Integer,Integer>> getSummonTiles(GameState gs)
+    public ArrayList<Pair<Integer,Integer>> getSummonTiles(ExtractedGameState gs)
     {
         System.out.println("AI: getting summon tiles");
         ArrayList<Pair<Integer,Integer>> tiles = new ArrayList<>();
+        ArrayList<Pair<Integer,Integer>> avTiles = new ArrayList<>();
         System.out.println("AI: about to get all friendlies");
 
         ArrayList<Pair<Integer,Integer>> friendlies = gs.getUnitsPosition(gs.getTurn());
         System.out.println("AI: got all friendlies");
+
+        tiles.addAll(gs.getUnitMovementAndAttack().get1RAtkTiles(gs.getMyAvatarPosition().getFirst(),gs.getMyAvatarPosition().getSecond()));
 
         for(int i =0; i < friendlies.size(); i++){
             System.out.println("AI: got a friend");

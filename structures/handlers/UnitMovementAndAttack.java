@@ -22,6 +22,7 @@ import java.util.ArrayList;
  * @author Anamika Maurya (2570847M@student.gla.ac.uk)
  * @author Thorfinn Manson (2604495M@student.gla.ac.uk)
  * @author Yu-Sung Hsu (2540296h@student.gla.ac.uk)
+ * @author Jun Jie Low (2600104L@student.gla.ac.uk/nelsonlow_88@hotmail.com)
  */
 
 public class UnitMovementAndAttack {
@@ -566,6 +567,7 @@ public class UnitMovementAndAttack {
     *
     * This method is used for the actions to be performed after
     * attacking a unit.
+    *
     * @author Jun Jie Low (2600104L@student.gla.ac.uk/nelsonlow_88@hotmail.com)
     * @author Anamika Maurya (2570847M@student.gla.ac.uk)
     */

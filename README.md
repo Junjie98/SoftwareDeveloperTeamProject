@@ -2,6 +2,8 @@
 
 The main repo of the app folder for the game project excluding assets folder.
 
+We have made **TWO AI implementations**. The Original AI (ai/original), which was all made by William T Manson had incredible amount of details and cases but because of lack of time, we weren't able to solve all its bugs so we considered more appropriate to make a second, more simple implementation.
+
 ## Contributors
 
 There are some cases where commit identity does not match exactly with the identity registered on GitLab. Here is a map of all the team members to commiters.

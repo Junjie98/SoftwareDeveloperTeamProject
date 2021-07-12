@@ -39,6 +39,9 @@ public class AI
 
     }
 
+    // @author William Manson (26044995M@student.gla.ac.uk)
+    //
+    //This is where the AI starts, triggered from the end turn button click.
     public void TakeTurn(ActorRef out, GameState gs)
     {
         //think method that runs sim returns list of actions with info in order for this turn
@@ -54,7 +57,9 @@ public class AI
 
     }
 
-    
+    // @author William Manson (26044995M@student.gla.ac.uk)
+    //
+    //Overall function that selects the best moves after they have been sorted by goodness score.
     public void findBestMoves(ActorRef out, GameState gameState)
     {
         //Get simstate from gameState, this will act as the root state.
@@ -99,6 +104,10 @@ public class AI
         gameState.endTurnClicked(out);
     }
 
+
+    // @author William Manson (26044995M@student.gla.ac.uk)
+    //
+    //Possible fix to the async issues where only one unit can move per turn
     public void actionAIStack(ActorRef out, GameState gs)
     {
         // if(memInd < mems.size())
@@ -116,6 +125,9 @@ public class AI
 
     }
 
+    // @author William Manson (26044995M@student.gla.ac.uk)
+    //
+    //Wrapper function to carry out all the generations per node.
     public void generateMoves(ActorRef out, ArrayList<AiNode> nodes, int depth, int limit)
     {
         System.out.println("AI depth gen at: "+depth);
@@ -138,6 +150,9 @@ public class AI
         generateMoves(out, nodes, ++depth, limit);
     }
 
+    // @author William Manson (26044995M@student.gla.ac.uk)
+    //
+    //This function creates new nodes and movesets for each node created so far, it also passes all information to the gameMementos
     public void generateMovesForNode(ActorRef out, ArrayList<AiNode> nodes, AiNode aiNode, int depth)
     {
 
@@ -529,7 +544,9 @@ public class AI
 
 
     //Part of the AI control "interface"
-
+    // @author William Manson (26044995M@student.gla.ac.uk)
+    //
+    //Simple set of controls from which to edit controller options
     public void AI_Action(ActorRef out, GameState gs, GameMemento mem)
     {
         System.out.println("[AI ACTION OUT]");
@@ -601,73 +618,12 @@ public class AI
         if(moveIndex < (gs.getTurn()==Players.PLAYER2? gs.player2UnitsPosition:gs.player1UnitsPosition).size())
         {
             System.out.print("more moving to happen");
-            //move(out, gs);
         }
     }
 
-    // ===========================================================================
-    // Cast Methods
-    // ===========================================================================
-
-    public void castInit(ActorRef out, GameState gs)
-    {
-        HashMap<Card,Integer> summonCards = new HashMap<Card,Integer>();
-        HashMap<Card,Integer> spellCards = new HashMap<Card,Integer>();
-
-        //check mana
-        //check spells
-        //prioritise and cast
-        mana = gs.getPlayer(Players.PLAYER2).getMana();
-        System.out.println("player 2 mana: " + mana);
-
-        if(gs.player2CardsInHand.size()==0){
-            return;
-        }
-        for (int i = 0; i < gs.player2CardsInHand.size(); i++) {
-            if(gs.player2CardsInHand.get(i).getManacost() <= mana){
-                System.out.println("manacost: " + gs.player2CardsInHand.get(i).getManacost());
-                //for each castable spell this round split into summons and spells
-                if(gs.player2CardsInHand.get(i).isSpell()){
-                    spellCards.put(gs.player2CardsInHand.get(i),i);
-                    System.out.println("spell card");
-                }
-                else{
-                    summonCards.put(gs.player2CardsInHand.get(i),i);
-                    System.out.println("unit card");
-
-                }
-            }
-        }
-        int indexOfHigh = 0;
-        int highCost = 0;
-        Pair<Integer,Integer> targ = null;
-        if(summonCards.size()>0)
-        {   //lets prioritise summons and do them first since game pieces are more efficient than spells
-            for(Card key : summonCards.keySet()){
-                if(key.getManacost()>highCost){
-                    highCost = key.getManacost();
-                    indexOfHigh = summonCards.get(key).intValue();
-                }
-            }
-
-            ArrayList<Pair<Integer,Integer>> tiles = new ArrayList<>();
-
-            for(int i =0; i < gs.player2UnitsPosition.size(); i++){
-                Pair<Integer,Integer> pos = gs.player2UnitsPosition.get(i);
-                tiles.addAll(gs.getUnitMovementAndAttack().get1RAtkTiles(pos.getFirst(), pos.getSecond()));
-            }
-
-            for (Pair<Integer,Integer> pair : tiles) {
-                if(!Board.getInstance().getTile(pair).hasUnit()){
-                    targ = pair;
-                }
-            }
-            AI_SummonUnit(out, gs, indexOfHigh, targ);
-        }
-    }
-
-
-    
+    // @author William Manson (26044995M@student.gla.ac.uk)
+    //
+    //Gets all the tiles that could be used to summon a unit, leans towards diagonals at the avatar        
     public ArrayList<Pair<Integer,Integer>> getSummonTiles(ExtractedGameState gs)
     {
         System.out.println("AI: getting summon tiles");
@@ -700,21 +656,9 @@ public class AI
         return tiles;
     }
 
-    // ===========================================================================
-    // Move Methods
-    // ===========================================================================
-
-    public void moveInit(ActorRef out, GameState gs)
-    {
-       // friendlies = gs.player2UnitsPosition;
-        //enemyTarget = findEnemyTarget(gs);
-        //enemyXRange = enemyTarget.getFirst() + (gs.getTurn() == Players.PLAYER2 ? 2 : -2);    //add two for move and attack range
-        moveIndex = 0;
-        //move(out, gs);
-
-    }
-
-
+    // @author William Manson (26044995M@student.gla.ac.uk)
+    //
+    //Finds a good move in case of being blocked
     public Pair<Integer,Integer> findGoodMove(GameState gs,Pair<Integer,Integer> unitPos, Pair<Integer,Integer> enemyTarget)
     {
         
@@ -791,6 +735,9 @@ public class AI
 
     }
 
+    // @author William Manson (26044995M@student.gla.ac.uk)
+    //
+    //Find the enemy target for the ai to either move to or attack or cast etc
     public static Pair<Integer, Integer> findEnemyTarget( GameState gs)
     {
         ArrayList<Pair<Integer,Integer>> enemyUnits = new ArrayList<>();

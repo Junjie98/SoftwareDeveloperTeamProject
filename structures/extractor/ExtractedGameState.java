@@ -10,8 +10,6 @@ import structures.handlers.Pair;
 
 import java.util.ArrayList;
 
-import javax.lang.model.util.ElementScanner14;
-
 
 public class ExtractedGameState extends GameState {
     protected Board board = null;
@@ -125,7 +123,9 @@ public class ExtractedGameState extends GameState {
         }
         return output;
     }
-
+    // @author William Manson (26044995M@student.gla.ac.uk)
+    //
+    //Gets all possible movers available but doesnt determine their moves
     public ArrayList<Pair<Integer,Integer>> canStillMove(){
         ArrayList<Pair<Integer,Integer>> out = new ArrayList<>();
         for (Pair<Integer,Integer> unit : 
@@ -137,11 +137,13 @@ public class ExtractedGameState extends GameState {
         }
         return out;
     }
-
+    // @author William Manson (26044995M@student.gla.ac.uk)
+    //
+    //returns all possible summons available
     public ArrayList<Pair<Integer, Card>> canStillSummon(){
         ArrayList<Pair<Integer, Card>> out = new ArrayList<>();
         int totalMana = getPlayer(getTurn()).getMana();
-        ArrayList<Card> hand = (getTurn()==Players.PLAYER2) ? player2CardsInHand : player1CardsInHand;
+        ArrayList<Card> hand = getCardsInHand(getTurn());
         for (int i=0; i < hand.size(); i++) {
             if(!hand.get(i).isSpell() && hand.get(i).getManacost()<=totalMana){
                 out.add(new Pair<>(i,hand.get(i)));
@@ -149,7 +151,9 @@ public class ExtractedGameState extends GameState {
         }
         return out;
     }
-
+    // @author William Manson (26044995M@student.gla.ac.uk)
+    //
+    //returns all the possible casts still available 
     public ArrayList<Pair<Integer, Card>> canStillCast(){
         ArrayList<Pair<Integer, Card>> out = new ArrayList<>();
         int totalMana = getPlayer(getTurn()).getMana();
@@ -161,7 +165,9 @@ public class ExtractedGameState extends GameState {
         }
         return out;
     }
-
+    // @author William Manson (26044995M@student.gla.ac.uk)
+    //
+    //finds and returns all the attacks possible via source target pairs
     public  ArrayList<Pair<Pair<Integer,Integer>,Pair<Integer,Integer>>> canStillAttack()
     {
         ArrayList<Pair<Pair<Integer,Integer>,Pair<Integer,Integer>>> out = new ArrayList<>();

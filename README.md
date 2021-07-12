@@ -1,6 +1,7 @@
 # IT SD Group Project
 
 The main repo of the app folder for the game project excluding assets folder.
+https://stgit.dcs.gla.ac.uk/team-project-m/2020/iteam-pro-max/itsd-project-app
 
 We have made **TWO AI implementations**. The Original AI (ai/original), which was all made by William T Manson had incredible amount of details and cases but because of lack of time, we weren't able to solve all its bugs so we considered more appropriate to make a second, more simple implementation.
 

@@ -16,16 +16,13 @@ import structures.GameState;
  * }
  * 
  * @author Dr. Richard McCreadie
- *
+ * @author William T Manson (2604495m@student.gla.ac.uk)
+ * @author Yu-Sung Hsu (2540296h@student.gla.ac.uk)
  */
 public class CardClicked implements EventProcessor{
-
 	@Override
 	public void processEvent(ActorRef out, GameState gameState, JsonNode message) {
-		
 		int handPosition = message.get("position").asInt();
-		
-		
+		gameState.cardClicked(out, handPosition);
 	}
-
 }

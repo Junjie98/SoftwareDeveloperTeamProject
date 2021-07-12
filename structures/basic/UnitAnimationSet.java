@@ -81,8 +81,4 @@ public class UnitAnimationSet {
 	public void setHit(UnitAnimation hit) {
 		this.hit = hit;
 	}
-	
-	
-	
-	
 }

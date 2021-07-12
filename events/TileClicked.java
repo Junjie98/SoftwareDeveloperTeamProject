@@ -18,16 +18,16 @@ import structures.GameState;
  * }
  * 
  * @author Dr. Richard McCreadie
- *
+ * @author William T Manson (2604495m@student.gla.ac.uk)
  */
 public class TileClicked implements EventProcessor{
-
 	@Override
 	public void processEvent(ActorRef out, GameState gameState, JsonNode message) {
-
 		int tilex = message.get("tilex").asInt();
 		int tiley = message.get("tiley").asInt();
 		
+		System.out.println("tilehook");
+		
+		gameState.tileClicked(out, tilex, tiley);
 	}
-
 }

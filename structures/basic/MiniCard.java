@@ -13,7 +13,6 @@ package structures.basic;
  *
  */
 public class MiniCard {
-
 	String[] cardTextures;
 	String[] animationFrames;
 	int fps;
@@ -60,9 +59,4 @@ public class MiniCard {
 	public void setIndex(int index) {
 		this.index = index;
 	}
-	
-	
-	
-	
-	
 }

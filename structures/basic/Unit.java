@@ -1,7 +1,12 @@
 package structures.basic;
 
+import commandbuilders.enums.Players;
+import commandbuilders.enums.UnitType;
+import java.util.ArrayList;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import structures.handlers.Pair;
 
 /**
  * This is a representation of a Unit on the game board.
@@ -14,6 +19,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * 
  * @author Dr. Richard McCreadie
  *
+ * Getters and properties are added when needed:
+ *
+ * @author Theodoros Vrakas (2593566v@student.gla.ac.uk)
+ * @author William T Manson (2604495m@student.gla.ac.uk)
+ * @author Anamika Maurya (2570847M@student.gla.ac.uk)
+ * @author Yu-Sung Hsu (2540296h@student.gla.ac.uk)
+ * @author Jun Jie Low (2600104L@student.gla.ac.uk/nelsonlow_88@hotmail.com)
  */
 public class Unit {
 
@@ -25,7 +37,31 @@ public class Unit {
 	Position position;
 	UnitAnimationSet animations;
 	ImageCorrection correction;
-	
+	Players owningPlayer;
+	int unitHealth = 0;
+	int unitDamage =  0;
+	UnitType type = null;
+
+	boolean provoked = false;
+	boolean provoker =false;
+	ArrayList<Unit> unitProvoked = new ArrayList<>();
+
+	String configFile = ""; // For copies
+	String name = ""; // For memento
+
+	boolean isFlying = false;
+	boolean isAvatar = false;
+	//Ana: for counter attack
+	ArrayList<Unit> attackedBy = new ArrayList<>();
+
+	//Ana : For ranged
+	boolean isRanged = false;
+	//JJ: for attack logic. If attacked without move, it forfeits the move ability
+	boolean hasMoved = false; //moved this for visibility
+
+	int attackCount = 0;
+	int attackLimit = 1;
+
 	public Unit() {}
 	
 	public Unit(int id, UnitAnimationSet animations, ImageCorrection correction) {
@@ -47,9 +83,7 @@ public class Unit {
 		this.correction = correction;
 		this.animations = animations;
 	}
-	
-	
-	
+
 	public Unit(int id, UnitAnimationType animation, Position position, UnitAnimationSet animations,
 			ImageCorrection correction) {
 		super();
@@ -59,7 +93,67 @@ public class Unit {
 		this.animations = animations;
 		this.correction = correction;
 	}
+	
+	public void setHealth(int health) {
+		if(health<=0) {
+			unitHealth = 0;
+		} else {
+			unitHealth = health;
+		}
+	}
 
+	public int getHealth()
+	{
+		return unitHealth;
+	}
+	public void setDamage(int health) 
+	{
+		unitDamage = health;
+	}
+	public int getDamage()
+	{
+		return unitDamage;
+	}
+
+	public boolean getHasMoved()
+	{
+		return hasMoved;
+	}
+	public void resetHasMoved()
+	{
+		hasMoved = false;
+	}
+	public void setHasMoved(boolean newValue) {
+		hasMoved = newValue;
+	}
+//////////////////////////////////////////////////////////////////////////////////////////
+	/**
+	* getter and setter to work for provoke
+	* @author Jun Jie Low (2600104L@student.gla.ac.uk/nelsonlow_88@hotmail.com)
+	*/
+	
+	public void setProvoker(boolean value){
+		this.provoker = value;
+	}
+	public boolean getProvoker(){
+		return this.provoker;
+	}
+	public void setProvoked(boolean value) {
+		this.provoked = value;
+	}
+	public boolean getProvoked() {
+		return this.provoked;
+	}
+	public void setProvokedMove(boolean value){
+		hasMoved = value;
+	}
+	public void setUnitProvoked(Unit value){
+		unitProvoked.add(value);
+	}
+	public ArrayList<Unit> getUnitProvoked(){
+		return unitProvoked;
+	}
+/////////////////////////////////////////////////////////////////////////////////////////////
 	public int getId() {
 		return id;
 	}
@@ -96,7 +190,7 @@ public class Unit {
 	public void setAnimations(UnitAnimationSet animations) {
 		this.animations = animations;
 	}
-	
+
 	/**
 	 * This command sets the position of the Unit to a specified
 	 * tile.
@@ -106,6 +200,91 @@ public class Unit {
 	public void setPositionByTile(Tile tile) {
 		position = new Position(tile.getXpos(),tile.getYpos(),tile.getTilex(),tile.getTiley());
 	}
-	
-	
+
+	public void setConfigFile(String configFile) {
+		this.configFile = configFile;
+	}
+	public String getConfigFile() {
+		return configFile;
+	}
+	public void setName(String name) {
+		this.name = name;
+	}
+	public String getName() {
+		return name;
+	}
+
+	public void setPlayerID(Players Player) 
+	{
+		this.owningPlayer = Player;
+	}
+	public Players getPlayerID()
+	{
+		return this.owningPlayer;
+	}
+	public void setHasAttacked() {
+		attackCount++;
+	}
+	public boolean getHasAttacked() {
+		return attackCount >= attackLimit;
+	}
+    public void setFlying(boolean bool) {
+		isFlying = bool;
+    }
+	public boolean isFlying() {
+		return isFlying;
+	}
+	public boolean isAvatar() {
+		return isAvatar;
+	}
+	public void setAvatar(boolean avatar) {
+		isAvatar = avatar;
+	}
+	public void setRanged(boolean bool) {
+ 		this.isRanged = bool;
+    }
+	public boolean isRanged() {
+		return isRanged;
+	}
+
+	public UnitType getType() {
+		return type;
+	}
+
+	public void setType(UnitType type) {
+		this.type = type;
+	}
+
+	public Pair<Integer, Integer> getLocationPair() {
+		return new Pair<>(position.tilex, position.tiley);
+	}
+
+	public void addAttacker(Unit attacker) {
+		attackedBy.add(attacker);
+	}
+
+	public boolean hasBeenAttackedBy(Unit attacker) {
+		if (attacker.type == UnitType.AZURITE_LION || attacker.type == UnitType.SERPENTI) {
+			int counter = 0;
+			for (Unit unit: attackedBy) {
+				if (unit == attacker) {
+					counter++;
+				}
+			}
+			return counter >= 2;
+		}
+		return attackedBy.contains(attacker);
+	}
+
+	public void clearAttackers() {
+		attackedBy.clear();
+	}
+
+	public void resetAttackCount() {
+		attackCount = 0;
+	}
+
+	public void setAttackLimit(int value) {
+		attackLimit = value;
+	}
 }

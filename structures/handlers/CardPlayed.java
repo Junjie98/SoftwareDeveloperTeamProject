@@ -1,11 +1,3 @@
-/**
- * Implementation of the actions that take place after a Card
- * and a Tile are selected in order for the card to move the the board
- * and what actions should trigger based in what type of card it is.
- * @author Theodoros Vrakas (2593566v@student.gla.ac.uk)
- * @author William T Manson (2604495m@student.gla.ac.uk)
- */
-
 package structures.handlers;
 
 import akka.actor.ActorRef;
@@ -13,8 +5,13 @@ import akka.actor.ActorRef;
 /**
  * This class consists of the logic related to events after a card 
  * has been played.
+ * Implementation of the actions that take place after a Card
+ * and a Tile are selected in order for the card to move the the board
+ * and what actions should trigger based in what type of card it is.
  * @author Anamika Maurya (2570847M@student.gla.ac.uk)
  * @author Theodoros Vrakas (2593566v@student.gla.ac.uk)
+ * @author William T Manson (2604495m@student.gla.ac.uk)
+ * @author Jun Jie Low (2600104L@student.gla.ac.uk/nelsonlow_88@hotmail.com)
  */
 
 import commandbuilders.*;

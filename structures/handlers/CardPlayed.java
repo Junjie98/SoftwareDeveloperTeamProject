@@ -31,6 +31,17 @@ import structures.memento.SummonInformation;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+/**
+ * Handling moving cards to board, including summon and spell
+ *
+ * @author Dr. Richard McCreadie
+ * @author Theodoros Vrakas (2593566v@student.gla.ac.uk)
+ * @author William T Manson (2604495m@student.gla.ac.uk)
+ * @author Anamika Maurya (2570847M@student.gla.ac.uk)
+ * @author Yu-Sung Hsu (2540296h@student.gla.ac.uk)
+ * @author Jun Jie Low (2600104L@student.gla.ac.uk/nelsonlow_88@hotmail.com)
+ */
+
 public class CardPlayed {
     String cardname;
     private final GameState parent;
@@ -38,15 +49,14 @@ public class CardPlayed {
     Pair<Card, Integer> activeCard = null;
     public CardPlayed(GameState parent) { this.parent = parent; }
 
-    // ===========================================================================
-    // Move card to the Board and logic behind it. Considers if the card
-    // is a spell card or a normal Unit card for different actions.
-    // @author Theodoros Vrakas (2593566v@student.gla.ac.uk)
-    // ===========================================================================
     /**
      * This method moves a card to board.
-     * @author Anamika Maurya (2570847M@student.gla.ac.uk)
+     *
+     * Move card to the Board and logic behind it. Considers if the card
+     * is a spell card or a normal Unit card for different actions.
+     *
      * @author Theodoros Vrakas (2593566v@student.gla.ac.uk)
+     * @author Anamika Maurya (2570847M@student.gla.ac.uk)
      */
     public void moveCardToBoard(ActorRef out, int x, int y) {
         Card current = parent.getCardsInHand(parent.getTurn()).get(activeCard.getSecond());
@@ -151,14 +161,14 @@ public class CardPlayed {
             // Ana: Ranged Attack
             unit.setRanged(cardname.equals("Pyromancer") || cardname.equals("Fire Spitter"));
             // set to true
-/////////////////////////////////////////////////////////////////////////////////////////
+            /////////////////////////////////////////////////////////////////////////////////////////
 
-                    /*
-                    *set selected card as provoker.
-                    *@author Jun Jie Low (2600104L@student.gla.ac.uk/nelsonlow_88@hotmail.com)
-                    */
+            /**
+            * set selected card as provoker.
+            * @author Jun Jie Low (2600104L@student.gla.ac.uk/nelsonlow_88@hotmail.com)
+            */
             unit.setProvoker((cardname.equals("Silverguard Knight") || cardname.equals("Ironcliff Guardian") || cardname.equals("Rock Pulveriser")));
-////////////////////////////////////////////////////////////////////////////////////////
+            ////////////////////////////////////////////////////////////////////////////////////////
             if (unit.getType() == UnitType.AZURITE_LION || unit.getType().equals(UnitType.SERPENTI))
                 unit.setAttackLimit(2);
 
@@ -238,11 +248,11 @@ public class CardPlayed {
             target.setDamage(attackAfterSpell);
         }
 
-        ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                     /*
-                    *This is just to keep the board health linked with the avatar's health on the side of the board.
-                    *@author Jun Jie Low (2600104L@student.gla.ac.uk/nelsonlow_88@hotmail.com)
-                    */
+         ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+         /**
+          * This is just to keep the board health linked with the avatar's health on the side of the board.
+          * @author Jun Jie Low (2600104L@student.gla.ac.uk/nelsonlow_88@hotmail.com)
+          */
         // update avatar health to UI player health.
         ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
         if(target.isAvatar() && target.getPlayerID() == Players.PLAYER1) {

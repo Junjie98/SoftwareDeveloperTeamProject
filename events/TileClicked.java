@@ -18,7 +18,7 @@ import structures.GameState;
  * }
  * 
  * @author Dr. Richard McCreadie
- *
+ * @author William T Manson (2604495m@student.gla.ac.uk)
  */
 public class TileClicked implements EventProcessor{
 	@Override

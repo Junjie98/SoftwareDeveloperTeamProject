@@ -22,7 +22,6 @@ import java.util.ArrayList;
  * @author Anamika Maurya (2570847M@student.gla.ac.uk)
  * @author Thorfinn Manson (2604495M@student.gla.ac.uk)
  * @author Yu-Sung Hsu (2540296h@student.gla.ac.uk)
- * 
  */
 
 public class UnitMovementAndAttack {
@@ -42,6 +41,7 @@ public class UnitMovementAndAttack {
     // ===========================================================================
     // Highlight Logic
     // ===========================================================================
+    // @author William T Manson (2604495m@student.gla.ac.uk)
     public void unitClicked(ActorRef out, int x, int y) {
         Tile tile = parent.getBoard().getTile(x, y);
         if (tile.getUnit().getPlayerID() != parent.getTurn()) {
@@ -81,6 +81,7 @@ public class UnitMovementAndAttack {
         }
     }
 
+    // @author William T Manson (2604495m@student.gla.ac.uk)
     public void basicMoveHighlight(ActorRef out, int x, int y, boolean redOnly, boolean whiteOnly) {
         ArrayList<Pair<Integer, Integer>> initDir = parent.getMoveTiles(x, y, 1, 0);
         ArrayList<Pair<Integer, Integer>> secondDir = parent.getMoveTiles(x, y,2, 0);
@@ -135,7 +136,7 @@ public class UnitMovementAndAttack {
         provokeFunc(x,y);
     }
 
-    //angry at nelson for amking me name something so ugly >=(
+    // @author William T Manson (2604495m@student.gla.ac.uk)
     public void movedButCanAttackHighlight(ActorRef out, int x, int y)
     {
         if(parent.getBoard().getTile(x,y) != null)
@@ -155,6 +156,8 @@ public class UnitMovementAndAttack {
 
         }
     }
+
+    // @author William T Manson (2604495m@student.gla.ac.uk)
     public void moveHighlight(ActorRef out, int x, int y) {
         if (parent.getBoard().getTile(x, y) != null) {
             Unit temp = parent.getBoard().getTile(x, y).getUnit();
@@ -171,7 +174,6 @@ public class UnitMovementAndAttack {
     /**
      * This method consists logic to highlight tiles for flying or ranged attacks.
      * @author Anamika Maurya (2570847M@student.gla.ac.uk)
-     * 
      */
     public void flyingOrRangedMoveHighlight(ActorRef out, Unit unit) {
         if (unit.isFlying()) {
@@ -202,7 +204,6 @@ public class UnitMovementAndAttack {
      * This method is used to highlight the tiles for units that 
      * can be summoned anywhere.
      * @author Anamika Maurya (2570847M@student.gla.ac.uk)
-     * 
      */
     public void summonAnywhereHighlight(ActorRef out) {
 	    for (Pair<Integer, Integer> ti : getFlyMoveTiles()) {
@@ -211,12 +212,15 @@ public class UnitMovementAndAttack {
 	    }
     }
 
+    // @author William T Manson (2604495m@student.gla.ac.uk)
     public ArrayList<Pair<Integer, Integer>> getAllMoveTiles(int x, int y) {
         ArrayList<Pair<Integer, Integer>> output = parent.getMoveTiles(x, y, 1, 0);
         output.addAll(parent.getMoveTiles(x, y, 2, 0));
         output.addAll(parent.getMoveTiles(x, y, 1, 1));
         return output;
     }
+
+    // @author William T Manson (2604495m@student.gla.ac.uk)
     public ArrayList<Pair<Integer, Integer>> getAllAtkTiles(int x, int y) {
         ArrayList<Pair<Integer, Integer>> output = parent.getMoveTiles(x, y, 2, 1);
         output.addAll(parent.getMoveTiles(x, y, 2, 2));
@@ -226,11 +230,15 @@ public class UnitMovementAndAttack {
         output.addAll(parent.getMoveTiles(x, y, 3, 1));
         return output;
     }
+
+    // @author William T Manson (2604495m@student.gla.ac.uk)
     public ArrayList<Pair<Integer, Integer>> get1RAtkTiles(int x, int y) {
         ArrayList<Pair<Integer, Integer>> output = parent.getMoveTiles(x, y, 1, 0);
         output.addAll(parent.getMoveTiles(x, y, 1, 1));
         return output;
     }
+
+    // @author William T Manson (2604495m@student.gla.ac.uk)
     public Pair<Integer,Integer> getMoveTileForAttack(int Ax, int Ay, int Ex, int Ey)
     {
         //ArrayList<Pair<Integer,Integer>> rangeTiles = get1RAtkTiles(x, y);
@@ -247,8 +255,9 @@ public class UnitMovementAndAttack {
         }
         Pair<Integer, Integer> out = new Pair<>(Ex + mx, Ey + my);
         return out;
-
     }
+
+    // @author William T Manson (2604495m@student.gla.ac.uk)
     public ArrayList<Pair<Integer, Integer>> getFlyMoveTiles() {
         int[][] maxContainer = new int[45][2];
         int count = 0 ;
@@ -270,6 +279,7 @@ public class UnitMovementAndAttack {
         return output;
     }
 
+    // @author William T Manson (2604495m@student.gla.ac.uk)
     public void highlightedMoveTileClicked(ActorRef out, int x, int y) {
         Tile activatedTile = parent.getBoard().getTile(activeUnit);
         System.out.println("move activated to: " +x + ":" + y);
@@ -335,8 +345,11 @@ public class UnitMovementAndAttack {
     
     /**
      * This method is used to write attack logic for a unit.
+     * This method is initiated by Yu-Sung Hsu,
+     * Rewritten by William T Manson (2604495m@student.gla.ac.uk),
+     * Refactored by
      * @author Anamika Maurya (2570847M@student.gla.ac.uk)
-     * 
+     * @author Yu-Sung Hsu (2540296h@student.gla.ac.uk)
      */
     public void launchAttack(ActorRef out, int x, int y) {
         try{

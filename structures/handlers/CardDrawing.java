@@ -12,6 +12,11 @@ import structures.basic.Card;
 
 import java.util.ArrayList;
 
+/**
+ * Handling card drawing and overdraw logics.
+ * @author Yu-Sung Hsu (2540296h@student.gla.ac.uk)
+ */
+
 public class CardDrawing {
     final private GameState parent;
 

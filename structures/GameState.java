@@ -18,7 +18,9 @@ import structures.memento.GameMemento;
  * @author William T Manson (2604495m@student.gla.ac.uk)
  * @author Anamika Maurya (2570847M@student.gla.ac.uk)
  * @author Yu-Sung Hsu (2540296h@student.gla.ac.uk)
+ * @author Jun Jie Low (2600104L@student.gla.ac.uk/nelsonlow_88@hotmail.com)
  */
+
 
 public class GameState {
     protected int roundNumber = 3;
@@ -49,6 +51,7 @@ public class GameState {
     // Game Initialisation
     // ===========================================================================
     //Creates the two players
+    // @author Yu-Sung Hsu (2540296h@student.gla.ac.uk)
     public void generateTwoUsers(ActorRef out) {
     	player1 = new Player(20,2); //set players health and mana to 20
         player2 = new Player(20,2); //player start with 2 mana in round 1.
@@ -66,6 +69,8 @@ public class GameState {
     }
 
     //Spawns Avatars in starting positions at init
+
+    // @author William T Manson (2604495m@student.gla.ac.uk)
     public void spawnAvatars(ActorRef out) {
         //Avatar1
         human = new UnitFactory().generateUnit(UnitType.HUMAN);
@@ -152,6 +157,7 @@ public class GameState {
     }
 
     // This method add 3 cards to both Players as part of initialisation.
+    // @author Yu-Sung Hsu (2540296h@student.gla.ac.uk)
     public void drawInitialCards(ActorRef out) {
         int INITIAL_CARD_COUNT = 3;
         for (int idx = 0; idx < INITIAL_CARD_COUNT; idx++) {
@@ -164,6 +170,7 @@ public class GameState {
     // ===========================================================================
     // Handlers
     // ===========================================================================
+    // @author Yu-Sung Hsu (2540296h@student.gla.ac.uk)
     public void endTurnClicked(ActorRef out) {
         highlighter.clearBoardHighlights(out);
         turn = (turn == Players.PLAYER1) ? Players.PLAYER2 : Players.PLAYER1;
@@ -231,6 +238,7 @@ public class GameState {
             dehighlightCard(out);
         }
     }
+
 
     public void tileClicked(ActorRef out, int x, int y) {
         Tile tile = getBoard().getTile(x, y);
@@ -314,17 +322,19 @@ public class GameState {
         }
     }
 
+    /**
+     * Methods to reset mana per turn. Also the getter.
+     * Minor contribution towards mana as Mana has been refactored by Anamika & Yu-Sung! :D
+     *
+     * @author Jun Jie Low (2600104L@student.gla.ac.uk/nelsonlow_88@hotmail.com)
+     * @author Anamika Maurya (2570847M@student.gla.ac.uk)
+     * @author Yu-Sung Hsu (2540296h@student.gla.ac.uk)
+     */
     private int getCurrentRoundMana() {
         // This is separated for the potential use in simulation.
         return Math.min(getRound() + 1, 9);
     }
-                    /*
-                    * Method to reset mana per turn.
-                    *Minor contribution towards mana as Mana has been refactored by Anamika & Yu-Sung! :D
-                    *@author Jun Jie Low (2600104L@student.gla.ac.uk/nelsonlow_88@hotmail.com)
-                    *  @author Anamika Maurya (2570847M@student.gla.ac.uk)
-                    *  @author Yu-Sung Hsu (2540296h@student.gla.ac.uk)
-                    */
+
     private void setManaByRound(ActorRef out) {
         int mana = getCurrentRoundMana();
 
@@ -373,6 +383,7 @@ public class GameState {
     // ===========================================================================
     // Shared Functions
     // ===========================================================================
+    // @author William T Manson (2604495m@student.gla.ac.uk)
     public ArrayList<Pair<Integer, Integer>> getMoveTiles(int x, int y, int depth, int diag) {
         ArrayList<Pair<Integer, Integer>> output = new ArrayList<>();
         output.add(new Pair<>(x-diag, y-depth));
@@ -382,6 +393,7 @@ public class GameState {
         return output;
     }
 
+    // @author Yu-Sung Hsu (2540296h@student.gla.ac.uk)
     public void unitDied(ActorRef out, Tile unitLocaltion, ArrayList<Pair<Integer, Integer>> pool) {
         specialAbilities.unitDidDie(out, unitLocaltion.getUnit());
 
@@ -403,6 +415,7 @@ public class GameState {
         removeFromPool(pool, item);
     }
 
+    // @author Yu-Sung Hsu (2540296h@student.gla.ac.uk)
     public void removeFromPool(ArrayList<Pair<Integer, Integer>> pool, Pair<Integer, Integer> item) {
         for (Pair<Integer, Integer> position: pool) {
             if (position.equals(item)) {
